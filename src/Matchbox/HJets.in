@@ -1,0 +1,12 @@
+# -*- ThePEG-repository -*-
+
+cd /Herwig/MatrixElements/Matchbox
+
+clear Factory:Amplitudes
+library HJets.so
+read HJetsProcesses.in
+
+cd /Herwig/Particles
+
+set b:HardProcessMass 0*GeV
+set bbar:HardProcessMass 0*GeV

@@ -1,0 +1,14 @@
+# -*- ThePEG-repository -*-
+
+# GoSam as the one and only matrix element provider
+
+cd /Herwig/MatrixElements/Matchbox/Amplitudes
+
+clear /Herwig/MatrixElements/Matchbox/Factory:Amplitudes
+insert /Herwig/MatrixElements/Matchbox/Factory:Amplitudes 0 GoSam
+
+cd /Herwig/Particles
+
+do b:UnsetHardProcessMass
+do bbar:UnsetHardProcessMass
+

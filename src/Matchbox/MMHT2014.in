@@ -1,0 +1,12 @@
+# -*- ThePEG-repository -*-
+
+cd /Herwig/Partons
+
+set HardLOPDF:PDFName MMHT2014lo68cl
+set HardNLOPDF:PDFName MMHT2014nlo68cl
+
+set ShowerLOPDF:PDFName MMHT2014lo68cl
+set ShowerNLOPDF:PDFName MMHT2014nlo68cl
+
+set MPIPDF:PDFName MMHT2014lo68cl
+set RemnantPDF:PDFName MMHT2014lo68cl

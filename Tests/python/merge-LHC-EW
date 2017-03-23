@@ -1,0 +1,152 @@
+#! /usr/bin/env python
+import logging
+import sys
+import os, yoda
+
+"""%prog
+
+Script for merging aida files
+
+"""
+
+import sys
+if sys.version_info[:3] < (2,4,0):
+    print "rivet scripts require Python version >= 2.4.0... exiting"
+    sys.exit(1)
+
+if __name__ == "__main__":
+    import logging
+    from optparse import OptionParser, OptionGroup
+    parser = OptionParser(usage="%prog aidafile aidafile2 [...]")
+    parser.add_option("-o", "--out", dest="OUTFILE", default="-")
+    verbgroup = OptionGroup(parser, "Verbosity control")
+    verbgroup.add_option("-v", "--verbose", action="store_const", const=logging.DEBUG, dest="LOGLEVEL",
+                         default=logging.INFO, help="print debug (very verbose) messages")
+    verbgroup.add_option("-q", "--quiet", action="store_const", const=logging.WARNING, dest="LOGLEVEL",
+                         default=logging.INFO, help="be very quiet")
+    parser.add_option_group(verbgroup)
+    (opts, args) = parser.parse_args()
+    logging.basicConfig(level=opts.LOGLEVEL, format="%(message)s")
+
+    ## Check args
+    if len(args) < 1:
+        logging.error("Must specify at least one AIDA histogram file")
+        sys.exit(1)
+
+    ## Get histos
+    outhistos={}
+    for file in args:
+        print file
+        if not os.access(file, os.R_OK):
+            logging.error("%s can not be read" % file)
+            break
+        try:
+            aos = yoda.read(file)
+        except:
+            logging.error("%s can not be parsed as XML" % file)
+            break
+        ## Get histos from this YODA file
+        for aopath, ao in aos.iteritems() :
+            if(aopath.find("ATLAS_2010_S8919674")>0) :
+                if((aopath.find("d01")>0 or aopath.find("d05")>0 or 
+                    aopath.find("d07")>0) and file.find("-e")>0) : 
+                    outhistos[aopath] = ao
+                elif((aopath.find("d02")>0 or aopath.find("d06")>0 or 
+                      aopath.find("d08")>0) and file.find("-mu")>0) : 
+                    outhistos[aopath] = ao
+            elif (aopath.find("ATLAS_2011_S9131140")>0) :
+                if(aopath.find("d01")>0 and file.find("-e")>0) : 
+                    outhistos[aopath] = ao
+                elif(aopath.find("d02")>0 and file.find("-mu")>0) : 
+                    outhistos[aopath] = ao
+            elif (aopath.find("ATLAS_2011_I925932")>0) :
+                if(aopath.find("d01")>0 and file.find("-e")>0) : 
+                    outhistos[aopath] = ao
+                elif(aopath.find("d02")>0 and file.find("-mu")>0) : 
+                    outhistos[aopath] = ao
+            elif (aopath.find("ATLAS_2011_I945498")>0) :
+                if(aopath.find("y01")>0 and file.find("-e")>0) : 
+                    outhistos[aopath] = ao
+                elif(aopath.find("y02")>0 and file.find("-mu")>0) : 
+                    outhistos[aopath] = ao
+                elif(aopath.find("y03")>0 and file.find("-mu")>0) : 
+                    outhistos[aopath] = ao
+            elif (aopath.find("ATLAS_2013_I1217867")>0) :
+                if(aopath.find("y01")>0 and file.find("-e")>0) : 
+                    outhistos[aopath] = ao
+                elif(aopath.find("y02")>0 and file.find("-mu")>0) : 
+                    outhistos[aopath] = ao
+            elif (aopath.find("CMS_2012_I941555")>0) :
+                if((aopath.find("y01")>0 or aopath.find("y03")>0 ) and file.find("-mu")>0) : 
+                    outhistos[aopath] = ao
+                elif(aopath.find("y02")>0 and file.find("-e")>0) : 
+                    outhistos[aopath] = ao
+            elif (aopath.find("ATLAS_2014_I1300647" )>0) :
+                if(aopath.find("y01")>0 and file.find("-e")>0) : 
+                    outhistos[aopath] = ao
+                elif((not aopath.find("y01")>0) and file.find("-mu")>0) :
+                    outhistos[aopath] = ao
+            elif (aopath.find("ATLAS_2014_I1288706" )>0) :
+                if(aopath.find("y02")>0 and file.find("-e")>0) : 
+                    outhistos[aopath] = ao
+                elif(aopath.find("y01")>0 and file.find("-mu")>0) :
+                    outhistos[aopath] = ao
+            elif (aopath.find("ATLAS_2012_I1204784" )>0) :
+                if( file.find("-e")>0 and
+                    ( aopath.find("d03")>0 or 
+                      ((aopath.find("d01")>0 or aopath.find("d02")>0) and aopath.find("y01")>0))) : 
+                    outhistos[aopath] = ao
+                elif(file.find("-mu")>0 and
+                     ( aopath.find("d04")>0 or 
+                       ((aopath.find("d01")>0 or aopath.find("d02")>0) and aopath.find("y02")>0))) : 
+                    outhistos[aopath] = ao
+            elif (aopath.find("ATLAS_2014_I1312627_EL") >0) :
+                if(file.find("-e")>0) :
+                    outhistos[aopath] = ao
+            elif (aopath.find("ATLAS_2014_I1312627_MU") >0) :
+                if(file.find("-mu")>0) :
+                    outhistos[aopath] = ao
+            elif (aopath.find("ATLAS_2014_I1312627") >0) :
+                if(file.find("-e")>0) :
+                    outhistos[aopath] = ao
+            elif (aopath.find("CMS_2013_I1224539_WJET" )>0) :
+                if(file.find("-1-e")>0 and (aopath.find("d52")>0 or aopath.find("d53")>0 or aopath.find("d56")>0 or aopath.find("d57")>0 or aopath.find("d60")>0 or aopath.find("d61")>0 or aopath.find("d64")>0 or aopath.find("d65")>0 or aopath.find("d68")>0 or aopath.find("d69")>0 or aopath.find("d72")>0)) :
+                    outhistos[aopath] = ao
+                elif(file.find("-2-e")>0 and (aopath.find("d54")>0 or aopath.find("d58")>0 or aopath.find("d62")>0 or aopath.find("d66")>0 or aopath.find("d70")>0 or aopath.find("d73")>0)) :
+                    outhistos[aopath] = ao
+                elif(file.find("-3-e")>0 and (aopath.find("d55")>0 or aopath.find("d59")>0 or aopath.find("d63")>0 or aopath.find("d67")>0 or aopath.find("d71")>0 or aopath.find("d74")>0)) :
+                    outhistos[aopath] = ao
+            elif (aopath.find("CMS_2013_I1224539_ZJET" )>0) :
+                if(file.find("-1-e")>0 and (aopath.find("d29")>0 or aopath.find("d30")>0 or aopath.find("d33")>0 or aopath.find("d34")>0 or aopath.find("d37")>0 or aopath.find("d38")>0 or aopath.find("d41")>0 or aopath.find("d42")>0 or aopath.find("d45")>0 or aopath.find("d46")>0 or aopath.find("d49")>0)) :
+                    outhistos[aopath] = ao
+                elif(file.find("-2-e")>0 and (aopath.find("d31")>0 or aopath.find("d35")>0 or aopath.find("d39")>0 or aopath.find("d43")>0 or aopath.find("d47")>0 or aopath.find("d50")>0)) :
+                    outhistos[aopath] = ao
+                elif(file.find("-3-e")>0 and (aopath.find("d32")>0 or aopath.find("d36")>0 or aopath.find("d40")>0 or aopath.find("d44")>0 or aopath.find("d48")>0 or aopath.find("d51")>0)) :
+                    outhistos[aopath] = ao
+            elif (aopath.find("CMS_2013_I1258128")>0) :
+                if(aopath.find("d01")>0 or aopath.find("d02")>0 or
+                   aopath.find("d03")>0 or aopath.find("d04")>0) :
+                    outhistos[aopath] = ao
+            elif (aopath.find("CMS_2013_I1209721" )>0 and file.find("-0")>0 ) :
+                outhistos[aopath] = ao
+            elif (aopath.find("ATLAS_2011_I928289")>0) :
+                if(file.find("-e")>=0 and (aopath.find("y01")>=0 or aopath.find("y02")>=0)) :
+                    outhistos[aopath] = ao
+                elif(file.find("-mu")>=0 and (aopath.find("y03")>=0 or aopath.find("y04")>=0)) :
+                    outhistos[aopath] = ao
+            elif (aopath.find("CMS_2013_I1122847")>0) :
+                if(file.find("-mu")>=0 and aopath.find("d01")>=0 ) :
+                    outhistos[aopath] = ao
+                elif(file.find("-e")>=0 and (aopath.find("d02")>=0 or aopath.find("d03")>=0)) :
+                    outhistos[aopath] = ao
+            elif (aopath.find("CMS_2015_I1310737")>0) :
+                if aopath in outhistos :
+                    outhistos[aopath] += ao
+                else :
+                    outhistos[aopath] = ao
+            else :
+                outhistos[aopath] = ao
+
+    # Choose output file
+    yoda.writeYODA(outhistos,opts.OUTFILE)
+    sys.exit(0)

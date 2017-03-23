@@ -1,0 +1,6 @@
+##################################################
+# select the analyses
+##################################################
+# General analysis
+insert /Herwig/Analysis/RivetAnalysis:Analyses 0 MC_HJETS
+insert /Herwig/Analysis/RivetAnalysis:Analyses 0 MC_HINC

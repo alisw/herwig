@@ -1,0 +1,36 @@
+##################################################
+# Technical parameters for this run
+##################################################
+cd /Herwig/Generators
+set LHCGenerator:NumberOfEvents 10000000
+set LHCGenerator:RandomNumberGenerator:Seed 31122001
+set LHCGenerator:PrintEvent 10
+set LHCGenerator:MaxErrors 1000000
+set LHCGenerator:EventHandler:StatLevel Full
+##################################################
+#  Create the Herwig analysis
+##################################################
+create ThePEG::RivetAnalysis /Herwig/Analysis/RivetAnalysis RivetAnalysis.so
+insert LHCGenerator:AnalysisHandlers 0 /Herwig/Analysis/RivetAnalysis
+set /Herwig/Analysis/RivetAnalysis:Debug No
+
+mv /Herwig/Generators/LHCGenerator /Herwig/Generators/EventGenerator
+cd /Herwig/MatrixElements
+set /Herwig/Generators/EventGenerator:EventHandler:LuminosityFunction:Energy 7000.0
+insert SimpleQCD:MatrixElements[0] MEPP2VV
+set MEPP2VV:Process WZ
+do /Herwig/Particles/W+:SelectDecayModes /Herwig/Particles/W+/W+->nu_e,e+; /Herwig/Particles/W+/W+->nu_mu,mu+;
+do /Herwig/Particles/W-:SelectDecayModes /Herwig/Particles/W-/W-->nu_ebar,e-; /Herwig/Particles/W-/W-->nu_mubar,mu-;
+do /Herwig/Particles/Z0:SelectDecayModes /Herwig/Particles/Z0/Z0->e-,e+; /Herwig/Particles/Z0/Z0->mu-,mu+;
+create Herwig::BranchingRatioReweighter /Herwig/Generators/BRReweighter
+insert /Herwig/Generators/EventGenerator:EventHandler:PostHadronizationHandlers 0 /Herwig/Generators/BRReweighter
+
+
+cd /Herwig/Generators
+read LHC/LHC-WZ.in
+
+##################################################
+# Save run for later usage with 'Herwig run'
+##################################################
+cd /Herwig/Generators
+saverun LHC-WZ EventGenerator

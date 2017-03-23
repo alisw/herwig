@@ -1,0 +1,30 @@
+# -*- ThePEG-repository -*-
+
+read Matchbox/LO.in
+
+cd /Herwig/EventHandlers
+
+insert EventHandler:PreCascadeHandlers[0] /Herwig/Decays/DecayHandler
+
+set EventHandler:CascadeHandler /Herwig/DipoleShower/DipoleShowerHandler
+read Matchbox/MCatNLO-Dipole-HardAlphaSTune.in
+
+set /Herwig/DipoleShower/DipoleShowerHandler:RestrictPhasespace On
+set /Herwig/DipoleShower/DipoleShowerHandler:MaxPtIsMuF Yes
+set /Herwig/DipoleShower/DipoleShowerHandler:HardScaleProfile /Herwig/MatrixElements/Matchbox/HardScaleProfile
+
+cd /Herwig/Analysis
+
+create ThePEG::RivetAnalysis Rivet RivetAnalysis.so
+create ThePEG::HepMCFile HepMC HepMCAnalysis.so
+
+cd /Herwig/Particles
+
+do c:UnsetHardProcessMass
+do cbar:UnsetHardProcessMass
+set c:NominalMass 0*GeV
+set cbar:NominalMass 0*GeV
+
+cd /Herwig/UnderlyingEvent
+set MEQCD2to2Fast:StrictFlavourScheme On
+

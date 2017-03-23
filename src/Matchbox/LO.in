@@ -1,0 +1,22 @@
+# -*- ThePEG-repository -*-
+
+cd /Herwig/MatrixElements/Matchbox
+
+set Factory:VirtualContributions Off
+set Factory:RealContributions Off
+set Factory:ShowerApproximation NULL
+
+cd /Herwig/Partons
+
+set /Herwig/Particles/p+:PDF HardLOPDF
+set /Herwig/Particles/pbar-:PDF HardLOPDF
+set /Herwig/Partons/QCDExtractor:FirstPDF HardLOPDF
+set /Herwig/Partons/QCDExtractor:SecondPDF HardLOPDF
+
+set /Herwig/Shower/ShowerHandler:PDFA ShowerLOPDF
+set /Herwig/Shower/ShowerHandler:PDFB ShowerLOPDF
+set /Herwig/DipoleShower/DipoleShowerHandler:PDFA ShowerLOPDF
+set /Herwig/DipoleShower/DipoleShowerHandler:PDFB ShowerLOPDF
+
+set /Herwig/Generators/EventGenerator:StandardModelParameters:QCD/RunningAlphaS /Herwig/Couplings/LOAlphaS
+

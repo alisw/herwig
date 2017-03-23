@@ -1,0 +1,12 @@
+# -*- ThePEG-repository -*-
+
+read Matchbox/LO.in
+
+cd /Herwig/EventHandlers
+
+set EventHandler:CascadeHandler /Herwig/Shower/ShowerHandler
+
+cd /Herwig/Analysis
+
+create ThePEG::RivetAnalysis Rivet RivetAnalysis.so
+create ThePEG::HepMCFile HepMC HepMCAnalysis.so

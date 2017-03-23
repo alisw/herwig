@@ -1,0 +1,8 @@
+# -*- ThePEG-repository -*-
+
+cd /Herwig/MatrixElements/Matchbox/Amplitudes
+
+set GoSam:HiggsEff On
+set OpenLoops:HiggsEff On
+set MadGraph:Model heft
+

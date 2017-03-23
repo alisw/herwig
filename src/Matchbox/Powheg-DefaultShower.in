@@ -1,0 +1,32 @@
+# -*- ThePEG-repository -*-
+
+read Matchbox/Powheg.in
+
+set /Herwig/Shower/Evolver:HardVetoReadOption PrimaryCollision
+set /Herwig/Shower/Evolver:MECorrMode No
+set /Herwig/Shower/Evolver:SpinCorrelations No
+set /Herwig/Shower/KinematicsReconstructor:InitialStateReconOption SofterFraction
+set /Herwig/Shower/PartnerFinder:PartnerMethod 0
+set /Herwig/Shower/PartnerFinder:ScaleChoice 0
+
+set /Herwig/Shower/PowhegShowerHandler:RestrictPhasespace On
+set /Herwig/Shower/PowhegShowerHandler:MaxPtIsMuF Yes
+set /Herwig/Shower/PowhegShowerHandler:HardScaleProfile NULL
+
+cd /Herwig/EventHandlers
+
+set EventHandler:CascadeHandler /Herwig/Shower/PowhegShowerHandler
+
+cd /Herwig/Shower
+
+set PowhegShowerHandler:Factory /Herwig/MatrixElements/Matchbox/Factory
+
+set Evolver:HardEmissionMode FullPOWHEG
+
+# tunes
+read Matchbox/Powheg-Default-HardAlphaSTune.in
+
+cd /Herwig/Analysis
+
+create ThePEG::RivetAnalysis Rivet RivetAnalysis.so
+create ThePEG::HepMCFile HepMC HepMCAnalysis.so

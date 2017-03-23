@@ -1,0 +1,13 @@
+# -*- ThePEG-repository -*-
+
+#=============================================================================
+#                ::::: Verbosity options for Matchbox:::::
+#
+# Settings increase the verbosity of the Matchbox interface
+#=============================================================================
+
+set /Herwig/Samplers/Sampler:Verbose On
+set /Herwig/MatrixElements/Matchbox/Factory:InitVerbose On
+
+cd /
+
