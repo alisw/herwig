@@ -2,10 +2,10 @@
 
 // (C) 2007-2009 Simon Plaetzer -- sp@particle.uni-karlsruhe.de
 
-// workaround for OS X bug where isnan() and isinf() are hidden
+// workaround for OS X bug where std::isnan() and std::isinf() are hidden
 // when <iostream> is included
-extern "C" int isnan(double) throw();
-extern "C" int isinf(double) throw();
+extern "C" int std::isnan(double) throw();
+extern "C" int std::isinf(double) throw();
 
 namespace Analysis2 {
 
@@ -72,7 +72,7 @@ inline HistogramChannel::HistogramChannel (const vector<pair<double,double> >& b
 {}
 
 inline void HistogramChannel::book (unsigned int bin, double weight) {
-  if (isnan(weight) || isinf(weight)) {
+  if (std::isnan(weight) || std::isinf(weight)) {
     ++_nanWeights[bin];
     return;
   }

@@ -204,7 +204,7 @@ void BinSampler::fillRemappers(bool progress) {
       throw;
     }
 
-    if ( isnan(w) || isinf(w) )
+    if ( std::isnan(w) || std::isinf(w) )
       ++nanPoints;
     
     if ( theNonZeroInPresampling &&  w==0. ){

@@ -779,8 +779,8 @@ MatchboxMEBase::AccuracyHistogram::AccuracyHistogram(double low,
 }
 
 void MatchboxMEBase::AccuracyHistogram::book(double a, double b) {
-  if ( isnan(a) || isnan(b) ||
-       isinf(a) || isinf(b) ) {
+  if ( std::isnan(a) || std::isnan(b) ||
+       std::isinf(a) || std::isinf(b) ) {
     ++nans;
     return;
   }

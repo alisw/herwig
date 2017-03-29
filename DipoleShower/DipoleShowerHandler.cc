@@ -460,7 +460,7 @@ Energy DipoleShowerHandler::getWinner(DipoleSplittingInfo& winner,
 						      spectator->momentum());
 
     // in very exceptional cases happening in DIS
-    if ( isnan(dScale/GeV ) )
+    if ( std::isnan(dScale/GeV ) )
       throw RedoShower();
 
     candidate.scale(dScale);

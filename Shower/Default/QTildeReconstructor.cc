@@ -1039,7 +1039,7 @@ inverseRescalingFactor(vector<Lorentz5Momentum> pout,
     }
     while(ntry<100);
   }
-  if(isnan(lambda))
+  if(std::isnan(lambda))
     throw Exception() << "Rescaling factor is nan in  QTildeReconstructor::"
 		      << "inverseRescalingFactor " 
 		      << Exception::eventerror;

@@ -367,7 +367,7 @@ double GeneralSampler::generate() {
       throw;
     }
 
-    if ( isnan(lastSampler()->lastWeight()) || isinf(lastSampler()->lastWeight()) ) {
+    if ( std::isnan(lastSampler()->lastWeight()) || std::isinf(lastSampler()->lastWeight()) ) {
       lastSampler() = samplers().upper_bound(UseRandom::rnd())->second;
       if ( ++excptTries == eventHandler()->maxLoop() )
 	break;
