@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // GeneralSampler.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef Herwig_GeneralSampler_H
@@ -148,12 +148,10 @@ public:
    */
   bool weighted() const { return eventHandler()->weighted(); }
 
-
   /** 
-   * True if the sampler runs in Allmostunweighted mode.
+   * Return true if this sampler is generating almost unweighted events.
    */ 
-
-  bool almostUnweighted() const { return theAlmostUnweighted; }
+  virtual bool almostUnweighted() const { return theAlmostUnweighted; }
 
 public:
 

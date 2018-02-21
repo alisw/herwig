@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // FFMassiveInvertedTildeKinematics.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_FFMassiveInvertedTildeKinematics_H
@@ -20,7 +20,7 @@ using namespace ThePEG;
 
 /**
  * \ingroup Matchbox
- * \author Simon Platzer
+ * \author Simon Platzer, Stephen Webster
  *
  * \brief FFMassiveInvertedTildeKinematics inverts the final-final tilde
  * kinematics.
@@ -80,12 +80,12 @@ public:
    * For generated pt and z, check if this point is
    * kinematically allowed
    */
-  /*virtual*/ bool ptzAllowed(pair<Energy,double>) const;
+  /*virtual*/ bool ptzAllowed(pair<Energy,double> ptz, vector<double>* values ) const;
 
   /**
    * Generate pt and z
    */
-  virtual pair<Energy,double> generatePtZ(double& jac, const double * r) const;
+  virtual pair<Energy,double> generatePtZ(double& jac, const double * r, vector<double>* values) const;
 
 public:
   
@@ -170,6 +170,11 @@ private:
    * In fact, it should not even be implemented.
    */
   FFMassiveInvertedTildeKinematics & operator=(const FFMassiveInvertedTildeKinematics &);
+
+  /**
+   * Option to use the full jacobian, including the z->zprime jacobian.
+   **/
+  bool  theFullJacobian;
 
 };
 

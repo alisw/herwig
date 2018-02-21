@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // TildeKinematics.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_TildeKinematics_H
@@ -166,7 +166,20 @@ public:
    * Return the pt associated to the last merged splitting.
    */
   virtual Energy lastPt() const = 0;
+  
+  
+  /**
+   * Return the pt associated to emitter emission and sppectator momentum.
+   */
+  virtual Energy lastPt(Lorentz5Momentum,Lorentz5Momentum,Lorentz5Momentum) const =0 ;
 
+
+  /**
+   * Given a pt and a hard pt, return the boundaries on z; 
+   */
+  virtual pair<double,double> zBounds(Energy pt, Energy hardPt ) const = 0;
+  
+  
   /**
    * Return the momentum fraction associated to the last splitting.
    */
@@ -176,6 +189,12 @@ public:
    * Return the relevant dipole scale
    */
   virtual Energy lastScale() const;
+  
+  virtual bool aboveAlpha() const {
+	cerr<<"only implemented for light kinematics";
+        assert(false);
+	return false;
+  }
 
   /**
    * Return the particle type of the emitter in the real emission process
@@ -245,6 +264,29 @@ protected:
    */
   vector<double>& subtractionParameters() { return theDipole->subtractionParameters(); }
 
+public: 
+  /**
+   * Return the momentum fraction of the emitter
+   */
+  double emitterX() const {
+    return
+    theDipole->bornEmitter() == 0 ?
+    theBornXComb->lastX1() :
+    theBornXComb->lastX2();
+  }
+  
+  
+  /**
+   * Return the momentum fraction of the spectator
+   */
+  double spectatorX() const {
+    return
+    theDipole->bornSpectator() == 0 ?
+    theBornXComb->lastX1() :
+    theBornXComb->lastX2();
+  }
+
+  
 public:
 
   /** @name Functions used by the persistent I/O system. */

@@ -1,0 +1,37 @@
+##################################################
+# Technical parameters for this run
+##################################################
+cd /Herwig/Generators
+set LHCGenerator:NumberOfEvents 10000000
+set LHCGenerator:RandomNumberGenerator:Seed 31122001
+set LHCGenerator:PrintEvent 10
+set LHCGenerator:MaxErrors 1000000
+set LHCGenerator:EventHandler:StatLevel Full
+##################################################
+#  Create the Herwig analysis
+##################################################
+create ThePEG::RivetAnalysis /Herwig/Analysis/RivetAnalysis RivetAnalysis.so
+insert LHCGenerator:AnalysisHandlers 0 /Herwig/Analysis/RivetAnalysis
+set /Herwig/Analysis/RivetAnalysis:Debug No
+
+mv /Herwig/Generators/LHCGenerator /Herwig/Generators/EventGenerator
+cd /Herwig/MatrixElements
+set /Herwig/Generators/EventGenerator:EventHandler:LuminosityFunction:Energy 7000.0
+set MEHeavyQuark:QuarkType Top
+insert SimpleQCD:MatrixElements[0] MEHeavyQuark
+set /Herwig/Particles/t:Synchronized Not_synchronized
+set /Herwig/Particles/tbar:Synchronized Not_synchronized
+do /Herwig/Particles/t:SelectDecayModes t->nu_e,e+,b; t->nu_mu,mu+,b;
+do /Herwig/Particles/tbar:SelectDecayModes tbar->b,bbar,cbar; tbar->bbar,cbar,d; tbar->bbar,cbar,s; tbar->bbar,s,ubar; tbar->bbar,ubar,d;
+create Herwig::BranchingRatioReweighter /Herwig/Generators/BRReweighter
+insert /Herwig/Generators/EventGenerator:EventHandler:PostHadronizationHandlers 0 /Herwig/Generators/BRReweighter
+
+
+cd /Herwig/Generators
+read LHC/LHC-7-Top-SL.in
+
+##################################################
+# Save run for later usage with 'Herwig run'
+##################################################
+cd /Herwig/Generators
+saverun LHC-7-Top-SL EventGenerator

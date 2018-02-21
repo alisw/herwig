@@ -12,6 +12,8 @@ create ThePEG::UnResolvedRemnant LeptonRemnants UnResolvedRemnant.so
 create Herwig::HwRemDecayer RemnantDecayer HwShower.so
 newdef RemnantDecayer:PomeronStructure Gluon
 newdef RemnantDecayer:colourDisrupt 0.7983
+newdef RemnantDecayer:ladderPower -0.088983
+newdef RemnantDecayer:ladderNorm 1.086029
 
 create ThePEG::SoftRemnantHandler HadronRemnants
 newdef HadronRemnants:RemnantDecayer RemnantDecayer
@@ -19,14 +21,16 @@ newdef HadronRemnants:RemnantDecayer RemnantDecayer
 
 read PDF.in
 
-
 # Make particle extractors
 create ThePEG::PartonExtractor EEExtractor
 newdef EEExtractor:NoPDF NoPDF
-cp EEExtractor QCDExtractor
-newdef QCDExtractor:FlatSHatY 1
-newdef QCDExtractor:FirstPDF HardLOPDF
-newdef QCDExtractor:SecondPDF HardLOPDF
-cp EEExtractor DISExtractor
-newdef DISExtractor:FlatSHatY 1
+cp EEExtractor PPExtractor
+newdef PPExtractor:FlatSHatY 1
+newdef PPExtractor:FirstPDF HardLOPDF
+newdef PPExtractor:SecondPDF HardLOPDF
+cp EEExtractor EPExtractor
+newdef EPExtractor:FlatSHatY 1
 
+newdef PPExtractor:FirstPDF HardLOPDF
+newdef PPExtractor:SecondPDF HardLOPDF
+newdef EPExtractor:SecondPDF HardLOPDF

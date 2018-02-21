@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // ShowerApproximation.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -392,6 +392,19 @@ double ShowerApproximation::channelWeight() const {
 // If needed, insert default implementations of virtual function defined
 // in the InterfacedBase class here (using ThePEG-interfaced-impl in Emacs).
 
+void ShowerApproximation::doinit() {
+  if ( profileScales() ) {
+    if ( profileScales()->unrestrictedPhasespace() &&
+	 restrictPhasespace() ) {
+      generator()->log()
+	<< "ShowerApproximation warning: The scale profile chosen requires an unrestricted phase space,\n"
+	<< "however, the phase space was set to be restricted. Will switch to unrestricted phase space.\n"
+	<< flush;
+      restrictPhasespace(false);
+    }
+  }
+  HandlerBase::doinit();
+}
 
 void ShowerApproximation::persistentOutput(PersistentOStream & os) const {
   os << theLargeNBasis
@@ -489,14 +502,14 @@ void ShowerApproximation::Init() {
     ("RestrictPhasespace",
      "Switch on or off phasespace restrictions",
      &ShowerApproximation::theRestrictPhasespace, true, false, false);
-  static SwitchOption interfaceRestrictPhasespaceOn
+  static SwitchOption interfaceRestrictPhasespaceYes
     (interfaceRestrictPhasespace,
-     "On",
+     "Yes",
      "Perform phasespace restrictions",
      true);
-  static SwitchOption interfaceRestrictPhasespaceOff
+  static SwitchOption interfaceRestrictPhasespaceNo
     (interfaceRestrictPhasespace,
-     "Off",
+     "No",
      "Do not perform phasespace restrictions",
      false);
 
@@ -544,6 +557,8 @@ void ShowerApproximation::Init() {
      "Use the shower scale",
      showerScale);
 
+  interfaceRealEmissionScaleInSubtraction.rank(-1);
+
   static Switch<ShowerApproximation,int> interfaceBornScaleInSubtraction
     ("BornScaleInSubtraction",
      "Set the scale choice for the Born cross section in the matching subtraction.",
@@ -563,6 +578,8 @@ void ShowerApproximation::Init() {
      "ShowerScale",
      "Use the shower scale",
      showerScale);
+
+  interfaceBornScaleInSubtraction.rank(-1);
 
   static Switch<ShowerApproximation,int> interfaceEmissionScaleInSubtraction
     ("EmissionScaleInSubtraction",
@@ -584,6 +601,8 @@ void ShowerApproximation::Init() {
      "Use the shower scale",
      showerScale);
 
+  interfaceEmissionScaleInSubtraction.rank(-1);
+
   static Switch<ShowerApproximation,int> interfaceRealEmissionScaleInSplitting
     ("RealEmissionScaleInSplitting",
      "Set the scale choice for the real emission cross section in the splitting.",
@@ -603,6 +622,8 @@ void ShowerApproximation::Init() {
      "ShowerScale",
      "Use the shower scale",
      showerScale);
+
+  interfaceRealEmissionScaleInSplitting.rank(-1);
 
   static Switch<ShowerApproximation,int> interfaceBornScaleInSplitting
     ("BornScaleInSplitting",
@@ -624,6 +645,8 @@ void ShowerApproximation::Init() {
      "Use the shower scale",
      showerScale);
 
+  interfaceBornScaleInSplitting.rank(-1);
+
   static Switch<ShowerApproximation,int> interfaceEmissionScaleInSplitting
     ("EmissionScaleInSplitting",
      "Set the scale choice for the emission in the splitting.",
@@ -644,17 +667,23 @@ void ShowerApproximation::Init() {
      "Use the shower scale",
      showerScale);
 
+  interfaceEmissionScaleInSplitting.rank(-1);
+
   static Parameter<ShowerApproximation,Energy> interfaceRenormalizationScaleFreeze
     ("RenormalizationScaleFreeze",
      "The freezing scale for the renormalization scale.",
      &ShowerApproximation::theRenormalizationScaleFreeze, GeV, 1.0*GeV, 0.0*GeV, 0*GeV,
      false, false, Interface::lowerlim);
 
+  interfaceRenormalizationScaleFreeze.rank(-1);
+
   static Parameter<ShowerApproximation,Energy> interfaceFactorizationScaleFreeze
     ("FactorizationScaleFreeze",
      "The freezing scale for the factorization scale.",
      &ShowerApproximation::theFactorizationScaleFreeze, GeV, 1.0*GeV, 0.0*GeV, 0*GeV,
      false, false, Interface::lowerlim);
+
+  interfaceFactorizationScaleFreeze.rank(-1);
 
   static Reference<ShowerApproximation,HardScaleProfile> interfaceHardScaleProfile
     ("HardScaleProfile",
@@ -665,6 +694,8 @@ void ShowerApproximation::Init() {
     ("LargeNBasis",
      "Set the large-N colour basis implementation.",
      &ShowerApproximation::theLargeNBasis, false, false, true, true, false);
+
+  interfaceLargeNBasis.rank(-1);
 
   static Switch<ShowerApproximation,bool> interfaceMaxPtIsMuF
     ("MaxPtIsMuF",

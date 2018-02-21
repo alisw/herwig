@@ -1,0 +1,37 @@
+
+##########################
+##  Setup the MonacoSampler.
+##########################
+
+cd /Herwig/Samplers
+
+# set the Sampler to use the MonacoSampler.
+set /Herwig/Samplers/Sampler:BinSampler MonacoSampler
+
+# Perform the addaption in the read/integrate step with:
+set MonacoSampler:NIterations 4
+set MonacoSampler:InitialPoints 20000
+set MonacoSampler:EnhancementFactor 1.2
+
+# Only count non vanishing points for InitialPoints
+set MonacoSampler:NonZeroInPresampling Yes
+
+# Additional remappings
+set MonacoSampler:RemapChannelDimension No
+set MonacoSampler:LuminosityMapperBins 0
+set MonacoSampler:RemapperMinSelection 0.00001
+set MonacoSampler:RemapperPoints 50000
+
+# If in the run step a weight larger than the
+# assumed maximum weight is found, the event
+# produced with the higher weight.
+set Sampler:AlmostUnweighted Yes
+
+# Unweight the events to kappa*MaxWeight.
+# Events with weight larger that kappa*MaxWeight are possible/likely.
+set Sampler:BinSampler:Kappa 1.
+
+# write out additional information of the sampler to
+# combine runs.
+set Sampler:RunCombinationData No
+set Sampler:Verbose Yes

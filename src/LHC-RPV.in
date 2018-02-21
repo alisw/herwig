@@ -11,8 +11,10 @@
 # The second section contains the user settings.
 ###################################################
 
+read snippets/PPCollider.in
+
 # Set emission to POWHEG for radiation in decays
-set /Herwig/Shower/Evolver:HardEmissionMode POWHEG
+set /Herwig/Shower/ShowerHandler:HardEmission POWHEG
 
 # read model
 # trilinear RPV
@@ -30,8 +32,8 @@ setup RPV/Model RPV-UDD.slha
 # Bilinear RPV
 #read RPV-Bi.model
 #cd /Herwig/NewPhysics
+#set RPV/Model:AllowedToResetSMMasses Yes
 #setup RPV/Model RPV-BI.slha
-
 
 ##################################################
 #
@@ -72,14 +74,16 @@ erase DecayConstructor:NBodyDecayConstructors 1
 #set NewModel:MinimumBR 1e-6
 
 
-# Intrinsic pT tune extrapolated to LHC energy
-set /Herwig/Shower/Evolver:IntrinsicPtGaussian 2.2*GeV
+
+##################################################
+## prepare for Rivet analysis or HepMC output
+## when running with parton shower
+##################################################
+#read snippets/Rivet.in
+#insert /Herwig/Analysis/Rivet:Analyses 0 XXX_2015_ABC123
+#read snippets/HepMC.in
+#set /Herwig/Analysis/HepMC:PrintEvent NNN
 
 # Other parameters for run
 cd /Herwig/Generators
-set LHCGenerator:NumberOfEvents 10000000
-set LHCGenerator:RandomNumberGenerator:Seed 31122001
-set LHCGenerator:PrintEvent 10
-set LHCGenerator:MaxErrors 10000
-
-saverun LHC-RPV LHCGenerator
+saverun LHC-RPV EventGenerator

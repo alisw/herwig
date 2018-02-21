@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MEee2gZ2ll.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_MEee2gZ2ll_H
@@ -18,7 +18,7 @@
 #include "Herwig/MatrixElement/ProductionMatrixElement.h"
 #include "ThePEG/Helicity/WaveFunction/SpinorWaveFunction.h"
 #include "ThePEG/Helicity/WaveFunction/SpinorBarWaveFunction.h"
-#include "Herwig/Shower/Couplings/ShowerAlpha.h"
+#include "Herwig/Shower/Core/Couplings/ShowerAlpha.h"
 
 namespace Herwig {
 
@@ -61,8 +61,8 @@ public:
   /**
    *  Apply the POWHEG style correction
    */
-  virtual HardTreePtr generateHardest(ShowerTreePtr,
-				      vector<ShowerInteraction::Type>);
+  virtual RealEmissionProcessPtr generateHardest(RealEmissionProcessPtr,
+						 ShowerInteraction);
   //@}
 
 public:
@@ -258,7 +258,7 @@ protected:
   /**
    *  Generate the momenta for a hard configuration
    */
-  Energy generateHard(ShowerTreePtr tree, 
+  Energy generateHard(RealEmissionProcessPtr tree, 
 		      vector<Lorentz5Momentum> & emission,
 		      unsigned int & iemit, unsigned int & ispect,
 		      bool applyVeto);

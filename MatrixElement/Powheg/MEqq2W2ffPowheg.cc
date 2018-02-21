@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MEqq2W2ffPowheg.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -218,7 +218,7 @@ double MEqq2W2ffPowheg::NLOweight() const {
   if(_xt<1.-_eps)
     wgt += _a*(1./pow(1.-_xt,_p)-(1.-pow(_eps,1.-_p))/(1.-_p)/(1.-_eps));
   // return the answer
-  assert(!isinf(wgt)&&!isnan(wgt));
+  assert(isfinite(wgt));
   return _contrib==1 ? max(0.,wgt) : max(0.,-wgt);
 }
 

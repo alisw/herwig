@@ -1,8 +1,8 @@
 // -*- C++ -*-
 
 //
-// ColourFlowBasis.hpp is part of CVolver, (C) 2013 Simon Plätzer -- simon.plaetzer@desy.de
-// CVolver is licenced under version 2 of the GPL, see COPYING for details.
+// ColourFlowBasis.hpp is part of CVolver, (C) 2013 Simon Plätzer -- simon.plaetzer@desy.de, The Herwig Collaboration
+// CVolver is licenced under version 3 of the GPL, see COPYING for details.
 //
 
 #ifndef CVOLVER_ColourFlowBasis_hpp_included
@@ -251,7 +251,7 @@ namespace CVolver {
      */
     void addColourCrossing(const std::size_t& leg,
 			   std::size_t& count,
-			   const double& sign) {
+			   double sign) {
       theColourMap[count] = leg;
       theColourCrossingSigns[count] = sign;
       theReverseColourMap[leg] = count;
@@ -263,7 +263,7 @@ namespace CVolver {
      */
     void addAntiColourCrossing(const std::size_t& leg,
 			       std::size_t& count,
-			       const double& sign) {
+			       double sign) {
       theAntiColourMap[count] = leg;
       theAntiColourCrossingSigns[count] = sign;
       theReverseAntiColourMap[leg] = count;

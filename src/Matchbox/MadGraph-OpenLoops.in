@@ -8,6 +8,9 @@ insert /Herwig/MatrixElements/Matchbox/Factory:Amplitudes 0 GenericProcesses
 set GenericProcesses:TreeLevelAmplitude MadGraph
 set GenericProcesses:OneLoopAmplitude OpenLoops
 
+clear /Herwig/Merging/MergingFactory:Amplitudes
+insert /Herwig/Merging/MergingFactory:Amplitudes 0 GenericProcesses
+
 cd /Herwig/Particles
 
 do b:UnsetHardProcessMass

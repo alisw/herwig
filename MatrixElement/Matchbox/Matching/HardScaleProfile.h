@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // HardScaleProfile.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef Herwig_HardScaleProfile_H
@@ -49,6 +49,12 @@ public:
    * Return a scale profile towards the hard scale
    */
   virtual double hardScaleProfile(Energy hard, Energy soft) const;
+
+  /**
+   * Return true, if this hard scale profile requires an unrestricted
+   * radiation phase space.
+   */
+  virtual bool unrestrictedPhasespace() const;
 
 public:
 

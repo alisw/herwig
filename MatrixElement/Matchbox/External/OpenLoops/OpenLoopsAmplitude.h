@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // OpenLoopsAmplitude.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef Herwig_OpenLoopsAmplitude_H
@@ -162,7 +162,6 @@ public:
    * Start the one loop provider, if appropriate
    */
   virtual void startOLP(const string&, int& status);
-  virtual void getids() const ;
 
   /**
    * Return the value of the dimensional regularization
@@ -286,7 +285,7 @@ private:
   /**
    * first is the olp id from herwig, second the answer from openloops
    */
-  mutable map< int , int > idpair;
+  static vector< int > idpair;
 
   
   /**
@@ -295,12 +294,6 @@ private:
   
   map<int , OpenLoopsProcInfo > processmap;
   
-  
-  /**
-   * Extra argument of BLHA2 to tell the Amplitude which OpenLoops installation to use.
-   */
-
-  mutable string extraOpenLoopsPath;
   
   /**
    * Interface for Higgs Effective
@@ -313,7 +306,12 @@ private:
   
   bool use_cms;
   
-  
+ 
+  /**
+   * Use of Collier Lib (arXiv:1604.06792), available since OpenLoops 1.3.0.
+   */
+  bool theCollierLib=true; 
+ 
   /**
    * parameter to set Phase space tolerance for massiv particles.
    * Should not be used. Better: set Openloops:Massless 11
@@ -324,12 +322,27 @@ private:
   /**
    *   Location of the OpenLoops libraries
    */
-  string OpenLoopsLibs_;
+  static string OpenLoopsLibs_;
 
   /**
    *   Location of the OpenLoops
    */
-  string OpenLoopsPrefix_;
+  static string OpenLoopsPrefix_;
+  
+  
+  /**
+   *  Helper functions to make long strings static
+   */
+  
+  void setOpenLoopsLibs(string p);
+  string getOpenLoopsLibs() const;
+  
+  void setOpenLoopsPrefix(string p);
+  string getOpenLoopsPrefix() const;
+
+  
+  
+  
 };
 
 }

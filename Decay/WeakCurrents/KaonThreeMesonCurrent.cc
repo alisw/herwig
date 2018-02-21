@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // KaonThreeMesonCurrent.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -28,11 +28,6 @@ describeHerwigKaonThreeMesonCurrent("Herwig::KaonThreeMesonCurrent",
 				    "HwWeakCurrents.so");
 HERWIG_INTERPOLATOR_CLASSDESC(KaonThreeMesonCurrent,Energy,Energy2)
 
-namespace {
-  inline Energy  timesGeV (double x) { return x * GeV; }
-  inline Energy2 timesGeV2(double x) { return x * GeV2; }
-}
- 
 IBPtr KaonThreeMesonCurrent::clone() const {
   return new_ptr(*this);
 }
@@ -150,13 +145,13 @@ KaonThreeMesonCurrent::KaonThreeMesonCurrent() {
   _a1runwidth.clear();
   std::transform(tmp1.begin(), tmp1.end(),
 		 back_inserter(_a1runwidth),
-		 timesGeV);
+		 [](double x){return x*GeV;});
   
   vector<double> tmp2(a1q2in,a1q2in+200);
   _a1runq2.clear();
   std::transform(tmp2.begin(), tmp2.end(),
 		 back_inserter(_a1runq2),
-		 timesGeV2);
+		 [](double x){return x*GeV2;});
 
 
   // K_1 parameters

@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // GeneralTwoBodyDecayer.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_GeneralTwoBodyDecayer_H
@@ -16,7 +16,7 @@
 #include "Herwig/Decay/DecayPhaseSpaceMode.h"
 #include "ThePEG/Helicity/Vertex/VertexBase.h"
 #include "GeneralTwoBodyDecayer.fh"
-#include "Herwig/Shower/Couplings/ShowerAlpha.h"
+#include "Herwig/Shower/Core/Couplings/ShowerAlpha.h"
 
 namespace Herwig {
 using namespace ThePEG;
@@ -123,7 +123,8 @@ public:
   /**
    *  Member to generate the hardest emission in the POWHEG scheme
    */
-  virtual HardTreePtr generateHardest(ShowerTreePtr);
+  virtual RealEmissionProcessPtr generateHardest(RealEmissionProcessPtr);
+
 
   /**
    *  Three-body matrix element including additional QCD radiation
@@ -174,7 +175,7 @@ protected:
    * Set integration weight
    * @param wgt Maximum integration weight 
    */
-  void setWeight(const double & wgt) { _maxweight = wgt; }
+  void setWeight(double wgt) { _maxweight = wgt; }
 
   /**
    * Set colour connections
@@ -216,9 +217,9 @@ protected:
   /**
    *  Return the momenta including the hard emission
    */
-  vector<Lorentz5Momentum> hardMomenta(const ShowerProgenitorPtr &in, 
-				       const ShowerProgenitorPtr &emitter, 
-				       const ShowerProgenitorPtr &spectator, 
+  vector<Lorentz5Momentum> hardMomenta(const PPtr &in, 
+				       const PPtr &emitter, 
+				       const PPtr &spectator, 
 				       const vector<dipoleType>  &dipoles, int i);
 
   /**
@@ -236,15 +237,14 @@ protected:
    *  Work out the type of process
    */
   bool identifyDipoles(vector<dipoleType> & dipoles,
-		       ShowerProgenitorPtr & aProgenitor,
-		       ShowerProgenitorPtr & bProgenitor,
-		       ShowerProgenitorPtr & cProgenitor) const;
-
+		       PPtr & aProgenitor,
+		       PPtr & bProgenitor,
+		       PPtr & cProgenitor) const;
+  
   /**
    * Set up the colour lines
    */
-  void getColourLines(vector<ColinePtr> & newline, const HardTreePtr & hardtree, 
-		      const ShowerProgenitorPtr & bProgenitor);
+  void getColourLines(RealEmissionProcessPtr real);
 
 
   /**

@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // EventContribution.hpp is a part of myStatistics
-// Copyright (C) 2012-2013 Simon Platzer
+// Copyright (C) 2012-2017 Simon Platzer, The Herwig Collaboration
 //
-// myStatistics is licenced under version 2 of the GPL, see COPYING for details.
+// myStatistics is licenced under version 3 of the GPL, see COPYING for details.
 //
 #ifndef MYSTATISTICS_EventContribution_hpp_included
 #define MYSTATISTICS_EventContribution_hpp_included
@@ -23,9 +23,9 @@ namespace Statistics {
     /**
      * Construct an eventContribution with given width
      */
-    EventContribution(const double& newCentralValue,
-		      const double& newWeight,
-		      const double& newWidth = 0.0)
+    EventContribution(double newCentralValue,
+		      double newWeight,
+		      double newWidth = 0.0)
       : theCentralValue(newCentralValue),
 	theSupport(newCentralValue - newWidth/2.,
 		   newCentralValue + newWidth/2.),
@@ -36,7 +36,7 @@ namespace Statistics {
     /**
      * Return the central value
      */
-    const double& centralValue() const { return theCentralValue; }
+    double centralValue() const { return theCentralValue; }
 
     /**
      * Return the support

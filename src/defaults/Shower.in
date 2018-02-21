@@ -16,7 +16,7 @@ library HwMatching.so
 mkdir /Herwig/Shower
 cd /Herwig/Shower
 
-create Herwig::ShowerHandler ShowerHandler
+create Herwig::QTildeShowerHandler ShowerHandler
 newdef ShowerHandler:MPIHandler /Herwig/UnderlyingEvent/MPIHandler
 newdef ShowerHandler:RemDecayer /Herwig/Partons/RemnantDecayer
 # use LO PDFs for Shower, can be changed later
@@ -31,7 +31,6 @@ newdef ShowerHandler:PDFBRemnant /Herwig/Partons/RemnantPDF
 create Herwig::SplittingGenerator SplittingGenerator
 create Herwig::ShowerAlphaQCD AlphaQCD
 create Herwig::ShowerAlphaQED AlphaQED
-create Herwig::Evolver Evolver
 create Herwig::QTildeModel ShowerModel
 create Herwig::QTildeFinder PartnerFinder
 newdef PartnerFinder:PartnerMethod 1
@@ -44,14 +43,12 @@ newdef KinematicsReconstructor:InitialInitialBoostOption LongTransBoost
 newdef /Herwig/Partons/RemnantDecayer:AlphaS  AlphaQCD
 newdef /Herwig/Partons/RemnantDecayer:AlphaEM AlphaQED
 
-newdef ShowerHandler:Evolver Evolver
 newdef ShowerModel:PartnerFinder PartnerFinder
 newdef ShowerModel:KinematicsReconstructor KinematicsReconstructor
-newdef Evolver:ShowerModel ShowerModel
-newdef Evolver:SplittingGenerator SplittingGenerator
-newdef Evolver:Interactions BothAtOnce
-newdef Evolver:SpinCorrelations Yes
-newdef Evolver:SoftCorrelations Singular
+newdef ShowerHandler:ShowerModel ShowerModel
+newdef ShowerHandler:SplittingGenerator SplittingGenerator
+newdef ShowerHandler:SpinCorrelations Yes
+newdef ShowerHandler:SoftCorrelations Singular
 
 ##################################################################
 # Intrinsic pT
@@ -63,15 +60,10 @@ newdef Evolver:SoftCorrelations Singular
 #
 # Set all parameters to 0 to disable
 ##################################################################
-newdef Evolver:IntrinsicPtGaussian 1.3*GeV
-newdef Evolver:IntrinsicPtBeta  	0
-newdef Evolver:IntrinsicPtGamma 	0*GeV
-newdef Evolver:IntrinsicPtIptmax   0*GeV
-#############################################################
-# Main control switches for the parton shower.
-#############################################################
-newdef SplittingGenerator:ISR Yes
-newdef SplittingGenerator:FSR Yes
+newdef ShowerHandler:IntrinsicPtGaussian 1.3*GeV
+newdef ShowerHandler:IntrinsicPtBeta  	0
+newdef ShowerHandler:IntrinsicPtGamma 	0*GeV
+newdef ShowerHandler:IntrinsicPtIptmax   0*GeV
 #############################################################
 # Set up truncated shower handler.
 #############################################################
@@ -79,14 +71,26 @@ newdef SplittingGenerator:FSR Yes
 create Herwig::PowhegShowerHandler PowhegShowerHandler
 set PowhegShowerHandler:MPIHandler /Herwig/UnderlyingEvent/MPIHandler
 set PowhegShowerHandler:RemDecayer /Herwig/Partons/RemnantDecayer
-set PowhegShowerHandler:Evolver /Herwig/Shower/Evolver
 newdef PowhegShowerHandler:PDFA /Herwig/Partons/ShowerLOPDF
 newdef PowhegShowerHandler:PDFB /Herwig/Partons/ShowerLOPDF
 newdef PowhegShowerHandler:PDFARemnant /Herwig/Partons/RemnantPDF
 newdef PowhegShowerHandler:PDFBRemnant /Herwig/Partons/RemnantPDF
-
-#############################################################
-
+newdef PowhegShowerHandler:MPIHandler /Herwig/UnderlyingEvent/MPIHandler
+newdef PowhegShowerHandler:RemDecayer /Herwig/Partons/RemnantDecayer
+newdef PowhegShowerHandler:PDFA /Herwig/Partons/ShowerLOPDF
+newdef PowhegShowerHandler:PDFB /Herwig/Partons/ShowerLOPDF
+newdef PowhegShowerHandler:PDFARemnant /Herwig/Partons/RemnantPDF
+newdef PowhegShowerHandler:PDFBRemnant /Herwig/Partons/RemnantPDF
+newdef PowhegShowerHandler:ShowerModel ShowerModel
+newdef PowhegShowerHandler:SplittingGenerator SplittingGenerator
+newdef PowhegShowerHandler:Interactions QCDandQED
+newdef PowhegShowerHandler:SpinCorrelations Yes
+newdef PowhegShowerHandler:SoftCorrelations Singular
+newdef PowhegShowerHandler:IntrinsicPtGaussian 1.3*GeV
+newdef PowhegShowerHandler:IntrinsicPtBeta  	0
+newdef PowhegShowerHandler:IntrinsicPtGamma 	0*GeV
+newdef PowhegShowerHandler:IntrinsicPtIptmax   0*GeV
+newdef PowhegShowerHandler:ReconstructionOption OffShell5
 
 #############################################################
 # End of interesting user servicable section.
@@ -98,14 +102,14 @@ newdef PowhegShowerHandler:PDFBRemnant /Herwig/Partons/RemnantPDF
 #############################################################
 #
 # a few default values
-newdef Evolver:MECorrMode 1
-newdef Evolver:ReconstructionOption OffShell
+newdef ShowerHandler:MECorrMode 1
+newdef ShowerHandler:ReconstructionOption OffShell5
 newdef AlphaQCD:ScaleFactor 1.0
 newdef AlphaQCD:NPAlphaS 2
 newdef AlphaQCD:Qmin 0.935
 newdef AlphaQCD:NumberOfLoops 2
 newdef AlphaQCD:InputOption 1
-newdef AlphaQCD:AlphaMZ 0.132
+newdef AlphaQCD:AlphaMZ 0.126234
 #
 #
 # Lets set up all the splittings
@@ -127,12 +131,12 @@ set GtoGGSplitFn:AngularOrdered Yes
 create Herwig::OneHalfHalfSplitFn GtoQQbarSplitFn
 newdef GtoQQbarSplitFn:InteractionType QCD
 newdef GtoQQbarSplitFn:ColourStructure OctetTripletTriplet
-set GtoQQbarSplitFn:AngularOrdered No
+set GtoQQbarSplitFn:AngularOrdered Yes
 
 create Herwig::OneHalfHalfSplitFn GammatoQQbarSplitFn
 newdef GammatoQQbarSplitFn:InteractionType QED
 newdef GammatoQQbarSplitFn:ColourStructure NeutralChargedCharged
-set GammatoQQbarSplitFn:AngularOrdered No
+set GammatoQQbarSplitFn:AngularOrdered Yes
 
 create Herwig::HalfOneHalfSplitFn QtoGQSplitFn
 newdef QtoGQSplitFn:InteractionType QCD
@@ -143,7 +147,6 @@ create Herwig::HalfOneHalfSplitFn QtoGammaQSplitFn
 newdef QtoGammaQSplitFn:InteractionType QED
 newdef QtoGammaQSplitFn:ColourStructure ChargedNeutralCharged
 set QtoGammaQSplitFn:AngularOrdered Yes
-
 #
 # Now the Sudakovs
 create Herwig::QTildeSudakov SudakovCommon
@@ -151,7 +154,7 @@ newdef SudakovCommon:Alpha AlphaQCD
 newdef SudakovCommon:cutoffKinScale 0.0*GeV
 newdef SudakovCommon:PDFmax 1.0
 newdef SudakovCommon:CutOffOption pT
-newdef SudakovCommon:pTmin 1.45*GeV
+newdef SudakovCommon:pTmin 1.222798*GeV
 
 cp SudakovCommon QtoQGSudakov
 newdef QtoQGSudakov:SplittingFunction QtoQGSplitFn
@@ -163,6 +166,8 @@ set QtoQGammaSudakov:Alpha AlphaQED
 set QtoQGammaSudakov:PDFmax 1.9
 
 cp QtoQGammaSudakov LtoLGammaSudakov
+# Technical parameter to stop evolution.
+set LtoLGammaSudakov:pTmin 0.000001
 
 cp SudakovCommon GtoGGSudakov
 newdef GtoGGSudakov:SplittingFunction GtoGGSplitFn
@@ -174,6 +179,7 @@ newdef GtoQQbarSudakov:PDFmax 120.0
 
 cp SudakovCommon GammatoQQbarSudakov
 newdef GammatoQQbarSudakov:SplittingFunction GammatoQQbarSplitFn
+set GammatoQQbarSudakov:Alpha AlphaQED
 newdef GammatoQQbarSudakov:PDFmax 120.0
 
 cp SudakovCommon GtobbbarSudakov
@@ -189,6 +195,7 @@ newdef QtoGQSudakov:SplittingFunction QtoGQSplitFn
 
 cp SudakovCommon QtoGammaQSudakov
 newdef QtoGammaQSudakov:SplittingFunction QtoGammaQSplitFn
+set QtoGammaQSudakov:Alpha AlphaQED
 
 cp SudakovCommon utoGuSudakov
 newdef utoGuSudakov:SplittingFunction QtoGQSplitFn
@@ -241,8 +248,8 @@ do SplittingGenerator:AddFinalSplitting mu-->mu-,gamma; LtoLGammaSudakov
 do SplittingGenerator:AddFinalSplitting tau-->tau-,gamma; LtoLGammaSudakov
 #
 # Now lets add the initial splittings. Remember the form a->b,c; means
-# that particle a is the particle given and we backward branch to
-# particle b which is initial state and particle c which is final state
+# that the current particle b is given and we backward branch to new
+# particle a which is initial state and new particle c which is final state
 #
 do SplittingGenerator:AddInitialSplitting u->u,g; QtoQGSudakov
 do SplittingGenerator:AddInitialSplitting d->d,g; QtoQGSudakov

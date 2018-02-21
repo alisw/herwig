@@ -16,66 +16,9 @@ library JetCuts.so
 library FastJetFinder.so
 library HwMatchboxScales.so
 library HwMatchboxCuts.so
-library HwSampling.so
 library HwColorFull.so
 library HwMatchboxBuiltin.so
 
-################################################################################
-# Integration/sampling
-################################################################################
-
-mkdir /Herwig/Samplers
-cd /Herwig/Samplers
-
-create Herwig::BinSampler FlatBinSampler
-set FlatBinSampler:InitialPoints 1000
-set FlatBinSampler:UseAllIterations No
-
-create Herwig::CellGridSampler CellGridSampler
-set CellGridSampler:InitialPoints 10000
-set CellGridSampler:ExplorationPoints 500
-set CellGridSampler:ExplorationSteps 4
-set CellGridSampler:Gain 0.3
-set CellGridSampler:Epsilon 1.0
-set CellGridSampler:MinimumSelection 0.000001
-set CellGridSampler:NIterations 1
-set CellGridSampler:EnhancementFactor 1
-set CellGridSampler:UseAllIterations No
-
-set CellGridSampler:RemapperPoints 50000
-set CellGridSampler:RemapperMinSelection 0.00001
-set CellGridSampler:RemapChannelDimension Yes
-set CellGridSampler:LuminosityMapperBins 20
-set CellGridSampler:GeneralMapperBins 0
-
-set CellGridSampler:HalfPoints No
-set CellGridSampler:MaxNewMax 30
-set CellGridSampler:NonZeroInPresampling Yes
-
-create Herwig::MonacoSampler MonacoSampler
-set MonacoSampler:InitialPoints 15000
-set MonacoSampler:NIterations 4
-set MonacoSampler:EnhancementFactor 1.2
-set MonacoSampler:UseAllIterations No
-set MonacoSampler:RemapChannelDimension No
-set MonacoSampler:LuminosityMapperBins 0
-set MonacoSampler:HalfPoints No
-set MonacoSampler:MaxNewMax 30
-set MonacoSampler:NonZeroInPresampling Yes
-
-create Herwig::GeneralSampler Sampler
-set Sampler:UpdateAfter 1000
-
-set Sampler:BinSampler CellGridSampler
-
-set Sampler:AddUpSamplers Off
-set Sampler:GlobalMaximumWeight Off
-set Sampler:FlatSubprocesses Off
-set Sampler:MinSelection 0.000001
-set Sampler:AlmostUnweighted Off
-set Sampler:RunCombinationData Off
-set Sampler:WriteGridsOnFinish No
-set Sampler:MaxEnhancement 1.1
 
 ################################################################################
 # Setup the factory object
@@ -293,24 +236,24 @@ create ColorFull::TraceBasis TraceBasis
 
 create Herwig::MatchboxHybridAmplitude GenericProcesses
 
-library HwMatchboxMadGraph.so
-create Herwig::MadGraphAmplitude MadGraph
-set MadGraph:ColourBasis TraceBasis
+# library HwMatchboxMadGraph.so
+# create Herwig::MadGraphAmplitude MadGraph
+# set MadGraph:ColourBasis TraceBasis
 
-library HwMatchboxGoSam.so
-create Herwig::GoSamAmplitude GoSam
+# library HwMatchboxGoSam.so
+# create Herwig::GoSamAmplitude GoSam
 
-library HwMatchboxNJet.so
-create Herwig::NJetsAmplitude NJet
+# library HwMatchboxNJet.so
+# create Herwig::NJetsAmplitude NJet
 
-do NJet:Massless 5
-do NJet:Massless -5
+# do NJet:Massless 5
+# do NJet:Massless -5
 
-library HwMatchboxOpenLoops.so
-create Herwig::OpenLoopsAmplitude OpenLoops
+# library HwMatchboxOpenLoops.so
+# create Herwig::OpenLoopsAmplitude OpenLoops
 
-library HwMatchboxVBFNLO.so
-create Herwig::VBFNLOAmplitude VBFNLO
+# library HwMatchboxVBFNLO.so
+# create Herwig::VBFNLOAmplitude VBFNLO
 
 mkdir Builtin
 cd Builtin
@@ -401,7 +344,7 @@ set InvertiblePhasespace:CouplingData PhasespaceCouplings
 
 create Herwig::FlatInvertibleLabframePhasespace InvertibleLabframePhasespace
 set InvertibleLabframePhasespace:CouplingData PhasespaceCouplings
-set InvertibleLabframePhasespace:LogSHat False
+set InvertibleLabframePhasespace:LogSHat No
 
 create Herwig::TreePhasespaceChannels TreePhasespaceChannels
 create Herwig::TreePhasespace TreePhasespace
@@ -512,8 +455,8 @@ do TreePhasespace:SetCoupling 25 23 23 362.91922658249853887524
 do TreePhasespace:SetCoupling 22 24 -24 0.00755391226478475287
 do TreePhasespace:SetCoupling 23 24 -24 0.02637401475019835008
 
-create Herwig::VBFNLOPhasespace VBFNLOPhasespace
-set VBFNLOPhasespace:CouplingData PhasespaceCouplings
+# create Herwig::VBFNLOPhasespace VBFNLOPhasespace
+# set VBFNLOPhasespace:CouplingData PhasespaceCouplings
 
 set /Herwig/MatrixElements/Matchbox/Factory:Phasespace TreePhasespace
 
@@ -527,7 +470,7 @@ cd /Herwig/MatrixElements/Matchbox
 create Herwig::HardScaleProfile HardScaleProfile
 
 create Herwig::MEMatching MEMatching
-set MEMatching:RestrictPhasespace On
+set MEMatching:RestrictPhasespace Yes
 set MEMatching:HardScaleProfile /Herwig/MatrixElements/Matchbox/HardScaleProfile
 set MEMatching:BornScaleInSubtraction BornScale
 set MEMatching:RealEmissionScaleInSubtraction RealScale
@@ -747,43 +690,20 @@ create Herwig::MatchboxLeptonPtScale LeptonPairPtScale
 create Herwig::MatchboxHtScale HTScale
 create Herwig::MatchboxTopMassScale TopPairMassScale
 create Herwig::MatchboxTopMTScale TopPairMTScale
+create Herwig::MatchboxTopLinearSumMTScale TopPairLinearMTScale
+create Herwig::MatchboxTopIndividualMTScale TopPairIndividualMTScale
+create Herwig::MatchboxTriVecScales TriVecScale
+
 set HTScale:JetFinder /Herwig/Cuts/JetFinder
 set HTScale:IncludeMT No
 set HTScale:JetPtCut 15.*GeV
 cp HTScale HTPrimeScale
 set HTPrimeScale:IncludeMT Yes
 set HTPrimeScale:JetPtCut 15.*GeV
+set TriVecScale:JetFinder /Herwig/Cuts/JetFinder
 cp LeptonPairMassScale LeptonQ2Scale
 
 set /Herwig/MatrixElements/Matchbox/Factory:ScaleChoice LeptonPairMassScale
-
-################################################################################
-# Factories for different colliders
-# only provided for backwards compatibility; refer to Matchbox/*.in input file
-# snippets for generic handling
-################################################################################
-
-cd /Herwig/MatrixElements/Matchbox
-
-cp Factory EEFactory
-set EEFactory:PartonExtractor /Herwig/Partons/EEExtractor
-set EEFactory:Cuts /Herwig/Cuts/EECuts
-set EEFactory:FirstPerturbativePDF No
-set EEFactory:SecondPerturbativePDF No
-
-cp Factory DISFactory
-
-set DISFactory:PartonExtractor /Herwig/Partons/DISExtractor
-set DISFactory:Cuts /Herwig/Cuts/DISCuts
-set DISFactory:FirstPerturbativePDF No
-set DISFactory:SecondPerturbativePDF Yes
-
-cp Factory PPFactory
-
-set PPFactory:PartonExtractor /Herwig/Partons/QCDExtractor
-set PPFactory:Cuts /Herwig/Cuts/QCDCuts
-set PPFactory:FirstPerturbativePDF Yes
-set PPFactory:SecondPerturbativePDF Yes
 
 cd /
 

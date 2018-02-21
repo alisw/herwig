@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // DipoleMatching.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -104,7 +104,6 @@ void DipoleMatching::persistentInput(PersistentIStream & is, int) {
 }
 
 void DipoleMatching::doinit() {
-  ShowerApproximation::doinit();
   if ( theShowerHandler ) {
     hardScaleFactor(theShowerHandler->hardScaleFactor());
     factorizationScaleFactor(theShowerHandler->factorizationScaleFactor());
@@ -113,6 +112,8 @@ void DipoleMatching::doinit() {
     restrictPhasespace(theShowerHandler->restrictPhasespace());
     hardScaleIsMuF(theShowerHandler->hardScaleIsMuF());
   }
+  // need to fo this after for consistency checks
+  ShowerApproximation::doinit();
 }
 
 // *** Attention *** The following static variable is needed for the type
@@ -130,8 +131,9 @@ void DipoleMatching::Init() {
 
   static Reference<DipoleMatching,ShowerHandler> interfaceShowerHandler
     ("ShowerHandler",
-     "",
+     "The dipole shower handler object to use.",
      &DipoleMatching::theShowerHandler, false, false, true, true, false);
+  interfaceShowerHandler.rank(-1);
 
 }
 

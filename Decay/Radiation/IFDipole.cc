@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // IFDipole.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -194,7 +194,7 @@ ParticleVector IFDipole::generatePhotons(const Particle & p,ParticleVector child
     wgt =makePhotons(boostv,children);
     ++ntry;
     // Record warnings about large and weird weights in the .log file.
-    if(wgt>_maxwgt||wgt<0.0||isnan(wgt)) {
+    if(wgt>_maxwgt||wgt<0.0||std::isnan(wgt)) {
       generator()->log() << "IFDipole.cc:\n";
       if(wgt>_maxwgt) {
 	generator()->log() << "Weight exceeds maximum for decay!\n"; 
@@ -202,7 +202,7 @@ ParticleVector IFDipole::generatePhotons(const Particle & p,ParticleVector child
       if(wgt<0.0) {
 	generator()->log() << "Weight is negative! \n"; 
       }
-      if(isnan(wgt)) {
+      if(std::isnan(wgt)) {
 	generator()->log() << "Weight is NAN! \n";
 	wgt = 0.;
       }

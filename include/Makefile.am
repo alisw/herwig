@@ -1,7 +1,5 @@
 BUILT_SOURCES = done-all-links
 
-AUTOMAKE_OPTIONS = -Wno-portability
-
 DIRLINKS = $(top_srcdir)/Analysis \
 	   $(top_srcdir)/Decay \
            $(top_srcdir)/Hadronization \
@@ -10,7 +8,6 @@ DIRLINKS = $(top_srcdir)/Analysis \
            $(top_srcdir)/PDF \
            $(top_srcdir)/PDT \
            $(top_srcdir)/Shower \
-           $(top_srcdir)/DipoleShower \
            $(top_srcdir)/Sampling \
            $(top_srcdir)/UnderlyingEvent \
            $(top_srcdir)/Utilities \

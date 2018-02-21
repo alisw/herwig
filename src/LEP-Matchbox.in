@@ -7,8 +7,8 @@
 ##################################################
 ## Collider type
 ##################################################
-
-read Matchbox/EECollider.in
+read snippets/Matchbox.in
+read snippets/EECollider.in
 
 ##################################################
 ## Beam energy sqrt(s)
@@ -69,7 +69,7 @@ do Factory:Process e- e+ -> j j
 ##################################################
 
 ## cuts on additional jets
-
+# cd /Herwig/Cuts
 # read Matchbox/DefaultEEJets.in
 
 # set NJetsCut:NJetsMin 3

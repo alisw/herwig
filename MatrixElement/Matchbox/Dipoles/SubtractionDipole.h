@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // SubtractionDipole.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_SubtractionDipole_H
@@ -135,7 +135,7 @@ public:
   /**
    * Setup bookkeeping maps.
    */
-  void setupBookkeeping(const map<Ptr<DiagramBase>::ptr,MergeInfo>& mergeInfo);
+  void setupBookkeeping(const map<Ptr<DiagramBase>::ptr,MergeInfo>& mergeInfo,bool slim);
 
   /**
    * Get bookkeeping information for the given
@@ -187,7 +187,7 @@ public:
   /**
    * Return true, if bookkeeping did not find a non-trivial setup.
    */
-  bool empty() const { return theSplittingMap.empty(); }
+  bool empty() const { return theSplittingMap.empty()&&theMergingMap.empty(); }
 
   /**
    * Return the emitter as referred to by the real emission
@@ -769,7 +769,31 @@ public:
    * Return the matrix element squared differential in the variables
    * given by the last call to generateKinematics().
    */
-  virtual CrossSection dSigHatDR() const { return dSigHatDR(ZERO); }  
+  virtual CrossSection dSigHatDR() const { return dSigHatDR(ZERO); }
+
+      
+        /// calculate the general prefactor for merging.
+  CrossSection prefactor(Energy2 factorizationScale)const;
+      
+  /**
+   *  Calculate the parton shower approximation for this dipole.
+   **/
+      
+  CrossSection ps(Energy2 factorizationScale,Ptr<ColourBasis>::tptr largeNBasis) const;
+
+  /**
+   *  Calculate the dipole with clusterfsafe flag.
+   **/
+
+  CrossSection dip(Energy2 factorizationScale) const;
+
+  
+
+  /**
+   *  Calculate the dipole dSigDR and the parton shower approximation for this dipole.
+   **/
+
+  pair<CrossSection,CrossSection> dipandPs(Energy2 factorizationScale,Ptr<ColourBasis>::tptr largeNBasis) const;
 
   //@}
 
@@ -914,7 +938,8 @@ public:
   /**
    * Clone the dependencies, using a given prefix.
    */
-  void cloneDependencies(const std::string& prefix = "");
+      
+  void cloneDependencies(const std::string& prefix = "", bool slim=false);
 
   //@}
 
@@ -945,7 +970,13 @@ public:
    * (http://arxiv.org/pdf/hep-ph/0307268v2.pdf) to restrict dipole
    * phase space
    */
-  double alpha() const;
+   double alpha() const;
+      
+   /*
+    * True if phase space point is above the alpha cut for this dipole.
+    */
+      
+   bool aboveAlpha() const;
 
   //@}
 

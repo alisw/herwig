@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // Interpolator.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_Interpolator_H
@@ -51,8 +51,8 @@ public:
 	       const vector<ArgT> & x, 
 	       unsigned int order) 
     : _fun(f.size(),0.0),_xval(x.size(),0.0),_order(order),
-      _funit(TypeTraits<ValT>::baseunit), 
-      _xunit(TypeTraits<ArgT>::baseunit),
+      _funit(TypeTraits<ValT>::baseunit()), 
+      _xunit(TypeTraits<ArgT>::baseunit()),
       _copyx(order+2),_copyfun(order+2) {
     assert(_order>0);
     assert(x.size() == f.size());

@@ -1,9 +1,10 @@
 // -*- C++ -*-
 //
+// Based on:
 // FxFxEventHandler.cc is a part of ThePEG - Toolkit for HEP Event Generation
 // Copyright (C) 1999-2011 Leif Lonnblad
 //
-// ThePEG is licenced under version 2 of the GPL, see COPYING for details.
+// ThePEG is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -188,10 +189,13 @@ void FxFxEventHandler::doinitrun() {
   for(int ww = 0; ww < weightnames.size(); ww++){
     initxsecs[ww].reset();
 
-    optstats.insert(std::make_pair<string,XSecStat>(weightnames[ww], initxsecs[ww]));			 
-    opthistStats.insert(std::make_pair<string,XSecStat>(weightnames[ww], initxsecs[ww]));
+    //  optstats.insert(std::make_pair<string,XSecStat>(weightnames[ww], initxsecs[ww]));			 
+    // opthistStats.insert(std::make_pair<string,XSecStat>(weightnames[ww], initxsecs[ww]));
     CrossSection initxs = 0.*picobarn;
-    optxs.insert(std::make_pair<string,CrossSection>(weightnames[ww], initxs));
+    //optxs.insert(std::make_pair<string,CrossSection>(weightnames[ww], initxs));
+    optstats.insert(std::make_pair(weightnames[ww], initxsecs[ww]));
+    opthistStats.insert(std::make_pair(weightnames[ww], initxsecs[ww]));
+    optxs.insert(std::make_pair(weightnames[ww], initxs));
   }
   ntries = 0;
 
@@ -237,18 +241,27 @@ EventPtr FxFxEventHandler::generateEvent() {
 
     weight /= currentReader()->preweight;
 
-
+    
+    // fact for weight normalization
+    double fact = theNormWeight ?  double(selector().sum()/picobarn) : 1.;
+    
     try {
 
       theLastXComb = currentReader()->getXComb();
 
       currentEvent(new_ptr(Event(lastParticles(), this, generator()->runName(),
-				 generator()->currentEventNumber(), weight)));
+				 generator()->currentEventNumber(), weight*fact)));
       currentEvent()->optionalWeights() = currentReader()->optionalEventWeights();
+     // normalize the optional weights
+      for(map<string,double>::iterator it = currentEvent()->optionalWeights().begin();
+	  it!=currentEvent()->optionalWeights().end();++it) {
+        if(it->first!="ecom"&& it->second!=-999 && it->second!=-111 && it->second!=-222 && it->second!=-333) { it->second *= fact; } 
+      }
 
 
       //print optional weights here
-      /*      for (map<string,double>::const_iterator it= currentReader()->optionalEventWeights().begin(); it!=currentReader()->optionalEventWeights().end(); ++it){
+      //  cout << "event weight = " << weight << " fact = " << fact << endl;
+      /*for (map<string,double>::const_iterator it= currentReader()->optionalEventWeights().begin(); it!=currentReader()->optionalEventWeights().end(); ++it){
 	std::cout << it->first << "  => " << it->second << '\n';
       }
       cout << endl;*/
@@ -276,6 +289,8 @@ EventPtr FxFxEventHandler::generateEvent() {
 
 void FxFxEventHandler::skipEvents() {
 
+  if ( weightOption() == 2 || weightOption() == -2 ) return; //does it make sense to skip events if we are using varying weights?
+  
   // Don't do this for readers which seem to generate events on the fly.
   if ( currentReader()->active() || currentReader()->NEvents() <= 0 ) return;
 
@@ -347,12 +362,18 @@ EventPtr FxFxEventHandler::continueEvent() {
     continueCollision();
   }
   catch (Veto) {
-    reject(currentEvent()->weight());
+    const double fact = 
+      theNormWeight ?  
+        double(selector().sum()/picobarn) : 1.;
+    reject(currentEvent()->weight()/fact);
   }
   catch (Stop) {
   }
   catch (Exception &) {
-    reject(currentEvent()->weight());
+    const double fact = 
+      theNormWeight ?  
+        double(selector().sum()/picobarn) : 1.;
+    reject(currentEvent()->weight()/fact);
     throw;
   }
   return currentEvent(); 
@@ -521,12 +542,15 @@ int FxFxEventHandler::ntriesinternal() const {
 
 void FxFxEventHandler::persistentOutput(PersistentOStream & os) const {
   os << stats << histStats << theReaders << theSelector
-     << oenum(theWeightOption) << theUnitTolerance << theCurrentReader << warnPNum;
+     << oenum(theWeightOption) << theUnitTolerance << theCurrentReader << warnPNum
+     << theNormWeight;
+
 }
 
 void FxFxEventHandler::persistentInput(PersistentIStream & is, int) {
   is >> stats >> histStats >> theReaders >> theSelector
-     >> ienum(theWeightOption) >> theUnitTolerance >> theCurrentReader >> warnPNum;
+     >> ienum(theWeightOption) >> theUnitTolerance >> theCurrentReader >> warnPNum
+     >> theNormWeight;
 }
 
 ClassDescription<FxFxEventHandler>
@@ -604,6 +628,22 @@ void FxFxEventHandler::Init() {
      (double(FxFxEventHandler::*)()const)(0),
      (double(FxFxEventHandler::*)()const)(0),
      (double(FxFxEventHandler::*)()const)(0));
+
+    static Switch<FxFxEventHandler,unsigned int> interfaceWeightNormalization
+    ("WeightNormalization",
+     "How to normalize the output weights",
+     &FxFxEventHandler::theNormWeight, 0, false, false);
+  static SwitchOption interfaceWeightNormalizationUnit
+    (interfaceWeightNormalization,
+     "Normalized",
+     "Standard normalization, i.e. +/- for unweighted events",
+     0);
+  static SwitchOption interfaceWeightNormalizationCrossSection
+    (interfaceWeightNormalization,
+     "CrossSection",
+     "Normalize the weights to the max cross section in pb",
+     1);
+
 
   interfaceFxFxReaders.rank(10);
   interfaceWeightOption.rank(9);

@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // GaussianIntegrator.tcc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -22,8 +22,8 @@ GaussianIntegrator::value(const T & function,
 			  const typename T::ArgType upper) const {
   typedef typename T::ValType ValType;
   typedef typename T::ArgType ArgType;
-  const ValType ValUnit = TypeTraits<ValType>::baseunit;
-  const ArgType ArgUnit = TypeTraits<ArgType>::baseunit;
+  const ValType ValUnit = TypeTraits<ValType>::baseunit();
+  const ArgType ArgUnit = TypeTraits<ArgType>::baseunit();
 
   // vector for the limits of the bin
   vector<double> lowerlim,upperlim;

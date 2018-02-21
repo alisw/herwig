@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // ColourReconnector.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -314,16 +314,60 @@ pair <int,int> ColourReconnector::_shuffle
 }
 
 
-bool ColourReconnector::isColour8(cPPtr p, cPPtr q) {
+bool ColourReconnector::isColour8(cPPtr p, cPPtr q) const {
   bool octet = false;
 
   // make sure we have a triplet and an anti-triplet
   if ( ( p->hasColour() && q->hasAntiColour() ) ||
        ( p->hasAntiColour() && q->hasColour() ) ) {
+
+    // true if p and q are originated from a colour octet
     if ( !p->parents().empty() && !q->parents().empty() ) {
-      // true if p and q are originated from a colour octet
-      octet = ( p->parents()[0] == q->parents()[0] ) &&
-              ( p->parents()[0]->data().iColour() == PDT::Colour8 );
+        octet = ( p->parents()[0] == q->parents()[0] ) &&
+          ( p->parents()[0]->data().iColour() == PDT::Colour8 );
+    }
+
+    // (Final) option: check if same colour8 parent
+    // or already found an octet.
+    if(_octetOption==0||octet) return octet;
+
+    // (All) option handling more octets
+    // by browsing particle history/colour lines.
+    tColinePtr cline,aline;
+
+    // Get colourlines form final states.
+    if(p->hasColour() && q->hasAntiColour()) {
+      cline  = p->    colourLine();
+      aline  = q->antiColourLine();
+    }
+    else {
+      cline  = q->    colourLine();
+      aline  = p->antiColourLine();
+    }
+    
+    // Follow the colourline of p.
+    if ( !p->parents().empty() ) {
+      tPPtr parent = p->parents()[0];
+      while (parent) {
+        if(parent->data().iColour() == PDT::Colour8) {
+            // Coulour8 particles should have a colour 
+            // and an anticolour line. Currently the 
+            // remnant has none of those. Since the children 
+            // of the remnant are not allowed to emit currently, 
+            // the colour octet remnant is handled by the return 
+            // statement above. The assert also catches other 
+            // colour octets without clines. If the children of 
+            // a remnant should be allowed to emit, the remnant 
+            // should get appropriate colour lines and 
+            // colour states.
+          //  See Ticket: #407 
+	  //  assert(parent->colourLine()&&parent->antiColourLine());
+          octet = (parent->    colourLine()==cline &&
+                   parent->antiColourLine()==aline);
+        }
+        if(octet||parent->parents().empty()) break;
+        parent = parent->parents()[0];
+      }
     }
   }
 
@@ -333,12 +377,14 @@ bool ColourReconnector::isColour8(cPPtr p, cPPtr q) {
 
 void ColourReconnector::persistentOutput(PersistentOStream & os) const {
   os << _clreco << _preco << _algorithm << _initTemp << _annealingFactor
-     << _annealingSteps << _triesPerStepFactor << ounit(_maxDistance,femtometer);
+     << _annealingSteps << _triesPerStepFactor << ounit(_maxDistance,femtometer)
+     << _octetOption;
 }
 
 void ColourReconnector::persistentInput(PersistentIStream & is, int) {
   is >> _clreco >> _preco >> _algorithm >> _initTemp >> _annealingFactor
-     >> _annealingSteps >> _triesPerStepFactor >> iunit(_maxDistance,femtometer);
+     >> _annealingSteps >> _triesPerStepFactor >> iunit(_maxDistance,femtometer)
+     >> _octetOption;
 }
 
 
@@ -352,12 +398,12 @@ void ColourReconnector::Init() {
     ("ColourReconnection",
      "Colour reconnections",
      &ColourReconnector::_clreco, 0, true, false);
-  static SwitchOption interfaceColourReconnectionOff
+  static SwitchOption interfaceColourReconnectionNo
     (interfaceColourReconnection,
      "No",
      "Colour reconnections off",
      0);
-  static SwitchOption interfaceColourReconnectionOn
+  static SwitchOption interfaceColourReconnectionYes
     (interfaceColourReconnection,
      "Yes",
      "Colour reconnections on",
@@ -422,5 +468,21 @@ void ColourReconnector::Init() {
      " to avoid colour reconneections of displaced vertices",
      &ColourReconnector::_maxDistance, femtometer, 1000.*femtometer, 0.0*femtometer, 1e100*femtometer,
      false, false, Interface::limited);
+
+  static Switch<ColourReconnector,unsigned int> interfaceOctetTreatment
+    ("OctetTreatment",
+     "Which octets are not allowed to be reconnected",
+     &ColourReconnector::_octetOption, 0, false, false);
+  static SwitchOption interfaceOctetTreatmentFinal
+    (interfaceOctetTreatment,
+     "Final",
+     "Only prevent for the final (usuaslly non-perturbative) g -> q qbar splitting",
+     0);
+  static SwitchOption interfaceOctetTreatmentAll
+    (interfaceOctetTreatment,
+     "All",
+     "Prevent for all octets",
+     1);
+
 
 }

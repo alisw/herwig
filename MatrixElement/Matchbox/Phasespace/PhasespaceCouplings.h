@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // PhasespaceCouplings.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef Herwig_PhasespaceCouplings_H
@@ -16,22 +16,19 @@
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
 
-#include <boost/tuple/tuple.hpp>
-#include <boost/tuple/tuple_comparison.hpp>
-
 namespace Herwig {
 
 using namespace ThePEG;
 
-typedef boost::tuple<long,long,long> LTriple;
+typedef std::tuple<long,long,long> LTriple;
 
 inline PersistentOStream& operator<<(PersistentOStream& os, const LTriple& t) {
-  os << t.get<0>() << t.get<1>() << t.get<2>();
+  os << std::get<0>(t) << std::get<1>(t) << std::get<2>(t);
   return os;
 }
 
 inline PersistentIStream& operator>>(PersistentIStream& is, LTriple& t) {
-  is >> t.get<0>() >> t.get<1>() >> t.get<2>();
+  is >> std::get<0>(t) >> std::get<1>(t) >> std::get<2>(t);
   return is;
 }
 
@@ -40,7 +37,7 @@ inline PersistentIStream& operator>>(PersistentIStream& is, LTriple& t) {
  * \ingroup Matchbox
  * \author Simon Platzer
  *
- * \brief Store couplings for the phasespace generator.
+ * \brief Store couplings for the phase space generator.
  *
  * @see \ref PhasespaceCouplingsInterfaces "The interfaces"
  * defined for PhasespaceCouplings.

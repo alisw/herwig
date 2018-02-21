@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MatchboxAmplitudelnuqqbarqqbar.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -160,11 +160,11 @@ Complex MatchboxAmplitudelnuqqbarqqbar::evaluate(size_t a, const vector<int>& he
       amplitudePartonData()[1]->id() < 0:
       amplitudePartonData()[0]->id() < 0;
     pair<int,int> tmp23(
-      SU2Helper::family(amplitudePartonData()[2]),
-      SU2Helper::family(amplitudePartonData()[3]));
+      SU2Helper::family(amplitudePartonData()[2])-1,
+      SU2Helper::family(amplitudePartonData()[3])-1);
     pair<int,int> tmp45(
-      SU2Helper::family(amplitudePartonData()[4]),
-      SU2Helper::family(amplitudePartonData()[5]));
+      SU2Helper::family(amplitudePartonData()[4])-1,
+      SU2Helper::family(amplitudePartonData()[5])-1);
     if ( amplitudePartonData()[3]->id() < 0 ) swap(tmp23.first,tmp23.second);
     if ( amplitudePartonData()[5]->id() < 0 ) swap(tmp45.first,tmp45.second);
     ckmelement23 = theCKM[tmp23.first][tmp23.second];

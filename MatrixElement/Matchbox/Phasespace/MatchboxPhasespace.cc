@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MatchboxPhasespace.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -112,23 +112,33 @@ double MatchboxPhasespace::generateTwoToOneKinematics(const double* r,
 
   double tau = momenta[2].mass2()/lastXCombPtr()->lastS();
   double ltau = log(tau)/2.;
-  double y = ltau - 2.*r[0]*ltau;
-  double x1 = sqrt(tau)*exp(y);
-  double x2 = sqrt(tau)*exp(-y);
+  //old:  y = ltau - 2.*r[0]*ltau; x1 = sqrt(tau)*exp(y); x2 = sqrt(tau)*exp(-y);
+  double x1=pow(tau,1.-r[0]);
+  double x2=pow(tau,r[0]);
 
-  ThreeVector<Energy> p1 =
-    x1*(lastXCombPtr()->lastParticles().first->momentum().vect());
+  // Due to the proton mass and P1.e() + P2.e() == lastS() we multiply here 
+  // with the correction factor abs(P1.e()/P1.z()) to produce incoming 
+  // p1/2 = (e1/2,0,0,+/- e1/2)  
+  Lorentz5Momentum P1 = lastXCombPtr()->lastParticles().first->momentum();
+  ThreeVector<Energy> p1 =  x1 * (P1.vect()) * abs(P1.e()/P1.z());
 
-  ThreeVector<Energy> p2 =
-    x2*(lastXCombPtr()->lastParticles().second->momentum().vect());
+  Lorentz5Momentum P2 = lastXCombPtr()->lastParticles().second->momentum();
+  ThreeVector<Energy> p2 =  x2 * (P2.vect()) * abs(P2.e()/P2.z());
 
   ThreeVector<Energy> q = p1 + p2;
 
   momenta[0] = Lorentz5Momentum(momenta[0].mass(),p1);
   momenta[1] = Lorentz5Momentum(momenta[1].mass(),p2);
   momenta[2] = Lorentz5Momentum(momenta[2].mass(),q);
+  
+  // check for energy conservation:
+  if ((momenta[0]+momenta[1]-momenta[2]).e()>pow(10,-9)*GeV)
+    generator()->log() 
+    << "Warning: Momentum conservation in generateTwoToOneKinematics not precise.\n"
+    << flush;
+  
 
-  lastXCombPtr()->lastX1X2(make_pair(x1,x2));
+  lastXCombPtr()->lastX1X2({x1,x2});
   lastXCombPtr()->lastSHat((momenta[0]+momenta[1]).m2());
 
   fillDiagramWeights();
@@ -276,10 +286,6 @@ MatchboxPhasespace::timeLikeWeight(const Tree2toNDiagram& diag,
   map<LTriple,double>::const_iterator cit = theCouplings->couplings().find(vertexKey);
   if ( cit != theCouplings->couplings().end() ){
     res.first *= cit->second;
-  }else{
-    if(factory()->verboseDia())
-    cout<<"\n MatchboxPhasespace no coupling for (timelike) :" << vertexKey.get<0>()
-    <<" "<<vertexKey.get<1>()<<" " <<vertexKey.get<2>();
   }
 
   Energy2 mass2 = sqr(diag.allPartons()[branch]->hardProcessMass());
@@ -342,10 +348,6 @@ double MatchboxPhasespace::spaceLikeWeight(const Tree2toNDiagram& diag,
   map<LTriple,double>::const_iterator cit = theCouplings->couplings().find(vertexKey);
   if ( cit != theCouplings->couplings().end() ){
     res.first *= cit->second;
-  }else{
-    if(factory()->verboseDia())
-    cout<<"\n MatchboxPhasespace no coupling for (space) :"<< vertexKey.get<0>()
-    <<" "<<vertexKey.get<1>()<<" " <<vertexKey.get<2>();
   }
   if ( children.first == diag.nSpace() - 1 ) {
     return res.first;
@@ -389,10 +391,9 @@ void MatchboxPhasespace::fillDiagramWeights(double flatCut) {
 
   diagramWeights().clear();
 
-  for ( StandardXComb::DiagramVector::const_iterator d =
-	  lastXComb().diagrams().begin(); d != lastXComb().diagrams().end(); ++d ) {
-    diagramWeights()[(**d).id()] = 
-      spaceLikeWeight(dynamic_cast<const Tree2toNDiagram&>(**d),meMomenta()[0],0,flatCut);
+  for ( auto & d : lastXComb().diagrams() ) {
+    diagramWeights()[d->id()] =
+      spaceLikeWeight(dynamic_cast<const Tree2toNDiagram&>(*d),meMomenta()[0],0,flatCut);
   }
 
 }
@@ -503,6 +504,7 @@ void MatchboxPhasespace::Init() {
      "[debug] Cutoff below which a region is considered singular.",
      &MatchboxPhasespace::singularCutoff, GeV, 10.0*GeV, 0.0*GeV, 0*GeV,
      false, false, Interface::lowerlim);
+  interfaceSingularCutoff.rank(-1);
 
   /*
   static Switch<MatchboxPhasespace,bool> interfaceUseMassGenerators
@@ -538,6 +540,7 @@ void MatchboxPhasespace::Init() {
      "in loop induced processes.",
      &MatchboxPhasespace::theLoopParticleIdMin, 200001, 0, 0,
      false, false, Interface::lowerlim);
+  interfaceLoopParticleIdMin.rank(-1);
 
   static Parameter<MatchboxPhasespace,int> interfaceLoopParticleIdMax
     ("LoopParticleIdMax",
@@ -546,12 +549,14 @@ void MatchboxPhasespace::Init() {
      "in loop induced processes.",
      &MatchboxPhasespace::theLoopParticleIdMax, 200100, 0, 0,
      false, false, Interface::lowerlim);
+  interfaceLoopParticleIdMax.rank(-1);
 
 
   static Reference<MatchboxPhasespace,PhasespaceCouplings> interfaceCouplingData
     ("CouplingData",
      "Set the storage for the couplings.",
      &MatchboxPhasespace::theCouplings, false, false, true, false, false);
+  interfaceCouplingData.rank(-1);
 
 }
 

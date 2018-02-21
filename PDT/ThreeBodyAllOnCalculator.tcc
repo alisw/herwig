@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // ThreeBodyAllOnCalculator.tcc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -14,7 +14,7 @@ using namespace Herwig;
 
 // shift the variables for the outer integrand and give limits for the inner one
 template <class T>
-void ThreeBodyAllOnCalculator<T>::outerVariables(const double & x, Energy2 & low,
+void ThreeBodyAllOnCalculator<T>::outerVariables(double x, Energy2 & low,
 						 Energy2 & upp) const { 
   // first convert the value of x into the value of souter
   if(_mapping[_thechannel]==0) {
@@ -63,7 +63,7 @@ void ThreeBodyAllOnCalculator<T>::outerVariables(const double & x, Energy2 & low
 
 template <class T>
 Energy2 ThreeBodyAllOnCalculator<T>::operator ()(Energy2 y) const {
-  assert(!isnan(y/MeV2)); 
+  assert(!std::isnan(double(y/MeV2))); 
   // set up the values of the s variables
   Energy2 s12(ZERO),s23(ZERO),s13(ZERO),
     m2sum(_m2[0]+_m2[1]+_m2[2]+_m2[3]);
@@ -101,7 +101,7 @@ Energy2 ThreeBodyAllOnCalculator<T>::operator ()(Energy2 y) const {
       sjac = s23;
       break;
     }
-    assert(!isnan(sjac/MeV2));
+    assert(!std::isnan(double(sjac/MeV2)));
     InvEnergy2 term; 
 
     if(_mapping[ix]==0) {

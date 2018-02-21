@@ -106,10 +106,12 @@ class ParticleConverter:
 
 
 
-def thepeg_particles(FR,parameters,modelname,modelparameters):
+def thepeg_particles(FR,parameters,modelname,modelparameters,forbidden_names):
     plist = []
     antis = {}
     names = []
+    splittings = []
+    done_splitting=[]
     for p in FR.all_particles:
         if p.spin == -1:
             continue
@@ -139,19 +141,21 @@ rm /Herwig/Masses/HiggsMass
 rm /Herwig/Widths/hWidth
 """
 )
+        if p.name in forbidden_names:
+            print 'RENAMING PARTICLE',p.name,'as ',p.name+'_UFO'
+            p.name +="_UFO"
+
         subs = ParticleConverter(p,parameters,modelparameters).subs()
         plist.append( particleT.substitute(subs) )
 
         pdg, name = subs['pdg_code'],  subs['name']
-
         names.append(name)
-
         if -pdg in antis:
             plist.append( 'makeanti %s %s\n' % (antis[-pdg], name) )
 
         else:
             plist.append( 'insert /Herwig/NewPhysics/NewModel:DecayParticles 0 %s\n' % name )
-            plist.append( 'insert /Herwig/Shower/ShowerHandler:DecayInShower 0 %s #  %s' % (pdg, name) )
+            plist.append( 'insert /Herwig/Shower/ShowerHandler:DecayInShower 0 %s #  %s' % (abs(pdg), name) )
             antis[pdg] = name
             selfconjugate = 1
 
@@ -174,10 +178,11 @@ rm /Herwig/Widths/hWidth
             return cols[c]
 
         try:
-            if p.color in [3,6,8]: # which colors?
+            if p.color in [3,6,8] and abs(pdg) not in done_splitting: # which colors?
+                done_splitting.append(abs(pdg))
                 splitname = '{name}SplitFn'.format(name=p.name)
                 sudname = '{name}Sudakov'.format(name=p.name)
-                plist.append(
+                splittings.append(
 """
 create Herwig::{s}{s}OneSplitFn {name}
 set {name}:InteractionType QCD
@@ -198,5 +203,4 @@ insert /Herwig/{ModelName}/V_GenericHPP:Bosons 0 {pname}
 insert /Herwig/{ModelName}/V_GenericHGG:Bosons 0 {pname}
 """.format(pname=p.name, ModelName=modelname)
             )
-
-    return ''.join(plist), names
+    return ''.join(plist)+''.join(splittings), names

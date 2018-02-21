@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // InvertedTildeKinematics.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_InvertedTildeKinematics_H
@@ -240,10 +240,10 @@ public:
    * Generate pt and z
    */
   virtual pair<Energy,double> generatePtZ(double& jac, const double * r,
-					  double power=1.) const;
+  					  double power=1., vector<double>* values = NULL) const;
 
   /**
-   * Return the single particle phasespace weight in units
+   * Return the single particle phase space weight in units
    * of sHat() for the last selected configuration.
    */
   double jacobian() const { return theJacobian; }
@@ -322,7 +322,7 @@ protected:
   vector<double>& subtractionParameters() { return theDipole->subtractionParameters(); }
 
   /**
-   * Set the single particle phasespace weight in units
+   * Set the single particle phase space weight in units
    * of sHat() for the last selected configuration.
    */
   void jacobian(double w) { theJacobian = w; }
@@ -424,7 +424,7 @@ private:
   Lorentz5Momentum theRealSpectatorMomentum;
 
   /**
-   * Return the single particle phasespace weight in units
+   * Return the single particle phase space weight in units
    * of sHat() for the last selected configuration.
    */
   double theJacobian;

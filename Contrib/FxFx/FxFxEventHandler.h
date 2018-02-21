@@ -3,7 +3,7 @@
 // FxFxEventHandler.h is a part of ThePEG - Toolkit for HEP Event Generation
 // Copyright (C) 1999-2011 Leif Lonnblad
 //
-// ThePEG is licenced under version 2 of the GPL, see COPYING for details.
+// ThePEG is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef THEPEG_FxFxEventHandler_H
@@ -73,7 +73,7 @@ public:
    * The default constructor.
    */
   FxFxEventHandler()
-    : theWeightOption(unitweight), theUnitTolerance(1.0e-6), warnPNum(true) 
+    : theWeightOption(unitweight), theUnitTolerance(1.0e-6), warnPNum(true), theNormWeight(0)
   {
     selector().tolerance(unitTolerance());
   }
@@ -250,6 +250,8 @@ public:
    */
   tFxFxReaderPtr theCurrentReader;
 
+
+
 protected:
 
   /** @name Clone Methods. */
@@ -334,8 +336,6 @@ protected:
   map<string,XSecStat> opthistStats;
 
 
-
-
   /*
    * The weight identifiers for the events
    */ 
@@ -373,6 +373,10 @@ private:
    */
   bool warnPNum;
 
+  /**
+   *  How to normalize the weights
+   */
+  unsigned int theNormWeight;
 
 
 public:

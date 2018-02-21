@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // HardScaleProfile.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -62,6 +62,14 @@ double HardScaleProfile::hardScaleProfile(Energy hard, Energy soft) const {
     return 1./(1.+x);
   }
   return 1.;
+}
+
+bool HardScaleProfile::unrestrictedPhasespace() const {
+  if ( theProfileType == theta ||
+       theProfileType == resummation ) {
+    return false;
+  }
+  return true;
 }
 
 // If needed, insert default implementations of virtual function defined

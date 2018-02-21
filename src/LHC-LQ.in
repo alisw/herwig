@@ -12,8 +12,10 @@
 # The second section contains the user settings.
 ###################################################
 
+read snippets/PPCollider.in
+
 # Set emission to POWHEG for radiation in decays
-set /Herwig/Shower/Evolver:HardEmissionMode POWHEG
+set /Herwig/Shower/ShowerHandler:HardEmission POWHEG
 
 # read model
 read Leptoquark.model
@@ -41,33 +43,26 @@ insert HPConstructor:Outgoing 0 /Herwig/Particles/S0
 insert HPConstructor:Outgoing 1 /Herwig/Particles/S0bar
 
 
-# Intrinsic pT tune extrapolated to LHC energy
-set /Herwig/Shower/Evolver:IntrinsicPtGaussian 2.2*GeV
-
-
-cd /Herwig/Shower
-set SplittingGenerator:ISR Yes
-set SplittingGenerator:FSR Yes                              
  
 # Cuts
 cd /Herwig/Cuts
 set JetKtCut:MinKT 0.0*GeV
-set QCDCuts:MHatMax 13000.0*GeV
-set EECuts:MHatMin 0.0*GeV
+set Cuts:MHatMax 13000.0*GeV
+set Cuts:MHatMin 0.0*GeV
 set PhotonKtCut:MinKT 0.0*GeV
 set PhotonKtCut:MinEta -10.
 set PhotonKtCut:MaxEta  10.
 set MassCut:MinM 0.*GeV
 
+##################################################
+## prepare for Rivet analysis or HepMC output
+## when running with parton shower
+##################################################
+#read snippets/Rivet.in
+#insert /Herwig/Analysis/Rivet:Analyses 0 XXX_2015_ABC123
+#read snippets/HepMC.in
+#set /Herwig/Analysis/HepMC:PrintEvent NNN
 
 # Other parameters for run
 cd /Herwig/Generators
-
-set LHCGenerator:EventHandler:LuminosityFunction:Energy 13000.0
-set LHCGenerator:NumberOfEvents 10000000
-set LHCGenerator:RandomNumberGenerator:Seed 31122001
-set LHCGenerator:PrintEvent 1000
-set LHCGenerator:MaxErrors 10000
-
-
-saverun LHC-LQ LHCGenerator
+saverun LHC-LQ EventGenerator

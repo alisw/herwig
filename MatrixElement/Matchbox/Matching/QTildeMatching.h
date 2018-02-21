@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // QTildeMatching.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef Herwig_QTildeMatching_H
@@ -14,8 +14,8 @@
 
 #include "Herwig/MatrixElement/Matchbox/Matching/ShowerApproximation.h"
 #include "Herwig/Shower/ShowerHandler.h"
-#include "Herwig/Shower/Default/QTildeFinder.h"
-#include "Herwig/Shower/Default/QTildeSudakov.h"
+#include "Herwig/Shower/QTilde/Default/QTildeFinder.h"
+#include "Herwig/Shower/QTilde/Default/QTildeSudakov.h"
 
 namespace Herwig {
 

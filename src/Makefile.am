@@ -1,6 +1,4 @@
-SUBDIRS = defaults snippets Matchbox
-
-AUTOMAKE_OPTIONS = -Wno-portability
+SUBDIRS = defaults snippets Matchbox Merging
 
 defaultsdir = ${pkgdatadir}/defaults
 
@@ -20,7 +18,9 @@ $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS)
 
 bin_SCRIPTS = herwig-config
 
-HELPERFILES = CMSSM40.1.1.slha RPV3.1.slha NMSSM.spc \
+HELPERFILES = \
+CMSSM40.1.1.slha \
+NMSSM.spc \
 ADD.model \
 Leptoquark.model \
 LH.model \
@@ -49,7 +49,7 @@ ILC-RS.in \
 LEP.in \
 LEP-Matchbox.in \
 LHC-ADD.in \
-LHC-diffractive.in \
+LHC-CEX.in \
 LHC-GammaGamma.in \
 LHC.in \
 LHC-Matchbox.in \
@@ -69,7 +69,8 @@ TVT.in \
 TVT-Powheg.in \
 TVT-TTBA.in \
 LHC-LH.in \
-LHC-LHTP.in
+LHC-LHTP.in \
+LHE.in
 
 dist_pkgdata_DATA = $(INPUTFILES) $(HELPERFILES)
 pkgdata_DATA = Makefile-UserModules
@@ -130,9 +131,9 @@ check-Matchbox: $(check_Matchbox)
 
 check-valgrind-Matchbox: $(check_Matchbox_valgrind)
 
-check-extra: check-LHC-diffractive check-LHC-GammaGamma check-LHC-MB check-TVT
+check-extra: check-LHC-CEX check-LHC-GammaGamma check-LHC-MB check-TVT
 
-check-valgrind-extra: check-valgrind-LHC-diffractive check-valgrind-LHC-GammaGamma check-valgrind-LHC-MB check-valgrind-TVT
+check-valgrind-extra: check-valgrind-LHC-CEX check-valgrind-LHC-GammaGamma check-valgrind-LHC-MB check-valgrind-TVT
 
 check-all: check-local check-Powheg check-BSM check-Matchbox check-extra
 
@@ -171,13 +172,6 @@ check-%: $(srcdir)/%.in HerwigDefaults.rpo link-helper-files
 SETUPTHEPEG=$(THEPEGPATH)/bin/setupThePEG
 THEPEGREPO=$(THEPEGLIBPATH)/ThePEGDefaults.rpo
 
-install-exec-local:
-	$(install_sh_SCRIPT) $(srcdir)/Herwig++ $(DESTDIR)$(bindir)/Herwig++
-	sed -e's!@BINDIR@!$(bindir)!' $(srcdir)/Herwig++ > $(DESTDIR)$(bindir)/Herwig++
-
-uninstall-local:
-	rm -f  $(DESTDIR)$(bindir)/Herwig++
-
 install-data-hook:
 	@echo Creating repository
 	@./Herwig init -L$(DESTDIR)$(pkglibdir) -i$(DESTDIR)$(pkgdatadir) -i$(DESTDIR)$(pkgdatadir)/snippets $(DESTDIR)$(defaultsdir)/HerwigDefaults.in --repo=$(DESTDIR)$(pkgdatadir)/HerwigDefaults.rpo
@@ -213,7 +207,7 @@ unregister-from-thepeg-repo:
 		-l$(DESTDIR)$(pkglibdir) ; \
 	fi
 
-EXTRA_DIST = herwigopts.ggo Herwig++
+EXTRA_DIST = herwigopts.ggo
 
 nodist_Herwig_SOURCES = hgstamp.inc
 BUILT_SOURCES += hgstamp.inc

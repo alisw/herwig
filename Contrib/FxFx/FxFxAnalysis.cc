@@ -24,13 +24,12 @@
 #include "HepMC/IO_AsciiParticles.h"
 #include "HepMC/IO_GenEvent.h"
 #include "ThePEG/Utilities/XSecStat.h"
-//#include <config.h>
 
 using namespace ThePEG;
 
 FxFxAnalysis::FxFxAnalysis() 
   :  _remnantId(82), _format(1),_unitchoice(),
-     _geneventPrecision(16), debug(false), _rivet(), _nevent(0), useoptweights(false) {}
+     _geneventPrecision(16), debug(false), _rivet(), _nevent(0), useoptweights(false), normoptweights(false) {}
 
 HepMC::GenEvent * FxFxAnalysis::makeEvent(tEventPtr event, tSubProPtr sub, long no,
 					  Energy eUnit, Length lUnit, 
@@ -40,6 +39,7 @@ HepMC::GenEvent * FxFxAnalysis::makeEvent(tEventPtr event, tSubProPtr sub, long 
  
   //reset the event 
   HepMCTraits<HepMC::GenEvent>::resetEvent(ev, no, event->weight()*sub->groupWeight(), event->optionalWeights());
+
   //set the cross section
   HepMCTraits<HepMC::GenEvent>::setCrossSection(*ev,xsec/picobarn,
 						xsecErr/picobarn);
@@ -48,11 +48,13 @@ HepMC::GenEvent * FxFxAnalysis::makeEvent(tEventPtr event, tSubProPtr sub, long 
 
 HepMC::GenEvent * FxFxAnalysis::makeEventW(tEventPtr event, tSubProPtr sub, long no,
 					  Energy eUnit, Length lUnit, 
-					       CrossSection xsec, CrossSection xsecErr, double evoptweight) const {
+                                           CrossSection xsec, CrossSection xsecErr, double evoptweight, double centralweight) const {
 
   //convert the event from the Herwig format to the HepMC format and write it to the common block
   HepMC::GenEvent * ev = HepMCConverter<HepMC::GenEvent>::convert(*event, false,eUnit, lUnit);
- 
+
+  if(normoptweights) { evoptweight /= centralweight; }
+  
   //reset the event 
   HepMCTraits<HepMC::GenEvent>::resetEvent(ev, no, evoptweight, event->optionalWeights());
   //set the cross section
@@ -107,16 +109,17 @@ void FxFxAnalysis::analyze(ThePEG::tEventPtr event, long ieve, int loop, int sta
       string word;
       istringstream iss(first_piece, istringstream::in);
       while( iss >> word ) strs.push_back(word);
-      if(strs[0] == "PDF" || strs[0] == "SC") { _numweights++; }
+      if(strs[0] != "np") { _numweights++; }
       strs.clear();
     }
   }
+  double CentralWeight = 1.;
   if(useoptweights) { 
     //find the weights
     _i = 0;//counter
     OptWeights.clear();
     for (map<string,double>::const_iterator it= event->optionalWeights().begin(); it!=event->optionalWeights().end(); ++it){
-      //    std::cout << it->first << " => " << it->second << '\n';
+      // std::cout << it->first << " => " << it->second << '\n';
       string first_piece = it->first;
       string word;
       istringstream iss(first_piece, istringstream::in);
@@ -124,7 +127,7 @@ void FxFxAnalysis::analyze(ThePEG::tEventPtr event, long ieve, int loop, int sta
 	strs.push_back(word);
       }
       std::pair<int,double> OptWeightsTemp;
-      if(strs[0] == "PDF") {
+      /*      if(strs[0] == "PDF") {
 	OptWeightsTemp.first = atoi(strs[2].c_str());
 	OptWeightsTemp.second= it->second;
 	OptWeights.push_back(OptWeightsTemp);
@@ -133,8 +136,17 @@ void FxFxAnalysis::analyze(ThePEG::tEventPtr event, long ieve, int loop, int sta
       if(strs[0] == "SC") {
 	OptWeightsTemp.first = atoi(strs[3].c_str());
 	OptWeightsTemp.second = it->second;
+        //        cout << "OptWeightsTemp.first = " << OptWeightsTemp.first << " OptWeightsTemp.second = " << OptWeightsTemp.second << endl;
+        if(OptWeightsTemp.first == 1001) { cout << "OptWeightsTemp.second = " << OptWeightsTemp.second << endl; CentralWeight = OptWeightsTemp.second; } 
 	OptWeights.push_back(OptWeightsTemp);
 	_i++;
+      }*/
+      if(strs[0] != "np") {
+        OptWeightsTemp.first = atoi((it->first).c_str());
+        OptWeightsTemp.second= it->second;
+        if(OptWeightsTemp.first == 1001) { /*cout << "OptWeightsTemp.second = " << OptWeightsTemp.second << endl;*/ CentralWeight = OptWeightsTemp.second; } 
+        OptWeights.push_back(OptWeightsTemp);
+        _i++;
       }
       strs.clear();
     }
@@ -146,10 +158,11 @@ void FxFxAnalysis::analyze(ThePEG::tEventPtr event, long ieve, int loop, int sta
   HepMC::GenEvent * hepmcMULTIi;
   if(useoptweights) { 
     for(int rr = 0; rr < _numweights; rr++) {
-      double xsrr = optxsec[boost::lexical_cast<string>(OptWeights[rr].first)]/picobarn;
-      //    cout << "xsec = " << xsec/picobarn << endl;
-      //  cout << "OptWeights[rr].second = " << OptWeights[rr].second << endl;
-      hepmcMULTIi = makeEventW(event,sub,_nevent,eUnit,lUnit,xsrr*picobarn,xsecErr,OptWeights[rr].second);
+      double xsrr = optxsec[std::to_string(OptWeights[rr].first)]/picobarn;
+      /* cout << "xsec = " << xsec/picobarn << endl;
+      cout << "OptWeights[rr].second = " << OptWeights[rr].second << endl;
+      cout << "xsrr = " << xsrr << endl;*/
+      hepmcMULTIi = makeEventW(event,sub,_nevent,eUnit,lUnit,xsrr*picobarn,xsecErr,OptWeights[rr].second, CentralWeight);
       hepmcMULTI.push_back(hepmcMULTIi); 
     }
   }
@@ -199,11 +212,11 @@ ThePEG::IBPtr FxFxAnalysis::fullclone() const {
 }
 
 void FxFxAnalysis::persistentOutput(ThePEG::PersistentOStream & os) const {
-  os << _analyses << filename << debug << useoptweights;
+  os << _analyses << filename << debug << useoptweights << normoptweights;
 }
 
 void FxFxAnalysis::persistentInput(ThePEG::PersistentIStream & is, int) {
-  is >> _analyses >> filename >> debug >> useoptweights;
+  is >> _analyses >> filename >> debug >> useoptweights >> normoptweights;
 }
 
 ThePEG::ClassDescription<FxFxAnalysis> FxFxAnalysis::initFxFxAnalysis;
@@ -265,6 +278,23 @@ void FxFxAnalysis::Init() {
      "Enable debug information from Rivet.",
      true);
 
+    static Switch<FxFxAnalysis,bool> interfaceNormOptWeights
+    ("NormOptWeights",
+     "Enable debug information from Rivet",
+     &FxFxAnalysis::normoptweights, false, true, false);
+  static SwitchOption interfaceNormOptWeightsNo
+    (interfaceNormOptWeights,
+     "No",
+     "Do not normalize optional weights",
+     false);
+  static SwitchOption interfacedNormOptWeightsYes
+    (interfaceNormOptWeights,
+     "Yes",
+     "Normalize optional weights.",
+     true);
+
+
+
 
   interfaceAnalyses.rank(10);
 
@@ -289,13 +319,13 @@ void FxFxAnalysis::dofinish() {
     for(int rr = 0; rr < _numweights; rr++) {
       cout << (OptWeights[rr].first)  << ", cross section = " << OptXS[rr] << endl;
       if( _nevent > 0 && _rivetMULTI[rr] ) {
-	double xsrr = optxsec[boost::lexical_cast<string>(OptWeights[rr].first)]/picobarn;
+	double xsrr = optxsec[std::to_string(OptWeights[rr].first)]/picobarn;
 	//      _rivetMULTI[rr]->setCrossSection(OptXS[rr]);
 	_rivetMULTI[rr]->setCrossSection(xsrr);
 	_rivetMULTI[rr]->finalize();
 	
 	string fname = filename;
-	fname = generator()->runName() + "_" + boost::lexical_cast<string>(OptWeights[rr].first) + ".yoda";
+	fname = generator()->runName() + "_" + std::to_string(OptWeights[rr].first) + ".yoda";
 	
 	_rivetMULTI[rr]->writeData(fname);
       }
@@ -335,6 +365,7 @@ void FxFxAnalysis::doinitrun() {
   _numweights = -999;
   AnalysisHandler::doinitrun();
   // create FxFx analysis handler
+  if(useoptweights) { cout << "Warning: Using optional weights launches multiple rivet analyses. This may slow down your run substantially!" << endl; }
   CurrentGenerator::Redirect stdout(cout);
   _rivet = new Rivet::AnalysisHandler; //(fname);
   _rivet->addAnalyses(_analyses);

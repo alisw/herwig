@@ -12,8 +12,10 @@
 # The second section contains the user settings.
 ###################################################
 
+read snippets/PPCollider.in
+
 # Set emission to POWHEG for radiation in decays
-set /Herwig/Shower/Evolver:HardEmissionMode POWHEG
+set /Herwig/Shower/ShowerHandler:HardEmission POWHEG
 
 # read model
 read Sextet.model
@@ -94,21 +96,19 @@ set Sextet/Model:g2 2 1.0
 set Sextet/Model:g2Prime 2 1.0
 set Sextet/Model:g3L 2 1.0
 
-# Intrinsic pT tune extrapolated to LHC energy
-set /Herwig/Shower/Evolver:IntrinsicPtGaussian 2.2*GeV
+
+# example to set mass
+#set /Herwig/Particles/DQPhi_1'':NominalMass 1000.*GeV
+
+##################################################
+## prepare for Rivet analysis or HepMC output
+## when running with parton shower
+##################################################
+#read snippets/Rivet.in
+#insert /Herwig/Analysis/Rivet:Analyses 0 XXX_2015_ABC123
+#read snippets/HepMC.in
+#set /Herwig/Analysis/HepMC:PrintEvent NNN
 
 # Other parameters for run
 cd /Herwig/Generators
-set LHCGenerator:NumberOfEvents 10000000
-set LHCGenerator:RandomNumberGenerator:Seed 31122001
-set LHCGenerator:PrintEvent 1000
-set LHCGenerator:MaxErrors 10000
-set LHCGenerator:EventHandler:CascadeHandler NULL
-#set LHCGenerator:EventHandler:CascadeHandler:MPIHandler NULL
-set LHCGenerator:EventHandler:DecayHandler NULL
-set LHCGenerator:EventHandler:HadronizationHandler NULL
-set /Herwig/Analysis/Basics:CheckQuark 0
-
-#set /Herwig/Particles/DQPhi_1'':NominalMass 1000.*GeV
-
-saverun LHC-Sextet LHCGenerator
+saverun LHC-Sextet EventGenerator

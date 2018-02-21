@@ -1,7 +1,7 @@
 # -*- Makefile -*- (for emacs)
 # Models/Feynrules/python/Makefile-FR.  Generated from Makefile-FR.in by configure.
 #
-# Herwig 7.0.4
+# Herwig 7.1.2
 #
 # This Makefile is intended for compiling Herwig plugins
 # You can find example plugins in the Contrib directory
@@ -16,22 +16,22 @@
 .PRECIOUS: %.o
 .PHONY: all clean
 
-CXX = cclang++ -std=c++11
+CXX = clang++ -std=c++11
 
-CXXFLAGS = -Wall -Wextra -pedantic -O3 -g -Wno-unused-parameter -Wno-unused-local-typedef
+CXXFLAGS = -Wall -Wextra -pedantic -g -O2 -Wno-unused-parameter
 
 # add additional package header directories here
-CPPFLAGS = -I/tmp/Herwig-release/include -I/mt/home/dgrell/src/ThePEG-release/include 
+CPPFLAGS = -I/Users/dg/opt/Herwig-release/include -I/Users/dg/src/ThePEG-release/include -I/opt/local/include
 
 # add additional libraries here
-LDFLAGS = 
+LDFLAGS = -Wl,-undefined,dynamic_lookup
 
 ALLCCFILES=$(shell echo *.cc)
 all : FeynrulesModel.so 
 ALLOBJFILES=$(ALLCCFILES:.cc=.o)
 
 %.so : $(ALLOBJFILES)
-	$(CXX) -shared -fPIC $(CXXFLAGS) $(LDFLAGS) $^ -o $@  
+	$(CXX) -bundle -fPIC $(CXXFLAGS) $(LDFLAGS) $^ -o $@  
 
 %.o : %.cc
 	$(CXX) -fPIC $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@

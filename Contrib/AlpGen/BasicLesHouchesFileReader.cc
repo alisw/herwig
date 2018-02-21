@@ -2,9 +2,9 @@
 //
 // BasicLesHouchesFileReader.cc is a part of Herwig - A multi-purpose
 // Monte Carlo event generator.
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -383,9 +383,9 @@ bool BasicLesHouchesFileReader::doReadEvent() {
 	          >> hepeup.PUP[i][3] >> hepeup.PUP[i][4]
         	  >> hepeup.VTIMUP[i] >> hepeup.SPINUP[i] ) )
       return false;
-    if(isnan(hepeup.PUP[i][0])||isnan(hepeup.PUP[i][1])||
-       isnan(hepeup.PUP[i][2])||isnan(hepeup.PUP[i][3])||
-       isnan(hepeup.PUP[i][4])) 
+    if(std::isnan(hepeup.PUP[i][0])||std::isnan(hepeup.PUP[i][1])||
+       std::isnan(hepeup.PUP[i][2])||std::isnan(hepeup.PUP[i][3])||
+       std::isnan(hepeup.PUP[i][4])) 
       throw Exception() 
 	<< "nan's as momenta in Les Houches file "
 	<< Exception::eventerror;
