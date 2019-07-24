@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MSSM.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_MSSM_H
@@ -27,6 +27,13 @@ using namespace ThePEG;
  * defined for MSSM.
  */
 class MSSM: public SusyBase {
+
+public:
+
+  /**
+   *  Default constructor
+   */
+  MSSM() : createDiagonalMixing_(false) {}
 
 public:
 
@@ -186,7 +193,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MSSM & operator=(const MSSM &);
+  MSSM & operator=(const MSSM &) = delete;
 
 private:
 
@@ -254,6 +261,11 @@ private:
    */
   MixingMatrixPtr HiggsPMix_;
   //@}
+
+  /**
+   *  Create diagonal the stop, bottom and stau mixing matrices if needed
+   */
+  bool createDiagonalMixing_;
 
 };
 

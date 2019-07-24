@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MEfv2vf.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_MEfv2vf_H
@@ -171,16 +171,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEfv2vf> initMEfv2vf;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEfv2vf & operator=(const MEfv2vf &);
+  MEfv2vf & operator=(const MEfv2vf &) = delete;
 
 private:
   
@@ -198,33 +192,6 @@ private:
     //@}
 
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEfv2vf. */
-template <>
-struct BaseClassTrait<Herwig::MEfv2vf,1> {
-  /** Typedef of the first base class of MEfv2vf. */
-  typedef Herwig::GeneralHardME NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEfv2vf class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEfv2vf>
-  : public ClassTraitsBase<Herwig::MEfv2vf> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEfv2vf"; }
-};
-
-/** @endcond */
 
 }
 

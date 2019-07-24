@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // ADDModelFFWGRVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -136,7 +136,7 @@ void ADDModelFFWGRVertex::setCoupling(Energy2 q2,tcPDPtr aa,tcPDPtr bb,
   // photon
   if(ibos==22) {
     // alpha
-    coup = UnitRemoval::E * kappa_ * couplast_;
+    coup = Complex(UnitRemoval::E * kappa_ * couplast_);
     // _charge of particle
     assert((iferm>=1 && iferm<=6)||(iferm>=11 &&iferm<=16));
     coup *= charge_[iferm];
@@ -145,14 +145,14 @@ void ADDModelFFWGRVertex::setCoupling(Energy2 q2,tcPDPtr aa,tcPDPtr bb,
   }
   // Z boson
   else if(ibos==23) {
-    coup = UnitRemoval::E * kappa_ * couplast_;
+    coup = Complex(UnitRemoval::E * kappa_ * couplast_);
     // _charge of particle
     assert((iferm>=1 && iferm<=6)||(iferm>=11 &&iferm<=16));
     left (gl_[iferm]);
     right(gr_[iferm]);
   }
   else if(ibos==24) {
-    coup = UnitRemoval::E * kappa_ * couplast_ * 
+    coup = Complex(UnitRemoval::E * kappa_ * couplast_) * 
       sqrt(0.5) / sqrt(sin2ThetaW());
     // the left and right couplings
     int iferm=abs(aa->id());

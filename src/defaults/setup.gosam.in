@@ -744,10 +744,10 @@ form.tempdir=@FORMTEMPDIR@
 ######################################################################
 # symmetries=family,generation
 
-# samurai.fcflags=-I/mt/data1/herwig/include/gosam-contrib
-# samurai.ldflags=-L/mt/data1/herwig/lib -lgolem -lsamurai -lavh_olo -lqcdloop -lff
-# golem95.fcflags=-I/mt/data1/herwig/include/gosam-contrib
-# golem95.ldflags=-L/mt/data1/herwig/lib -lgolem -lsamurai -lavh_olo -lqcdloop -lff
-# ninja.fcflags=-I/mt/data1/herwig/include/gosam-contrib
-# ninja.ldflags=-L/mt/data1/herwig/lib -lninja
+# samurai.fcflags=-I/home/richardn/montecarlo/utilities/include/gosam-contrib
+# samurai.ldflags=-L/home/richardn/montecarlo/utilities/lib -lgolem -lsamurai -lavh_olo -lqcdloop -lff
+# golem95.fcflags=-I/home/richardn/montecarlo/utilities/include/gosam-contrib
+# golem95.ldflags=-L/home/richardn/montecarlo/utilities/lib -lgolem -lsamurai -lavh_olo -lqcdloop -lff
+# ninja.fcflags=-I/home/richardn/montecarlo/utilities/include/gosam-contrib
+# ninja.ldflags=-L/home/richardn/montecarlo/utilities/lib -lninja
 

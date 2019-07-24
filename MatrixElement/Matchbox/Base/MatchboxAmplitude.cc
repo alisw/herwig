@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MatchboxAmplitude.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -51,9 +51,8 @@ void MatchboxAmplitude::persistentOutput(PersistentOStream & os) const {
      << theCleanupAfter << treeLevelHelicityPoints << oneLoopHelicityPoints
      << theTrivialColourLegs << theReshuffleMasses.size();
   if ( !theReshuffleMasses.empty() ) {
-    for ( map<long,Energy>::const_iterator r = theReshuffleMasses.begin();
-	  r != theReshuffleMasses.end(); ++r )
-      os << r->first << ounit(r->second,GeV);
+    for (auto const & r : theReshuffleMasses )
+      os << r.first << ounit(r.second,GeV);
   }
 }
 
@@ -90,13 +89,13 @@ void MatchboxAmplitude::doinit() {
 
 void MatchboxAmplitude::doinitrun() {
   Amplitude::doinitrun();
-  if ( colourBasis() )
+  if ( colourBasis())
     colourBasis()->initrun();
 }
 
-void MatchboxAmplitude::cloneDependencies(const std::string&) {}
+void MatchboxAmplitude::cloneDependencies(const std::string&,bool) {}
 
-Ptr<MatchboxMEBase>::ptr MatchboxAmplitude::makeME(const PDVector&) const {
+MatchboxMEBasePtr MatchboxAmplitude::makeME(const PDVector&) const {
   return new_ptr(MatchboxMEBase());
 }
 
@@ -128,9 +127,8 @@ void MatchboxAmplitude::olpOrderFileProcesses(ostream& os,
 
   map<int,pair<Process,int> > sorted;
 
-  for ( map<pair<Process,int>,int>::const_iterator p = proc.begin();
-	p != proc.end(); ++p ) {
-    sorted[p->second] = p->first;
+  for (auto const & p :  proc ) {
+    sorted[p.second] = p.first;
   }
 
   unsigned int currentOrderInAlphaS = sorted.begin()->second.first.orderInAlphaS;
@@ -379,7 +377,7 @@ void MatchboxAmplitude::fillCrossingMap(size_t shift) {
 	l != amplitudeLegs.end(); ++l )
     amplitudePartonData()[l->second] = l->first;
 
-  if ( colourBasis() ) {
+  if ( colourBasis() && !colourBasis()->indexMap().empty()) {
     assert(colourBasis()->indexMap().find(mePartonData()) !=
 	   colourBasis()->indexMap().end());
     const map<size_t,size_t> colourCross = 
@@ -488,13 +486,13 @@ void MatchboxAmplitude::prepareAmplitudes(Ptr<MatchboxMEBase>::tcptr) {
     set<vector<int> > helicities = generateHelicities();
     for ( set<vector<int> >::const_iterator h = helicities.begin();
           h != helicities.end(); ++h ) {
-      all.insert(make_pair(*h,CVector(colourBasisDim())));
-      allLargeN.insert(make_pair(*h,CVector(colourBasisDim())));
+      all.insert(make_pair(*h,CVector(max(colourBasisDim(),1))));
+      allLargeN.insert(make_pair(*h,CVector(max(colourBasisDim(),1))));
     }
     AmplitudeIterator amp = all.begin();
     AmplitudeIterator lamp = allLargeN.begin();
     for ( ; amp != all.end(); ++amp, ++lamp ) {
-      for ( size_t k = 0; k < colourBasisDim(); ++k ){
+      for ( size_t k = 0; k < max(colourBasisDim(),1); ++k ){
         amp->second(k) = evaluate(k,amp->first,lamp->second(k));
         if ( amp->second(k) != Complex(0.0) ) {
 	  if ( lastAmplitudes().find(amp->first)!=lastAmplitudes().end() ) {
@@ -514,7 +512,7 @@ void MatchboxAmplitude::prepareAmplitudes(Ptr<MatchboxMEBase>::tcptr) {
     AmplitudeIterator amp = lastAmplitudes().begin();
     AmplitudeIterator lamp = lastLargeNAmplitudes().begin();
     for ( ;amp != lastAmplitudes().end(); ++amp, ++lamp ) {
-      for ( size_t k = 0; k < colourBasisDim(); ++k ){
+      for ( size_t k = 0; k < max(colourBasisDim(),1); ++k ){
         amp->second(k) = evaluate(k,amp->first,lamp->second(k));
       }
     }
@@ -538,11 +536,11 @@ void MatchboxAmplitude::prepareOneLoopAmplitudes(Ptr<MatchboxMEBase>::tcptr) {
     set<vector<int> > helicities = generateHelicities();
     for ( set<vector<int> >::const_iterator h = helicities.begin();
           h != helicities.end(); ++h ) {
-      all.insert(make_pair(*h,CVector(colourBasisDim())));
+      all.insert(make_pair(*h,CVector(max(colourBasisDim(),1))));
     }
     AmplitudeIterator amp = all.begin();
     for ( ; amp != all.end(); ++amp ) {
-      for ( size_t k = 0; k < colourBasisDim(); ++k ){
+      for ( size_t k = 0; k < max(colourBasisDim(),1); ++k ){
         amp->second(k) = evaluateOneLoop(k,amp->first);
         if ( amp->second(k) != Complex(0.0) ) {
 	  if ( lastOneLoopAmplitudes().find(amp->first)!=lastOneLoopAmplitudes().end() ) {
@@ -558,7 +556,7 @@ void MatchboxAmplitude::prepareOneLoopAmplitudes(Ptr<MatchboxMEBase>::tcptr) {
   } else {
     AmplitudeIterator amp = lastOneLoopAmplitudes().begin();
     for ( ;amp != lastOneLoopAmplitudes().end(); ++amp ) {
-      for ( size_t k = 0; k < colourBasisDim(); ++k ){
+      for ( size_t k = 0; k < max(colourBasisDim(),1); ++k ){
         amp->second(k) = evaluateOneLoop(k,amp->first);
       }
     }
@@ -910,30 +908,35 @@ void MatchboxAmplitude::Init() {
      "The number of points after which helicity combinations are cleaned up.",
      &MatchboxAmplitude::theCleanupAfter, 20, 1, 0,
      false, false, Interface::lowerlim);
+  interfaceCleanupAfter.rank(-1);
 
   static Command<MatchboxAmplitude> interfaceReshuffle
     ("Reshuffle",
      "Reshuffle the mass for the given PDG id to a different mass shell for amplitude evaluation.",
      &MatchboxAmplitude::doReshuffle, false);
+    interfaceReshuffle.rank(-1);
 
   static Command<MatchboxAmplitude> interfaceMassless
     ("Massless",
      "Reshuffle the mass for the given PDG id to be massless for amplitude evaluation.",
      &MatchboxAmplitude::doMassless, false);
+    interfaceMassless.rank(-1);
 
   static Command<MatchboxAmplitude> interfaceOnShell
     ("OnShell",
      "Reshuffle the mass for the given PDG id to be the on-shell mass for amplitude evaluation.",
      &MatchboxAmplitude::doOnShell, false);
+    interfaceOnShell.rank(-1);
 
   static Command<MatchboxAmplitude> interfaceClearReshuffling
     ("ClearReshuffling",
      "Do not perform any reshuffling.",
      &MatchboxAmplitude::doClearReshuffling, false);
+    interfaceClearReshuffling.rank(-1);
 
   static Switch<MatchboxAmplitude,bool> interfaceTrivialColourLegs
     ("TrivialColourLegs",
-     "Expert option",
+     "Assume the process considered has trivial colour correllations.",
      &MatchboxAmplitude::theTrivialColourLegs, false, false, false);
   static SwitchOption interfaceTrivialColourLegsYes
     (interfaceTrivialColourLegs,
@@ -945,6 +948,7 @@ void MatchboxAmplitude::Init() {
      "No",
      "",
      false);
+  interfaceTrivialColourLegs.rank(-1);
 
 }
 

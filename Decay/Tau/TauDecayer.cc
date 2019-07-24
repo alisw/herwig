@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // TauDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -317,8 +317,7 @@ double TauDecayer::me2(const int ichan,const Particle & inpart,
     // element
     for(ihel[1]=0;ihel[1]<2;++ihel[1]){
       for(ihel[0]=0;ihel[0]<2;++ihel[0]) {
-	(*ME())(ihel)= lepton[ihel[0]][ihel[1]].dot(hadron[hhel])*
-	  SM().fermiConstant();
+	(*ME())(ihel)= Complex(lepton[ihel[0]][ihel[1]].dot(hadron[hhel])*SM().fermiConstant());
       }
     }
   }

@@ -4,10 +4,8 @@ read Matchbox/LO.in
 
 cd /Herwig/EventHandlers
 
-insert EventHandler:PreCascadeHandlers[0] /Herwig/Decays/DecayHandler
-
 set EventHandler:CascadeHandler /Herwig/DipoleShower/DipoleShowerHandler
-read Matchbox/MCatNLO-Dipole-HardAlphaSTune.in
+read snippets/Dipole_AutoTune_prel.in
 
 cd /Herwig/Analysis
 
@@ -22,5 +20,5 @@ set c:NominalMass 0*GeV
 set cbar:NominalMass 0*GeV
 
 cd /Herwig/UnderlyingEvent
-set MEQCD2to2Fast:StrictFlavourScheme On
+set MEQCD2to2Fast:StrictFlavourScheme Yes
 

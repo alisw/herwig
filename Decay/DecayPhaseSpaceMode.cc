@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // DecayPhaseSpaceMode.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -497,14 +497,16 @@ vector<Energy> DecayPhaseSpaceMode::externalMasses(Energy inmass,double & wgt,
     }
   }
   if(mlow>inmass) {
-    CurrentGenerator::log() << "Decay mode " << _extpart[0]->PDGName() << " -> ";
-    for(unsigned int ix=1;ix<_extpart.size();++ix) {
-      CurrentGenerator::log() << _extpart[ix]->PDGName() << " ";
+    if(_integrator->state()==runready) {
+      CurrentGenerator::log() << "Decay mode " << _extpart[0]->PDGName() << " -> ";
+      for(unsigned int ix=1;ix<_extpart.size();++ix) {
+	CurrentGenerator::log() << _extpart[ix]->PDGName() << " ";
+      }
+      CurrentGenerator::log() << "is below threshold in DecayPhaseMode::externalMasses()"
+			      << "the threshold is " << mlow/GeV
+			      << "GeV and the parent mass is " << inmass/GeV
+			      << " GeV\n";
     }
-    CurrentGenerator::log() << "is below threshold in DecayPhaseMode::externalMasses()"
-			    << "the threshold is " << mlow/GeV 
-			    << "GeV and the parent mass is " << inmass/GeV 
-			    << " GeV\n";
     throw Veto();
   }
   // now we need to generate the masses for the particles we haven't

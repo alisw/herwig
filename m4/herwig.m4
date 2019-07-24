@@ -1,53 +1,3 @@
-# check for gcc bug http://gcc.gnu.org/bugzilla/show_bug.cgi?id=34130
-AC_DEFUN([HERWIG_CHECK_ABS_BUG],
-[
-AC_REQUIRE([HERWIG_COMPILERFLAGS])
-if test "$GCC" = "yes"; then
-AC_MSG_CHECKING([for gcc abs bug])
-AC_RUN_IFELSE([
-	AC_LANG_PROGRAM(
-		[[ int foo (int i) { return -2 * __builtin_abs(i - 2); } ]],
-		[[ if ( foo(1) != -2 || foo(3) != -2 ) return 1; ]]
-	)],
-	[ AC_MSG_RESULT([not found. Compiler is ok.]) ],
-	[
-	AC_MSG_RESULT([found. Builtin abs() is buggy.])
-	AC_MSG_CHECKING([if -fno-builtin-abs works])
-	oldcxxflags=$CXXFLAGS
-	CXXFLAGS="$CXXFLAGS -fno-builtin-abs"
-	AC_RUN_IFELSE([
-		AC_LANG_PROGRAM(
-			[[
-			#include <cstdlib>
-			int foo (int i) { return -2 * std::abs(i - 2); }
-			]],
-			[[
-			if (foo(1) != -2 || foo(3) != -2) return 1;
-			]]
-		)],
-		[
-		AC_MSG_RESULT([yes. Setting -fno-builtin-abs.])
-		AM_CXXFLAGS="$AM_CXXFLAGS -fno-builtin-abs"
-		AM_CFLAGS="$AM_CFLAGS -fno-builtin-abs"
-		],
-		[
-		AC_MSG_RESULT([no. Setting -fno-builtin.])
-		AC_MSG_WARN([
-*****************************************************************************
-For this version of gcc, -fno-builtin-abs alone did not work to avoid the
-gcc abs() bug. Instead, all gcc builtin functions are now disabled.
-Update gcc if possible.
-*****************************************************************************])
-		AM_CXXFLAGS="$AM_CXXFLAGS -fno-builtin"
-		AM_CFLAGS="$AM_CFLAGS -fno-builtin"
-		]
-	)
-	CXXFLAGS=$oldcxxflags
-	]
-)
-fi
-])
-
 dnl ##### THEPEG #####
 AC_DEFUN([HERWIG_CHECK_THEPEG],
 [
@@ -61,7 +11,7 @@ AC_ARG_WITH(thepeg,
 AC_MSG_RESULT([$with_thepeg])
 
 if test "x$with_thepeg" = "xno"; then
-	AC_MSG_ERROR([Cannot build Herwig++ without ThePEG. Please set --with-thepeg.])
+	AC_MSG_ERROR([Cannot build Herwig without ThePEG. Please set --with-thepeg.])
 fi
 
 THEPEGLDFLAGS="-L${with_thepeg}/lib/ThePEG"
@@ -78,7 +28,7 @@ if test "${host_cpu}" == "x86_64" -a -e ${with_thepeg}/lib64/ThePEG/libThePEG.so
 fi
 
 if test "x$THEPEGHASLHAPDF" == "xno" ; then
-   AC_MSG_ERROR([Herwig++ requires ThePEG to be build with lhapdf.])
+   AC_MSG_ERROR([Herwig requires ThePEG to be build with lhapdf.])
 fi
 
 THEPEGHASFASTJET="no"
@@ -93,7 +43,7 @@ if test "${host_cpu}" == "x86_64" -a -e ${with_thepeg}/lib64/ThePEG/libThePEG.so
 fi
 
 if test "x$THEPEGHASFASTJET" == "xno" ; then
-   AC_MSG_ERROR([Herwig++ requires ThePEG to be build with FastJet.])
+   AC_MSG_ERROR([Herwig requires ThePEG to be build with FastJet.])
 fi
 
 THEPEGPATH="${with_thepeg}"
@@ -122,7 +72,7 @@ AC_ARG_WITH([thepeg-headers],
 AC_MSG_RESULT([$with_thepeg_headers])
 
 if test "x$with_thepeg_headers" = "xno"; then
-	AC_MSG_ERROR([Cannot build Herwig++ without ThePEG headers. Please set --with-thepeg-headers.])
+	AC_MSG_ERROR([Cannot build Herwig without ThePEG headers. Please set --with-thepeg-headers.])
 fi
 
 THEPEGINCLUDE="-I$with_thepeg_headers"
@@ -377,10 +327,10 @@ AC_SUBST([DO_NJET])
 dnl ##### gosam #####
 AC_DEFUN([HERWIG_CHECK_GOSAM],
 [
-AC_MSG_CHECKING([for gosam])
+AC_MSG_CHECKING([for GoSam])
 
 AC_ARG_WITH([gosam],
-    AS_HELP_STRING([--with-gosam=DIR], [Installation path of gosam]),
+    AS_HELP_STRING([--with-gosam=DIR], [Installation path of GoSam]),
     [],
     [with_gosam=no]
 )
@@ -400,6 +350,14 @@ AS_IF([test "x$have_gosam" = "xlib"],
 
 AS_IF([test "x$with_gosam" != "xno"  -a "x$have_gosam" = "xno"],
       [AC_MSG_ERROR([GoSam requested but not found])])
+
+AS_IF([test "x$with_gosam" != "xno"],
+[AC_MSG_CHECKING([for GoSam version >= 2.0.4])
+tmp_gosamversion=[$(${with_gosam}/bin/gosam.py --version | grep 'GoSam.*rev' | cut -d' ' -f2)]
+AX_COMPARE_VERSION([${tmp_gosamversion}],[lt],[2.0.4],
+                   [AC_MSG_RESULT([no])
+                    AC_MSG_ERROR([Herwig requires GoSam 2.0.4 or later, found ${tmp_gosamversion}])],
+                   [AC_MSG_RESULT([yes])])])
 
 AM_CONDITIONAL(HAVE_GOSAM,[test "x$have_gosam" = "xlib" ])
 
@@ -664,34 +622,98 @@ AC_SUBST([DO_MADGRAPH])
 
 ])
 
-dnl ##### PDF PATH #####
-AC_DEFUN([HERWIG_PDF_PATH],
+
+dnl ##### EvtGen #####
+AC_DEFUN([HERWIG_CHECK_EVTGEN],
 [
-AC_MSG_CHECKING([which Herwig++ PDF data to use])
-AC_ARG_WITH(pdf,
-        AC_HELP_STRING([--with-pdf=DIR],[installation path of Herwig++PDF data tarball]),
-        [],
-        [with_pdf=${prefix}]
-        )
-HERWIG_PDF_PREFIX=${with_pdf}/share/Herwig++PDF
+AC_MSG_CHECKING([for evtgen])
 
-if test -f "${HERWIG_PDF_PREFIX}/mrst/2008/mrstMCal.dat"; then
-	AC_MSG_RESULT([$with_pdf])
-	localPDFneeded=false
+AC_ARG_WITH([evtgen],
+    AS_HELP_STRING([--with-evtgen=DIR], [Installation path of EvtGen]),
+    [],
+    [with_evtgen=no]
+)
+
+AC_MSG_RESULT([$with_evtgen])
+
+AS_IF([test "x$with_evtgen" != "xno"],
+      [AC_CHECK_FILES(
+      ${with_evtgen}/lib/libEvtGenExternal.so,
+      [have_evtgen=lib], [have_evtgen=no])],
+      [have_evtgen=no])
+
+AS_IF([test "x$with_evtgen" != "xno" -a "x$have_evtgen" = "xno"],
+      [AC_CHECK_FILES(
+      ${with_evtgen}/lib64/libEvtGenExternal.so,
+      [have_evtgen=lib64], [have_evtgen=no])])
+
+AS_IF([test "x$with_evtgen" != "xno" -a "x$have_evtgen" = "xno" ],
+      [AC_CHECK_FILES(
+      ${with_evtgen}/lib/libEvtGenExternal.dylib,
+      [have_evtgen=lib], [have_evtgen=no])])
+
+AS_IF([test "x$have_evtgen" = "xlib" -o "x$have_evtgen" = "xlib64" ],
+      [EVTGENPREFIX=${with_evtgen}
+      AC_SUBST(EVTGENPREFIX)
+      ])
+
+AS_IF([test "x$with_evtgen" != "xno"  -a "x$have_evtgen" = "xno"],
+      [AC_MSG_ERROR([EvtGen requested but not found])])
+
+AC_SUBST([EVTGENINCLUDE],[-I$EVTGENPREFIX/include])
+
+AM_CONDITIONAL(HAVE_EVTGEN,[test "x$have_evtgen" = "xlib" -o "x$have_evtgen" = "xlib64"])
+
+if test "x$have_evtgen" = "xlib"  ; then
+     	LOAD_EVTGEN_DECAYS="read EvtGenBDecays.in"
+     	LOAD_EVTGEN_DECAYER="read EvtGenDecayer.in"
+	EVTGENLIBS="-L$with_evtgen/lib -lEvtGen -lEvtGenExternal"
+elif test "x$have_evtgen" = "xlib64"  ; then
+      LOAD_EVTGEN_DECAYS="read EvtGenBDecays.in"
+      LOAD_EVTGEN_DECAYER="read EvtGenDecayer.in"
+  EVTGENLIBS="-L$with_evtgen/lib64 -lEvtGen -lEvtGenExternal"
 else
-	AC_MSG_RESULT([Using built-in PDF data set. For other data sets, set --with-pdf.])
-	HERWIG_PDF_PREFIX=PDF
-	localPDFneeded=true
+     	LOAD_EVTGEN_DECAYS="read HerwigBDecays.in"
+     	LOAD_EVTGEN_DECAYER="#read EvtGenDecayer.in"
+	EVTGENLIBS=""
 fi
-HERWIG_PDF_DEFAULT=${HERWIG_PDF_PREFIX}/mrst/2008/mrstMCal.dat
-HERWIG_PDF_NLO=${HERWIG_PDF_PREFIX}/mrst/2002/mrst2002nlo.dat
-HERWIG_PDF_POMERON=${HERWIG_PDF_PREFIX}/diffraction/
 
-AM_CONDITIONAL(WANT_LOCAL_PDF,[test "x$localPDFneeded" = "xtrue"])
-AC_SUBST(HERWIG_PDF_DEFAULT)
-AC_SUBST(HERWIG_PDF_NLO)
-AC_SUBST(HERWIG_PDF_POMERON)
+AC_SUBST([LOAD_EVTGEN_DECAYS])
+AC_SUBST([LOAD_EVTGEN_DECAYER])
+AC_SUBST([EVTGENLIBS])
+
+
 ])
+
+AC_DEFUN([HERWIG_CHECK_PYTHIA],
+[
+dnl check if a directory is specified for Pythia
+AC_ARG_WITH(pythia,
+            [AC_HELP_STRING([--with-pythia=dir], 
+                            [Assume the given directory for Pythia])])
+
+dnl search for the pythia-config script
+if test "$with_pythia" = ""; then
+   AC_PATH_PROG(pythiaconfig, pythia8-config, no)
+else
+   AC_PATH_PROG(pythiaconfig, pythia8-config, no, ${with_pythia}/bin)
+fi
+
+if test "${pythiaconfig}" = "no"; then
+   AC_MSG_CHECKING(Pythia)
+   AC_MSG_RESULT(no);
+#   $2
+else
+
+   PYTHIA8DATA=`${pythiaconfig} --datadir`/xmldoc
+
+fi
+
+AC_SUBST(PYTHIA8DATA)
+
+])
+
+dnl CHECK PYTHIA END
 
 dnl ###### GSL ######
 AC_DEFUN([HERWIG_CHECK_GSL],
@@ -792,7 +814,7 @@ case "${ax_cv_cxx_compiler_vendor}" in
         AM_CXXFLAGS="-pedantic -Wall -W"
         ;;
      clang)
-        AM_CXXFLAGS="-pedantic -Wall -Wno-overloaded-virtual -Wno-unused-function"
+        AM_CXXFLAGS="-pedantic -Wall -Wno-overloaded-virtual -Wno-unused-function -Wno-unused-parameter"
 dnl  -Wno-unneeded-internal-declaration
         ;;
      intel)
@@ -862,6 +884,7 @@ cat << _HW_EOF_ > config.herwig
 *** OpenLoops:		$with_openloops
 *** VBFNLO:		$with_vbfnlo
 ***
+*** EvtGen:		$with_evtgen
 *** GSL:		$with_gsl
 *** boost:              ${BOOST_CPPFLAGS:-system}
 *** Fastjet:		${fjconfig}

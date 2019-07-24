@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // DipolePKOperator.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_DipolePKOperator_H
@@ -52,6 +52,11 @@ public:
    * element this class represents virtual corrections to.
    */
   virtual void setXComb(tStdXCombPtr xc);
+  
+  /**
+   * Set parameters for new alpha parameter.
+   */
+  virtual void setAlpha (double alpha)const;
 
   /**
    * Return the number of additional random variables
@@ -268,12 +273,12 @@ private:
   /**
    * K_q
    */
-  double KQuark;
+  mutable double KQuark;
 
   /**
    * K_g
    */
-  double KGluon;
+  mutable  double KGluon;
 
   /**
    * The scale to be used.
@@ -332,7 +337,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  DipolePKOperator & operator=(const DipolePKOperator &);
+  DipolePKOperator & operator=(const DipolePKOperator &) = delete;
 
 };
 

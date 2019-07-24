@@ -160,16 +160,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is an abstract class with persistent data.
-   */
-  static AbstractClassDescription<HardProcessConstructor> initHardProcessConstructor;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  HardProcessConstructor & operator=(const HardProcessConstructor &);
+  HardProcessConstructor & operator=(const HardProcessConstructor &) = delete;
 
 private:
 
@@ -192,32 +186,25 @@ private:
 
 };
 
+namespace HPC_helper {
+  // Helper functor for find_if in duplicate function.
+  class SameIncomingAs {
+  public:
+    SameIncomingAs(tPDPair in) : a(in.first->id()), b(in.second->id())  {}
+    bool operator()(tPDPair ppair) const {
+      long id1(ppair.first->id()), id2(ppair.second->id());
+      return ( id1 == a && id2 == b ) || ( id1 == b && id2 == a );
+    }
+  private:
+    long a, b;
+  };
+
+  inline bool duplicateIncoming(tPDPair ppair,const vector<tPDPair> &incPairs) {
+    vector<tPDPair>::const_iterator it = 
+      find_if( incPairs.begin(), incPairs.end(), SameIncomingAs(ppair) );
+    return it != incPairs.end(); 
+  }
 }
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of HardProcessConstructor. */
-template <>
-struct BaseClassTrait<Herwig::HardProcessConstructor,1> {
-  /** Typedef of the first base class of HardProcessConstructor. */
-  typedef Interfaced NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the HardProcessConstructor class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::HardProcessConstructor>
-  : public ClassTraitsBase<Herwig::HardProcessConstructor> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::HardProcessConstructor"; }
-};
-
-/** @endcond */
 
 }
 

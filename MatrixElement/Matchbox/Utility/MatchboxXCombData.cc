@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MatchboxXCombData.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -29,7 +29,6 @@ MatchboxXCombData::MatchboxXCombData()
     theLastLargeNME2(0.0), theCalculateOneLoopInterference(true), 
     theLastOneLoopInterference(0.0), theCalculateOneLoopPoles(true), 
     theLastOneLoopPoles(0.0,0.0), 
-    theNLight(0), 
     theColourBasisDim(0), theNDimPhasespace(0), 
     theNDimAmplitude(0), theNDimInsertions(0), 
     theSymmetryFactor(0.0), theOLPMomenta(0),
@@ -37,6 +36,12 @@ MatchboxXCombData::MatchboxXCombData()
     theInitialized(false), filledExternalMomenta(false) {
   flushCaches();
 }
+
+unsigned int MatchboxXCombData::theNLight(0);
+vector<long> MatchboxXCombData::theNLightJetVec=vector<long> ();
+vector<long> MatchboxXCombData::theNHeavyJetVec=vector<long>() ;
+vector<long> MatchboxXCombData::theNLightProtonVec=vector<long>() ;
+
 
 MatchboxXCombData::~MatchboxXCombData() {
   if ( theOLPMomenta ) {
@@ -57,7 +62,7 @@ MatchboxXCombData::MatchboxXCombData(tMEPtr newME)
     theLastTreeME2(0.0), theCalculateLargeNME2(true), 
     theLastLargeNME2(0.0), theCalculateOneLoopInterference(true), 
     theLastOneLoopInterference(0.0), theCalculateOneLoopPoles(true), 
-    theLastOneLoopPoles(0.0,0.0), theNLight(0), 
+    theLastOneLoopPoles(0.0,0.0),
     theColourBasisDim(0), theNDimPhasespace(0), 
     theNDimAmplitude(0), theNDimInsertions(0), 
     theSymmetryFactor(0.0), theOLPMomenta(0),
@@ -223,20 +228,28 @@ void MatchboxXCombData::flushCaches() {
   theCalculateLargeNME2 = true;
   theCalculateOneLoopInterference = true;
   theCalculateOneLoopPoles = true;
-  for ( map<pair<int,int>,bool>::iterator f = theCalculateColourCorrelators.begin();
-	f != theCalculateColourCorrelators.end(); ++f )
-    f->second = true;
-  for ( map<pair<int,int>,bool>::iterator f = theCalculateLargeNColourCorrelators.begin();
-	f != theCalculateLargeNColourCorrelators.end(); ++f )
-    f->second = true;
-  for ( map<pair<int,int>,bool>::iterator f = theCalculateColourSpinCorrelators.begin();
-	f != theCalculateColourSpinCorrelators.end(); ++f )
-    f->second = true;
-  for ( map<pair<int,int>,bool>::iterator f = theCalculateSpinCorrelators.begin();
-	f != theCalculateSpinCorrelators.end(); ++f )
-    f->second = true;
+  for ( auto & f : theCalculateColourCorrelators )
+    f.second = true;
+  for ( auto & f : theCalculateLargeNColourCorrelators )
+    f.second = true;
+  for ( auto & f : theCalculateColourSpinCorrelators )
+    f.second = true;
+  for ( auto & f : theCalculateSpinCorrelators )
+    f.second = true;
   filledOLPMomenta = false;
   filledExternalMomenta = false;
+    //theLastAmplitudes.clear();
+    //theLastLargeNAmplitudes.clear();
+    //theLastOneLoopAmplitudes.clear();
+  theColourCorrelators.clear();
+  theLargeNColourCorrelators.clear();
+  theColourSpinCorrelators.clear();
+  theSpinCorrelators.clear();
+  theAmplitudeRandomNumbers.clear();
+  theInsertionRandomNumbers.clear();
+  theDiagramWeights.clear();
+  theHelJamp.clear();
+  theLNHelJamp.clear();
 }
 
 void MatchboxXCombData::putCVector(PersistentOStream& os, const CVector& v) {

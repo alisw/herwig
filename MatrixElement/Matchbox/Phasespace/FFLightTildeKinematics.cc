@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // FFLightTildeKinematics.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -65,6 +65,22 @@ Energy FFLightTildeKinematics::lastPt() const {
   return scale * sqrt(y*z*(1.-z));
 
 }
+
+
+Energy FFLightTildeKinematics::lastPt(Lorentz5Momentum emitter,Lorentz5Momentum emission,Lorentz5Momentum spectator)const {
+  Energy scale =  (emitter+emission+spectator).m();
+  double y = emission*emitter/(emission*emitter + emission*spectator + emitter*spectator);
+  double z = emitter*spectator / (emitter*spectator + emission*spectator);
+  Energy ret = scale * sqrt( y  * z*(1.-z) );
+  return ret;
+}
+
+pair<double,double> FFLightTildeKinematics::zBounds(Energy pt, Energy hardPt) const {
+  if(pt>hardPt) return make_pair(0.5,0.5);
+  double s = sqrt(1.-sqr(pt/hardPt));
+  return make_pair(0.5*(1.-s),0.5*(1.+s));
+}
+
 
 double FFLightTildeKinematics::lastZ() const {
   return subtractionParameters()[1];

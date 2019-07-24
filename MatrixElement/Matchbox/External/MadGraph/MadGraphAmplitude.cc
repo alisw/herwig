@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MadGraphAmplitude.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -23,7 +23,6 @@
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
 #include "ThePEG/PDT/EnumParticles.h"
-#include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include <cstdlib>
 #include <dlfcn.h>
@@ -52,13 +51,18 @@ extern "C" void MG_vxxxxx                      (double* p,double* n,int* inc,dou
 extern "C" void MG_Colour                      (int* proc,int* i,int* j ,int* color);
 
 MadGraphAmplitude::MadGraphAmplitude()
-  : theMGmodel("loop_sm"),keepinputtopmass(false),
-    bindir_(HERWIG_BINDIR), includedir_(HERWIG_INCLUDEDIR), pkgdatadir_(HERWIG_PKGDATADIR), madgraphPrefix_(MADGRAPH_PREFIX)
-{}
+  : keepinputtopmass(false){ }
 
 MadGraphAmplitude::~MadGraphAmplitude() {
 
 }
+
+string MadGraphAmplitude::theProcessPath="";
+string MadGraphAmplitude::madgraphPrefix_=MADGRAPH_PREFIX;
+string MadGraphAmplitude::theMGmodel="loop_sm";
+string MadGraphAmplitude::bindir_=HERWIG_BINDIR;
+string MadGraphAmplitude::includedir_=HERWIG_INCLUDEDIR;
+string MadGraphAmplitude::pkgdatadir_=HERWIG_PKGDATADIR;
 
 IBPtr MadGraphAmplitude::clone() const {
   return new_ptr(*this);
@@ -236,7 +240,7 @@ bool MadGraphAmplitude::initializeExternal() {
       generator()->log()<<"\n         https://cp3.irmp.ucl.ac.be/projects/madgraph/wiki/Models/HiggsEffective";
       generator()->log()<<"\n\n         The Effective Higgs model in Gosam is using mT=infinity";
       generator()->log()<<"\n\n\n         If you want to use the LO matrixelements of MadGraph with finite' topmass you need to add:  ";
-      generator()->log()<<"\n\n             set Madgraph:KeepInputTopMass True";
+      generator()->log()<<"\n\n             set Madgraph:KeepInputTopMass Yes";
       generator()->log()<<"\n\n         to your input file.";
       generator()->log()<<"\n---------------------------------------------------------------";
       generator()->log()<<"\n---------------------------------------------------------------\n";
@@ -325,7 +329,7 @@ int MadGraphAmplitude::externalId(const cPDVector& proc) {
   string amp="";
   int k=0;
   for (cPDVector::const_iterator it=proc.begin();it!=proc.end();it++,k++){
-    amp+=boost::lexical_cast<string>( (*it)->id())+" ";if (k==1)amp+=" > ";
+    amp+=std::to_string( (*it)->id())+" ";if (k==1)amp+=" > ";
   }
   
   
@@ -381,7 +385,7 @@ bool MadGraphAmplitude::canHandle(const PDVector& p,
   string amp="";
   int k=0;
   for (PDVector::const_iterator it=p.begin();it!=p.end();it++,k++){
-    amp+=boost::lexical_cast<string>( (*it)->id())+" ";if (k==1)amp+=" > ";
+    amp+=std::to_string( (*it)->id())+" ";if (k==1)amp+=" > ";
   }
    if (virt && factory->highestVirt()>=p.size()){
     VirtAmplitudes.push_back(amp);
@@ -436,7 +440,8 @@ Complex MadGraphAmplitude::evaluate(size_t i, const vector<int>& hel, Complex& l
       return Complex(0.0);
     }
   } else {
-    set<vector<size_t> > a = colourOrdering(i);
+    set<vector<size_t> > a ;
+    if(lastMatchboxXComb()->colourBasisDim()>0)a=colourOrdering(i);
     int ncol=-1;
     MG_NCol(&xx,&ncol);
     assert(ncol!=-1);
@@ -772,17 +777,95 @@ void MadGraphAmplitude::evaloneLoopInterference() const  {
 }
  
 void MadGraphAmplitude::persistentOutput(PersistentOStream & os) const {
-  os << theOrderInGs << theOrderInGem << BornAmplitudes << VirtAmplitudes
-     << colourindex<<crossing << theProcessPath << theMGmodel << bindir_
+  os << theOrderInGs << theOrderInGem
+     << colourindex<<crossing;
+  
+    //Static variables need to be written only once.
+  os << theProcessPath << theMGmodel << bindir_
      << pkgdatadir_ << madgraphPrefix_;
+  theProcessPath.clear();
+  theMGmodel.clear();
+  bindir_.clear();
+  pkgdatadir_.clear();
+  madgraphPrefix_.clear();
+  
+  os << BornAmplitudes.size();
+  os << VirtAmplitudes.size();
+  for (auto amp : BornAmplitudes) os<<amp;
+  for (auto amp : VirtAmplitudes) os<<amp;
+  
+  BornAmplitudes.clear();
+  VirtAmplitudes.clear();
 }
  
 void MadGraphAmplitude::persistentInput(PersistentIStream & is, int) {
-  is >> theOrderInGs >> theOrderInGem >> BornAmplitudes >> VirtAmplitudes
-     >> colourindex>>crossing >> theProcessPath >> theMGmodel >> bindir_
-     >> pkgdatadir_ >> madgraphPrefix_;
+  is >> theOrderInGs >> theOrderInGem
+  >> colourindex>>crossing;
+  
+  string input=""; is>>input; if (!input.empty())theProcessPath=input;
+  input=""; is>>input; if (!input.empty())theMGmodel=input;
+  input=""; is>>input; if (!input.empty())bindir_=input;
+  input=""; is>>input; if (!input.empty())pkgdatadir_=input;
+  input=""; is>>input; if (!input.empty())madgraphPrefix_=input;
+  
+  int bs,vs;
+  is >> bs;
+  is >> vs;
+  string amp="";
+  for (int i=0;i<bs;i++){
+    is>>amp;
+    BornAmplitudes.push_back(amp);
+    amp="";
+  }
+  for (int i=0;i<vs;i++){
+    is>>amp;
+    VirtAmplitudes.push_back(amp);
+    amp="";
+  }
+  
 }
- 
+
+
+
+
+
+
+void MadGraphAmplitude::setProcessPath(string p){
+  theProcessPath=p;
+}
+string MadGraphAmplitude::getProcessPath() const{
+  return theProcessPath;
+}
+
+void MadGraphAmplitude::setBinDir(string p){
+  bindir_=p;
+}
+string MadGraphAmplitude::getBinDir() const {
+  return bindir_;
+}
+
+void MadGraphAmplitude::setDataDir(string p){
+  pkgdatadir_=p;
+}
+string MadGraphAmplitude::getDataDir() const {
+  return pkgdatadir_;
+}
+
+void MadGraphAmplitude::setModel(string p) {
+ theMGmodel=p;
+}
+string MadGraphAmplitude::getModel() const {
+  return theMGmodel;
+}
+
+void MadGraphAmplitude::setMadgraphPrefix(string p) {
+  madgraphPrefix_=p;
+}
+string MadGraphAmplitude::getMadgraphPrefix() const {
+  return madgraphPrefix_;
+}
+
+
 // *** Attention *** The following static variable is needed for the type
 // description system in ThePEG. Please check that the template arguments
 // are correct (the class and its base class), and that the constructor
@@ -806,44 +889,57 @@ void MadGraphAmplitude::Init() {
   static Parameter<MadGraphAmplitude,string> interfaceProcessPath
     ("ProcessPath",
      "The Process Path.",
-     &MadGraphAmplitude::theProcessPath, "",false, false);
+     0 , "",false, false,
+     &MadGraphAmplitude::setProcessPath,
+     &MadGraphAmplitude::getProcessPath);
   
   static Parameter<MadGraphAmplitude,string> interfaceModel
     ("Model",
      "The MadGraph-Model.",
-     &MadGraphAmplitude::theMGmodel, "loop_sm",false, false);
+     0, "loop_sm",false, false,
+     &MadGraphAmplitude::setModel,
+     &MadGraphAmplitude::getModel);
   
   static Switch<MadGraphAmplitude,bool> interfacekeepinputtopmass
          ("KeepInputTopMass",
           "Switch On/Off formopt",
           &MadGraphAmplitude::keepinputtopmass, false, false, false);
-  static SwitchOption interfacekeepinputtopmassTrue
+  static SwitchOption interfacekeepinputtopmassYes
          (interfacekeepinputtopmass,
-          "On",
-          "On",
+          "Yes",
+          "Yes",
           true);
-  static SwitchOption interfacekeepinputtopmassFalse
+  static SwitchOption interfacekeepinputtopmassNo
          (interfacekeepinputtopmass,
-          "Off",
-          "Off",
+          "No",
+          "No",
           false);  
-    
+  
+    static Parameter<MadGraphAmplitude,string> interfaceMadgraphPrefix
+    ("MadgraphPrefix",
+     "The prefix for the location of MadGraph",
+     0, string(MADGRAPH_PREFIX),
+     false, false,
+     &MadGraphAmplitude::setMadgraphPrefix,
+     &MadGraphAmplitude::getMadgraphPrefix);
+  
+    /// JB: I don't know why these should be needed:
   static Parameter<MadGraphAmplitude,string> interfaceBinDir
     ("BinDir",
      "The location for the installed executable",
-     &MadGraphAmplitude::bindir_, string(HERWIG_BINDIR),
-     false, false);
+     0, string(HERWIG_BINDIR),
+     false, false,
+     &MadGraphAmplitude::setBinDir,
+     &MadGraphAmplitude::getBinDir);
 
   static Parameter<MadGraphAmplitude,string> interfacePKGDATADIR
     ("DataDir",
      "The location for the installed Herwig data files",
-     &MadGraphAmplitude::pkgdatadir_, string(HERWIG_PKGDATADIR),
-     false, false);
+     0, string(HERWIG_PKGDATADIR),
+     false, false,
+     &MadGraphAmplitude::setDataDir,
+     &MadGraphAmplitude::getDataDir);
     
-  static Parameter<MadGraphAmplitude,string> interfaceMadgraphPrefix
-    ("MadgraphPrefix",
-     "The prefix for the location of MadGraph",
-     &MadGraphAmplitude::madgraphPrefix_, string(MADGRAPH_PREFIX),
-     false, false);
+
 
 }

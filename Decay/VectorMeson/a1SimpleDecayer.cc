@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // a1SimpleDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -354,7 +354,7 @@ double a1SimpleDecayer::me2(const int ichan,const Particle & inpart,
   }
   // compute the matrix element
   for(unsigned int ix=0;ix<3;++ix)
-    (*ME())(ix,0,0,0)=_coupling*current.dot(_vectors[ix]);
+    (*ME())(ix,0,0,0) = Complex(_coupling*current.dot(_vectors[ix]));
   // matrix element and identical particle factor
   double output=ME()->contract(_rho).real();
   if(imode()!=1) output*=0.5;

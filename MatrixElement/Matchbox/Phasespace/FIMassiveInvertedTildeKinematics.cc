@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // FIMassiveInvertedTildeKinematics.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -63,7 +63,10 @@ bool FIMassiveInvertedTildeKinematics::doMap(const double * r) {
     return false;
   }
 
-  // no additional massive factors
+  // SW 05/12/2016: Checked this is correct
+  // This should appear to have a factor of 1/x relative
+  // to the dipole shower jacobian. It is cancelled by ratios of
+  // real and born cross sections in the units.
   mapping /= z*(1.-z);
   jacobian(mapping*(sqr(lastScale())/sHat())/(16.*sqr(Constants::pi)));
 
@@ -84,9 +87,9 @@ bool FIMassiveInvertedTildeKinematics::doMap(const double * r) {
   double mu2  = x*m2/scale;
   double Mui2 = x*Mi2/scale;
   double xp = 1. + Mui2 - sqr(sqrt(mui2)+sqrt(mu2));
-  double zm = .5*( 1.-x+Mui2+mui2-mui2 -
+  double zm = .5*( 1.-x+Mui2+mui2-mu2 -
   		   sqrt( sqr(1.-x+Mui2-mui2-mu2)-4.*mui2*mu2 ) ) / (1.-x+Mui2);
-  double zp = .5*( 1.-x+Mui2+mui2-mui2 +
+  double zp = .5*( 1.-x+Mui2+mui2-mu2 +
   		   sqrt( sqr(1.-x+Mui2-mui2-mu2)-4.*mui2*mu2 ) ) / (1.-x+Mui2);
 
   if ( x > xp || z < zm || z > zp ) {
@@ -166,7 +169,7 @@ void FIMassiveInvertedTildeKinematics::Init() {
 
   static ClassDocumentation<FIMassiveInvertedTildeKinematics> documentation
     ("FIMassiveInvertedTildeKinematics inverts the final-initial tilde "
-     "kinematics.");
+     "kinematics involving a massive particle.");
 
 }
 

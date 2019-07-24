@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MatchboxReference.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef Herwig_MatchboxReference_H
@@ -61,7 +61,7 @@ public:
   }
 
   /**
-   * Return true, if this phasespace generator will generate incoming
+   * Return true, if this phase space generator will generate incoming
    * partons itself.
    */
   virtual bool haveX1X2() const { return true; }
@@ -126,7 +126,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MatchboxReference & operator=(const MatchboxReference &);
+  MatchboxReference & operator=(const MatchboxReference &) = delete;
 
   /**
    * Stream to read the reference samples.

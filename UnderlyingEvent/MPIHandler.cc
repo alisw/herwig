@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MPIHandler.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -185,14 +185,21 @@ void MPIHandler::initialize() {
 	softMu2_ = rootFinder.value(fs, 0.3*GeV2, 1.*GeV2);
 	softXSec_ = fs.softXSec();
       }catch(GSLBisection::IntervalError){
+        try{
+	// Very low energies (e.g. 200 GeV) need this.
+	// Very high energies (e.g. 100 TeV) produce issues with
+	// this choice. This is a temp. fix.  
+          softMu2_ = rootFinder.value(fs, 0.25*GeV2, 1.3*GeV2);
+          softXSec_ = fs.softXSec();
+        }catch(GSLBisection::IntervalError){
 	throw Exception() <<
-        "\n**********************************************************\n"
-	  "* Inconsistent MPI parameter choice for this beam energy *\n"
+        "\n**********************************************************\n"	  "* Inconsistent MPI parameter choice for this beam energy *\n"
 	  "**********************************************************\n"
 	  "MPIHandler parameter choice is unable to reproduce\n"
 	  "the total cross section. Please check arXiv:0806.2949\n"
 	  "for the allowed parameter space."
 			  << Exception::runerror;
+        }
       }
 
     }else{
@@ -236,9 +243,16 @@ void MPIHandler::initialize() {
     try{
       beta_ = rootFinder.value(fn2, -10/GeV2, 2/GeV2);
     }catch(GSLBisection::IntervalError){
+      try{
+	// Very low energies (e.g. 200 GeV) need this.
+	// Very high energies (e.g. 100 TeV) produce issues with
+	// this choice. This is a temp. fix.
+        beta_ = rootFinder.value(fn2, -5/GeV2, 8./GeV2);
+      }catch(GSLBisection::IntervalError){
       throw Exception() << "MPIHandler: slope of soft pt spectrum couldn't be "
 			<< "determined."
 			<< Exception::runerror;    
+      }
     }
   }
 
@@ -469,7 +483,7 @@ LengthDiff slopeInt::operator() (Length b) const {
 
 double MPIHandler::factorial (unsigned int n) const {
 
-  double f[] = {1.,1.,2.,6.,24.,120.,720.,5040.,40320.,362880.,3.6288e6,
+  static double f[] = {1.,1.,2.,6.,24.,120.,720.,5040.,40320.,362880.,3.6288e6,
 		3.99168e7,4.790016e8,6.2270208e9,8.71782912e10,1.307674368e12,
 		2.0922789888e13,3.55687428096e14,6.402373705728e15,1.21645100408832e17,
 		2.43290200817664e18,5.10909421717094e19,1.12400072777761e21,

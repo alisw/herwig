@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MadGraphAmplitude.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef Herwig_MadGraphAmplitude_H
@@ -286,12 +286,12 @@ protected:
   /**
    * The path for the process libraries.
    */
-  string theProcessPath;
+  static string theProcessPath;
   
   /**
    * The path to generate amplitudes in.
    */
-  string theMGmodel;
+  static string theMGmodel;
   
   bool keepinputtopmass;
 
@@ -329,22 +329,41 @@ protected:
   /**
    *   Location of the installed executables
    */
-  string bindir_;
+  static string bindir_;
 
   /**
    *   Location of the installed include files
    */
-  string includedir_;
+  static string includedir_;
 
   /**
    *   Location of the data files
    */
-  string pkgdatadir_;
+  static string pkgdatadir_;
 
   /**
    *  Location of MADGRAPH
    */
-  string madgraphPrefix_;
+  static string madgraphPrefix_;
+      
+  /**
+   *  Helper functions to make long strings static
+   */
+      
+  void setProcessPath(string );
+  string getProcessPath() const;
+      
+  void setBinDir(string p);
+  string getBinDir() const;
+      
+  void setDataDir(string p);
+  string getDataDir() const;
+     
+  void setModel(string p);
+  string getModel() const;
+      
+  void setMadgraphPrefix(string p);
+  string getMadgraphPrefix() const ;
 
 private:
 
@@ -352,7 +371,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MadGraphAmplitude & operator=(const MadGraphAmplitude &);
+  MadGraphAmplitude & operator=(const MadGraphAmplitude &) = delete;
 
 
 };

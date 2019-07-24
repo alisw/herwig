@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // WeakCurrentDecayConstructor.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -12,6 +12,7 @@
 //
 
 #include "WeakCurrentDecayConstructor.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/ParVector.h"
@@ -73,8 +74,10 @@ void WeakCurrentDecayConstructor::persistentInput(PersistentIStream & is, int) {
   is >> iunit(_masscut,GeV) >> decayTags_ >> particles_ >> _norm >> _current;
 }
 
-ClassDescription<WeakCurrentDecayConstructor> WeakCurrentDecayConstructor::initWeakCurrentDecayConstructor;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<WeakCurrentDecayConstructor,NBodyDecayConstructorBase>
+describeHerwigWeakCurrentDecayConstructor("Herwig::WeakCurrentDecayConstructor", "Herwig.so");
 
 void WeakCurrentDecayConstructor::Init() {
 
@@ -255,7 +258,7 @@ createDecayMode(vector<TwoBodyDecay> & decays) {
 		   << Exception::warning;
 	generator()->preinitInterface(ndm, "Decayer", "set",
 				      decayer->fullName());
-	generator()->preinitInterface(ndm, "OnOff", "set", "On");
+	generator()->preinitInterface(ndm, "Active", "set", "Yes");
 	setBranchingRatio(ndm, pWidth);
 	particles[0]->stable(false);
 	if(ndm->brat()<decayConstructor()->minimumBR()) {
@@ -279,7 +282,7 @@ createDecayMode(vector<TwoBodyDecay> & decays) {
 					  "Initialize", "set","0");
 	    continue;
 	  }
-	  generator()->preinitInterface(dm, "OnOff", "set", "On");
+	  generator()->preinitInterface(dm, "Active", "set", "Yes");
 	  particles[0]->width(particles[0]->width()*(1.-dm->brat()));
 	  setBranchingRatio(dm, pWidth);
 	}

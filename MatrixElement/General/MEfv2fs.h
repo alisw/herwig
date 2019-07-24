@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MEfv2fs.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_MEfv2fs_H
@@ -21,6 +21,7 @@
 #include "ThePEG/Helicity/Vertex/AbstractFFVVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractVSSVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractVVSVertex.h"
 
 namespace Herwig {
 using namespace ThePEG;
@@ -55,7 +56,7 @@ public:
   /**
    * The default constructor.
    */
-  MEfv2fs() : scalar_(0), fermion_(0) {}
+  MEfv2fs() : scalar_(0), fermion_(0), vector_(0) {}
 
 public:
 
@@ -181,16 +182,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEfv2fs> initMEfv2fs;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEfv2fs & operator=(const MEfv2fs &);
+  MEfv2fs & operator=(const MEfv2fs &) = delete;
 
 private:
 
@@ -203,35 +198,13 @@ private:
    * Store a pair of  FFSVertex and FFVVertex pointers  
    */
   vector<pair<AbstractFFSVertexPtr, AbstractFFVVertexPtr> > fermion_;
+
+  /**
+   * Store a pair of  VVSVertex and FFVVertex pointers  
+   */
+  vector<pair<AbstractFFVVertexPtr,AbstractVVSVertexPtr> > vector_;
   
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEfv2fs. */
-template <>
-struct BaseClassTrait<Herwig::MEfv2fs,1> {
-  /** Typedef of the first base class of MEfv2fs. */
-  typedef Herwig::GeneralHardME NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEfv2fs class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEfv2fs>
-  : public ClassTraitsBase<Herwig::MEfv2fs> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEfv2fs"; }
-};
-
-/** @endcond */
 
 }
 

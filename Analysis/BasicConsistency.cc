@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // BasicConsistency.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -21,6 +21,7 @@
 #include "ThePEG/Persistency/PersistentIStream.h"
 #include "Herwig/Utilities/EnumParticles.h"
 #include "ThePEG/PDT/DecayMode.h"
+#include "ThePEG/Utilities/ColourOutput.h"
 
 using namespace Herwig;
 using namespace ThePEG;
@@ -93,11 +94,10 @@ void BasicConsistency::analyze(tEventPtr event, long, int, int) {
 	test = (*it)->lifeLength();
 	break;
       }
-      problem |= 
-	std::isnan(test.x()/mm) || std::isnan(test.y()/mm) ||
-	std::isnan(test.z()/mm) || std::isnan(test.t()/mm) ||
-	std::isinf(test.x()/mm) || std::isinf(test.y()/mm) ||
-	std::isinf(test.z()/mm) || std::isinf(test.t()/mm);
+      problem |= ! ( isfinite(double(test.x()/mm)) && 
+                     isfinite(double(test.y()/mm)) && 
+                     isfinite(double(test.z()/mm)) && 
+                     isfinite(double(test.t()/mm)) );
     }
     if(problem) {
       generator()->log() << "Problem with position of " << **it << "\n"
@@ -125,7 +125,7 @@ void BasicConsistency::analyze(tEventPtr event, long, int, int) {
   Energy mag = ptotal.m();
   Energy ee  = ptotal.e();
 
-  if (std::isnan(mag/MeV)) {
+  if (std::isnan(double(mag/MeV))) {
     cerr << "\nMomentum is 'nan'; " << ptotal/MeV 
 	 << " MeV in event " << event->number() << '\n';
     generator()->log() <<"\nMomentum is 'nan'; " << ptotal/MeV 
@@ -184,7 +184,7 @@ void BasicConsistency::analyze(tEventPtr event, long, int, int) {
 	test = (*it)->lifeLength();
 	break;
       }
-      problem |= std::isnan(test.m2()/mm/mm) || std::isinf(test.m2()/mm/mm);
+      problem |= ( ! isfinite(double(test.m2()/mm/mm)) );
     }
     if(problem) {
       generator()->log() << "Problem with position of " << **it << "\n"
@@ -300,7 +300,9 @@ void BasicConsistency::Init() {
 void BasicConsistency::dofinish() {
   AnalysisHandler::dofinish();
   cout << "\nBasicConsistency: maximum 4-momentum violation: " 
-       << _epsmom/MeV << " MeV\n";
+       << ANSI::blue
+       << _epsmom/MeV << " MeV\n"
+       << ANSI::reset;
 }
 
 void BasicConsistency::doinitrun() {

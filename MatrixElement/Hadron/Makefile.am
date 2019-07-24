@@ -17,11 +17,12 @@ MEPP2VV.cc   MEPP2VV.h  \
 MEPP2VGamma.cc   MEPP2VGamma.h  \
 MEPP2HiggsVBF.cc   MEPP2HiggsVBF.h  \
 MEPP2SingleTop.cc   MEPP2SingleTop.h  \
-MEMinBias.h MEMinBias.cc
+MEMinBias.h MEMinBias.cc \
+MEDiffraction.h MEDiffraction.cc
 
-HwMEHadron_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 7:0:0
+HwMEHadron_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 9:0:0
 
 pkglib_LTLIBRARIES += HwMEHadronFast.la
 HwMEHadronFast_la_SOURCES = \
 MEQCD2to2Fast.h MEQCD2to2Fast.cc
-HwMEHadronFast_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 5:0:0
+HwMEHadronFast_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 7:0:0

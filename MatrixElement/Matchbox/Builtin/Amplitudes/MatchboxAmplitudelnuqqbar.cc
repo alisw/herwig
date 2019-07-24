@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MatchboxAmplitudelnuqqbar.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -24,6 +24,8 @@ MatchboxAmplitudelnuqqbar::~MatchboxAmplitudelnuqqbar() {}
 
 void MatchboxAmplitudelnuqqbar::doinit() {
   MatchboxAmplitude::doinit();
+  MZ = getParticleData(ParticleID::Z0)->hardProcessMass();
+  GZ = getParticleData(ParticleID::Z0)->hardProcessWidth();
   MW = getParticleData(ParticleID::Wplus)->hardProcessMass();
   GW = getParticleData(ParticleID::Wplus)->hardProcessWidth();
   CA = SM().Nc();
@@ -34,6 +36,12 @@ void MatchboxAmplitudelnuqqbar::doinit() {
 
 void MatchboxAmplitudelnuqqbar::doinitrun() {
   MatchboxAmplitude::doinitrun();
+  MZ = getParticleData(ParticleID::Z0)->hardProcessMass();
+  GZ = getParticleData(ParticleID::Z0)->hardProcessWidth();
+  MW = getParticleData(ParticleID::Wplus)->hardProcessMass();
+  GW = getParticleData(ParticleID::Wplus)->hardProcessWidth();
+  CA = SM().Nc();
+  CF = (SM().Nc()*SM().Nc()-1.)/(2.*SM().Nc());
   nPoints(4);
 }
 
@@ -110,8 +118,8 @@ Complex MatchboxAmplitudelnuqqbar::evaluate(size_t, const vector<int>& hel, Comp
       amplitudePartonData()[1]->id() < 0:
       amplitudePartonData()[0]->id() < 0;
     pair<int,int> tmp(
-      SU2Helper::family(amplitudePartonData()[2]),
-      SU2Helper::family(amplitudePartonData()[3]));
+      SU2Helper::family(amplitudePartonData()[2])-1,
+      SU2Helper::family(amplitudePartonData()[3])-1);
     if ( amplitudePartonData()[3]->id() < 0 ) swap(tmp.first,tmp.second);
     ckmelement = theCKM[tmp.first][tmp.second];
     if ( !wPlus ) ckmelement = conj(ckmelement);
@@ -136,8 +144,8 @@ Complex MatchboxAmplitudelnuqqbar::evaluateOneLoop(size_t, const vector<int>& he
       amplitudePartonData()[1]->id() < 0:
       amplitudePartonData()[0]->id() < 0;
     pair<int,int> tmp(
-      SU2Helper::family(amplitudePartonData()[2]),
-      SU2Helper::family(amplitudePartonData()[3]));
+      SU2Helper::family(amplitudePartonData()[2])-1,
+      SU2Helper::family(amplitudePartonData()[3])-1);
     if ( amplitudePartonData()[3]->id() < 0 ) swap(tmp.first,tmp.second);
     ckmelement = theCKM[tmp.first][tmp.second];
     if ( !wPlus ) ckmelement = conj(ckmelement);
@@ -154,11 +162,11 @@ Complex MatchboxAmplitudelnuqqbar::evaluateOneLoop(size_t, const vector<int>& he
 }
 
 void MatchboxAmplitudelnuqqbar::persistentOutput(PersistentOStream & os) const {
-  os <<  theDiagonal << theCKM << ounit(MW,GeV) << ounit(GW,GeV) << CA << CF;
+  os <<  theDiagonal << theCKM ;
 }
 
 void MatchboxAmplitudelnuqqbar::persistentInput(PersistentIStream & is, int) {
-  is >>  theDiagonal >> theCKM >> iunit(MW,GeV) >> iunit(GW,GeV) >> CA >> CF;
+  is >>  theDiagonal >> theCKM ;
 }
 
 DescribeClass<MatchboxAmplitudelnuqqbar,MatchboxAmplitude>

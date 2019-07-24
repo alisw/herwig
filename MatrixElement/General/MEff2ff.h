@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MEff2ff.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_MEff2ff_H
@@ -186,16 +186,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEff2ff> initMEff2ff;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEff2ff & operator=(const MEff2ff &);
+  MEff2ff & operator=(const MEff2ff &) = delete;
 
 private:
   
@@ -224,33 +218,6 @@ private:
    */
   mutable vector<vector<SpinorBarWaveFunction> > sbar_;
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEff2ff. */
-template <>
-struct BaseClassTrait<Herwig::MEff2ff,1> {
-  /** Typedef of the first base class of MEff2ff. */
-  typedef Herwig::GeneralHardME NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEff2ff class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEff2ff>
-  : public ClassTraitsBase<Herwig::MEff2ff> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEff2ff"; }
-};
-
-/** @endcond */
 
 }
 

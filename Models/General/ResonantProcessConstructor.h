@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // ResonantProcessConstructor.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_ResonantProcessConstructor_H
@@ -158,17 +158,10 @@ private:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<ResonantProcessConstructor> 
-  initResonantProcessConstructor;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  ResonantProcessConstructor & operator=(const ResonantProcessConstructor &);
+  ResonantProcessConstructor & operator=(const ResonantProcessConstructor &) = delete;
 
 private:
 
@@ -214,32 +207,5 @@ private:
 
 }
 
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of ResonantProcessConstructor. */
-template <>
-struct BaseClassTrait<Herwig::ResonantProcessConstructor,1> {
-  /** Typedef of the first base class of ResonantProcessConstructor. */
-  typedef Herwig::HardProcessConstructor NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the ResonantProcessConstructor class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::ResonantProcessConstructor>
-  : public ClassTraitsBase<Herwig::ResonantProcessConstructor> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::ResonantProcessConstructor"; }
-};
-
-/** @endcond */
-
-}
 
 #endif /* HERWIG_ResonantProcessConstructor_H */

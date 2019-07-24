@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MatchboxTopMassScale.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2014 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef Herwig_MatchboxTopMassScale_H
@@ -55,6 +55,12 @@ public:
    */
   virtual Energy2 factorizationScale() const;
 
+  /**
+   * Return the shower hard scale.
+   */
+  virtual Energy2 showerScale() const;
+
+
 public:
 
   /** @name Functions used by the persistent I/O system. */
@@ -100,6 +106,10 @@ protected:
 
 private:
 
+  /**
+   * Switch to choose the definition of the shower hard scale.
+   */
+  unsigned int theShowerScaleMode;
 
 // If needed, insert declarations of virtual function defined in the
 // InterfacedBase class here (using ThePEG-interfaced-decl in Emacs).
@@ -111,7 +121,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MatchboxTopMassScale & operator=(const MatchboxTopMassScale &);
+  MatchboxTopMassScale & operator=(const MatchboxTopMassScale &) = delete;
 
 };
 

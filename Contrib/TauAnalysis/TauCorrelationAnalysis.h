@@ -117,12 +117,12 @@ protected:
    * Analyze the given particle for correlations with pi.
    * @param particle pointer to the particle to be analyzed.
    */
-  void analyzePi(tPPtr particle);
+  void analyzePi(tPPtr particle, ParticleVector children);
   /**
    * Analyze the given particle for correlations with rho.
    * @param particle pointer to the particle to be analyzed.
    */
-  void analyzeRho(tPPtr particle);
+  void analyzeRho(tPPtr particle, ParticleVector children);
   //@}
 
 private:
@@ -137,7 +137,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  TauCorrelationAnalysis & operator=(const TauCorrelationAnalysis &);
+  TauCorrelationAnalysis & operator=(const TauCorrelationAnalysis &) = delete;
 
 private:
 

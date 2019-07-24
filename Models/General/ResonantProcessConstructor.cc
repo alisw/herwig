@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // ResonantProcessConstructor.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -12,6 +12,7 @@
 //
 
 #include "ResonantProcessConstructor.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -39,9 +40,10 @@ void ResonantProcessConstructor::persistentInput(PersistentIStream & is, int) {
      >> processOption_ >> scaleChoice_ >> scaleFactor_;
 }
 
-ClassDescription<ResonantProcessConstructor> 
-ResonantProcessConstructor::initResonantProcessConstructor;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<ResonantProcessConstructor,HardProcessConstructor>
+describeHerwigResonantProcessConstructor("Herwig::ResonantProcessConstructor", "Herwig.so");
 
 void ResonantProcessConstructor::Init() {
 
@@ -94,6 +96,12 @@ void ResonantProcessConstructor::Init() {
      "Inclusive",
      "Generate all modes which are allowed for the on-shell intermediate particle",
      3);
+  static SwitchOption interfaceProcessesVeryExclusive
+    (interfaceProcesses,
+     "VeryExclusive",
+     "Require that both the incoming and outgoing particles in the hard processes are in the"
+     " list of outgoing particles in every hard process",
+     4);
 
   static Switch<ResonantProcessConstructor,unsigned int> interfaceScaleChoice
     ("ScaleChoice",
@@ -126,32 +134,19 @@ void ResonantProcessConstructor::Init() {
 
 void ResonantProcessConstructor::doinit() {
   HardProcessConstructor::doinit();
-  if(processOption_==2&&outgoing_.size()!=2)
+  if((processOption_==2 || processOption_==4) &&
+     outgoing_.size()!=2)
     throw InitException() 
       << "Exclusive processes require exactly"
       << " two outgoing particles but " << outgoing_.size()
       << "have been inserted in ResonantProcessConstructor::doinit()."
       << Exception::runerror;
-}
-
-namespace {
-  // Helper functor for find_if in duplicate function.
-  class SameIncomingAs {
-  public:
-    SameIncomingAs(tPDPair in) : a(in.first->id()), b(in.second->id())  {}
-    bool operator()(tPDPair ppair) const {
-      long id1(ppair.first->id()), id2(ppair.second->id());
-      return ( id1 == a && id2 == b ) || ( id1 == b && id2 == a );
-    }
-  private:
-    long a, b;
-  };
-
-  bool duplicateIncoming(tPDPair ppair,const vector<tPDPair> &incPairs) {
-    vector<tPDPair>::const_iterator it = 
-      find_if( incPairs.begin(), incPairs.end(), SameIncomingAs(ppair) );
-    return it != incPairs.end(); 
-  }
+  if(processOption_==4 && incoming_.size()!=2)
+    throw InitException() 
+      << "Exclusive processes require exactly"
+      << " two incoming particles but " << incoming_.size()
+      << "have been inserted in ResonantProcessConstructor::doinit()."
+      << Exception::runerror;
 }
 
 void ResonantProcessConstructor::constructDiagrams() {
@@ -166,7 +161,7 @@ void ResonantProcessConstructor::constructDiagrams() {
 	  (inc.first->iSpin() == inc.second->iSpin() &&
 	   inc.first->id() < inc.second->id()) )
 	swap(inc.first, inc.second);
-      if( !duplicateIncoming(inc,incPairs) ) {
+      if( !HPC_helper::duplicateIncoming(inc,incPairs) ) {
 	incPairs.push_back(inc);
       }
     }
@@ -266,12 +261,19 @@ makeResonantDiagram(IDPair in, PDPtr offshell, long outa, long outb,
 		getParticleData(newdiag.outgoing.second));
     if(loc==outgoing_.end()) return;
   }
-  else if(processOption_==2) {
+  else if(processOption_==2 || processOption_==4 ) {
     if(!((newdiag.outgoing. first==outgoing_[0]->id()&&
 	  newdiag.outgoing.second==outgoing_[1]->id())||
 	 (newdiag.outgoing. first==outgoing_[1]->id()&&
 	  newdiag.outgoing.second==outgoing_[0]->id())))
       return;
+    if(processOption_==4) {
+      if(!((newdiag.incoming. first==incoming_[0]->id()&&
+	    newdiag.incoming.second==incoming_[1]->id())||
+	   (newdiag.incoming. first==incoming_[1]->id()&&
+	    newdiag.incoming.second==incoming_[0]->id())))
+	return;
+    }
   }
   // add to the list
   diagrams_.push_back(newdiag);

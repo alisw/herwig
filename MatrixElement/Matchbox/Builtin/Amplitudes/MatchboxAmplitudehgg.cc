@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MatchboxAmplitudehgg.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -143,11 +143,14 @@ void MatchboxAmplitudehgg::Init() {
 
   static ClassDocumentation<MatchboxAmplitudehgg> documentation
     ("MatchboxAmplitudehgg");
+
+  /* // not used guess leftover from validation (mu2() variation)
   static Parameter<MatchboxAmplitudehgg,Energy> interfaceTHooft
     ("interfaceTHooft",
      "The THooft Mass.",
      &MatchboxAmplitudehgg::interfaceTHooft, GeV, 115.0*GeV, 0.0*GeV, 0*GeV,
      false, false, Interface::lowerlim);
+  */
 
 }
 

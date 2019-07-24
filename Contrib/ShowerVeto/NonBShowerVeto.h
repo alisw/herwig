@@ -5,7 +5,7 @@
 // This is the declaration of the NonBShowerVeto class.
 //
 
-#include "Herwig/Shower/Base/FullShowerVeto.h"
+#include "Herwig/Shower/QTilde/Base/FullShowerVeto.h"
 
 namespace Herwig {
 
@@ -66,7 +66,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  NonBShowerVeto & operator=(const NonBShowerVeto &);
+  NonBShowerVeto & operator=(const NonBShowerVeto &) = delete;
 
 };
 

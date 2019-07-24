@@ -1,54 +1,41 @@
 // -*- C++ -*-
 //
 // AmplitudeCache.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 
 namespace Herwig {
 namespace SpinorHelicity {
 
-template<class AmplitudeKey>
+template<typename AmplitudeKey>
 void AmplitudeCache<AmplitudeKey>::nPoints(int n) {
+
+  assert( n <= MAX_N );
 
   theNPoints = n;
 
-  theMasses.clear();
-  theMomenta.clear();
-  theCrossingSigns.clear();
-  thePlusSpinors.clear();
-  thePlusConjugateSpinors.clear();  
-  theInvariants.clear();
-  thePlusProducts.clear();
-  thePlusCurrents.clear();
-  getInvariant.clear();
-  getPlusProduct.clear();
-  getPlusCurrent.clear();
-
-  theMasses.resize(n);
-  theMomenta.resize(n);
-  theCrossingSigns.resize(n);
-  thePlusSpinors.resize(n);
-  thePlusConjugateSpinors.resize(n);  
-  theInvariants.resize(n,vector<double>(n));
-  thePlusProducts.resize(n,vector<Complex>(n));
-  thePlusCurrents.resize(n,vector<LorentzVector<Complex> >(n));
-  getInvariant.resize(n,vector<bool>(n));
-  getPlusProduct.resize(n,vector<bool>(n));
-  getPlusCurrent.resize(n,vector<bool>(n));
+  theMasses.fill({});
+  theMomenta.fill({});
+  theCrossingSigns.fill({});
+  thePlusSpinors.fill(PlusSpinor());
+  thePlusConjugateSpinors.fill(PlusConjugateSpinor());  
+  theInvariants.fill({});
+  thePlusProducts.fill({});
+  thePlusCurrents.fill({});
 
   reset();    
 }
 
-template<class AmplitudeKey>
+template<typename AmplitudeKey>
 void AmplitudeCache<AmplitudeKey>::amplitudeScale(Energy s) const { 
   theScale = s;
   reset();
 }
 
-template<class AmplitudeKey>
+template<typename AmplitudeKey>
 void AmplitudeCache<AmplitudeKey>::momentum(int k, const LorentzMomentum& p, 
 			      bool getSpinors,
 			      Energy mass) const {
@@ -61,11 +48,11 @@ void AmplitudeCache<AmplitudeKey>::momentum(int k, const LorentzMomentum& p,
   }
 }
 
-template<class AmplitudeKey>
+template<typename AmplitudeKey>
 void AmplitudeCache<AmplitudeKey>::reset() const {
-  for_each(getInvariant.begin(),getInvariant.end(),boolVectorResetter());
-  for_each(getPlusProduct.begin(),getPlusProduct.end(),boolVectorResetter());
-  for_each(getPlusCurrent.begin(),getPlusCurrent.end(),boolVectorResetter());
+  getInvariant.fill(true);
+  getPlusProduct.fill(true);
+  getPlusCurrent.fill(true);
   for_each(theCachedAmplitudes.begin(),theCachedAmplitudes.end(),boolResetter());
   for_each(theCachedCurrents.begin(),theCachedCurrents.end(),boolResetter());
 }

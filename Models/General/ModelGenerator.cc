@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // ModelGenerator.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -296,6 +296,18 @@ void ModelGenerator::doinit() {
     // mass-shell
     checkDecays(parent);
     parent->reset();
+    // Now switch off the modes if needed
+    for(DecaySet::const_iterator it=parent->decayModes().begin();
+	it!=parent->decayModes().end();++it) {
+      if( _theDecayConstructor->disableDecayMode((**it).tag()) ) {
+	DMPtr mode = *it;
+	generator()->preinitInterface(mode, "Active", "set", "No");
+	if(mode->CC()) {
+	  DMPtr CCmode = mode->CC();
+	  generator()->preinitInterface(CCmode, "Active", "set", "No");
+	}
+      }
+    }
     parent->update();
     if( parent->CC() ) parent->CC()->synchronize();
     if( parent->decaySelector().empty() ) {
@@ -345,12 +357,6 @@ void ModelGenerator::doinit() {
       parent->widthGenerator()->init();
     if(parent->massGenerator())
       parent->massGenerator()->init();
-    // Now switch off the modes if needed
-    for(DecaySet::const_iterator it=parent->decayModes().begin();
-	it!=parent->decayModes().end();++it) {
-      if( _theDecayConstructor->disableDecayMode((**it).tag()) )
-	generator()->preinitInterface(*it, "OnOff", "set", "Off");
-    }
     // output the modes if needed
     if( !parent->decaySelector().empty() ) {
       if ( decayOutput_ == 2 )
@@ -402,7 +408,7 @@ void ModelGenerator::checkDecays(PDPtr parent) {
 	     << "will be switched off and the branching fractions of the "
 	     << "remaining modes rescaled.\n";
       rescalebrat = true;
-      generator()->preinitInterface(*dit, "OnOff", "set", "Off");
+      generator()->preinitInterface(*dit, "Active", "set", "No");
       generator()->preinitInterface(*dit, "BranchingRatio", 
 				    "set", "0.0");
       DecayIntegratorPtr decayer = dynamic_ptr_cast<DecayIntegratorPtr>((**dit).decayer());
@@ -482,13 +488,13 @@ void ModelGenerator::writeDecayModes(ostream & os, tcPDPtr parent) const {
        << parent->width()/GeV << endl;
     os << std::left << std::setw(40) << '#' 
        << std::left << std::setw(20) << "Partial Width/GeV"
-       << std::left << std::setw(20) << "BR" << "On/Off\n";
+       << std::left << std::setw(20) << "BR" << "Yes/No\n";
     for(set<tcDMPtr,DecayModeOrdering>::iterator dit=modes.begin();
 	dit!=modes.end();++dit)
       os << std::left << std::setw(40) << (**dit).tag() 
 	 << std::left << std::setw(20) << (**dit).brat()*parent->width()/GeV 
 	 << std::left << std::setw(20)  << (**dit).brat()
-	 << ((**dit).on() ? "On" : "Off" ) << '\n';
+	 << ((**dit).on() ? "Yes" : "No" ) << '\n';
     os << "#\n#";
   }
   else if(decayOutput_==2) {

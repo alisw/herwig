@@ -466,22 +466,22 @@ void LeptonsJetsAnalysis::dofinish() {
     h->second.finalize(xhistos);
   }
 
-  for ( map<boost::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
+  for ( map<std::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
 	  theThreeJetProperties.begin(); h != theThreeJetProperties.end(); ++h ) {
     h->second.finalize(xhistos);
   }
 
-  for ( map<boost::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
+  for ( map<std::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
 	  theJetPairEWIDTripleProperties.begin(); h != theJetPairEWIDTripleProperties.end(); ++h ) {
     h->second.finalize(xhistos);
   }
 
-  for ( map<boost::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
+  for ( map<std::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
 	  theJetPairChargedLeptonTripleProperties.begin(); h != theJetPairChargedLeptonTripleProperties.end(); ++h ) {
     h->second.finalize(xhistos);
   }
 
-  for ( map<boost::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
+  for ( map<std::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
 	  theJetPairNeutrinoTripleProperties.begin(); h != theJetPairNeutrinoTripleProperties.end(); ++h ) {
     h->second.finalize(xhistos);
   }
@@ -491,32 +491,32 @@ void LeptonsJetsAnalysis::dofinish() {
     h->second.finalize(xhistos);
   }
 
-  for ( map<boost::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
+  for ( map<std::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
 	  theJetPairHiggsTripleProperties.begin(); h != theJetPairHiggsTripleProperties.end(); ++h ) {
     h->second.finalize(xhistos);
   }
 
-  for ( map<boost::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
+  for ( map<std::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
 	  theThreeEWIDProperties.begin(); h != theThreeEWIDProperties.end(); ++h ) {
     h->second.finalize(xhistos);
   }
 
-  for ( map<boost::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
+  for ( map<std::tuple<unsigned int,unsigned int,unsigned int>,TripleProperties>::iterator h =
 	  theThreeChargedLeptonProperties.begin(); h != theThreeChargedLeptonProperties.end(); ++h ) {
     h->second.finalize(xhistos);
   }
 
-  for ( map<boost::tuple<unsigned int,unsigned int,unsigned int,unsigned int>,ObjectProperties>::iterator h =
+  for ( map<std::tuple<unsigned int,unsigned int,unsigned int,unsigned int>,ObjectProperties>::iterator h =
 	  theFourJetProperties.begin(); h != theFourJetProperties.end(); ++h ) {
     h->second.finalize(xhistos);
   }
 
-  for ( map<boost::tuple<unsigned int,unsigned int,unsigned int,unsigned int>,ObjectProperties>::iterator h =
+  for ( map<std::tuple<unsigned int,unsigned int,unsigned int,unsigned int>,ObjectProperties>::iterator h =
 	  theFourEWIDProperties.begin(); h != theFourEWIDProperties.end(); ++h ) {
     h->second.finalize(xhistos);
   }
 
-  for ( map<boost::tuple<unsigned int,unsigned int,unsigned int,unsigned int>,ObjectProperties>::iterator h =
+  for ( map<std::tuple<unsigned int,unsigned int,unsigned int,unsigned int>,ObjectProperties>::iterator h =
 	  theFourChargedLeptonProperties.begin(); h != theFourChargedLeptonProperties.end(); ++h ) {
     h->second.finalize(xhistos);
   }
@@ -525,7 +525,7 @@ void LeptonsJetsAnalysis::dofinish() {
 
   elem.append(xhistos);
 
-  string fname = name() + ".xml";
+  string fname = generator()->filename() + string("-") + name() + string(".xml");
   ofstream runXML(fname.c_str());
   runXML << setprecision(16);
   XML::ElementIO::put(elem,runXML);
@@ -565,7 +565,7 @@ DescribeClass<LeptonsJetsAnalysis,AnalysisHandler>
 void LeptonsJetsAnalysis::Init() {
 
   static ClassDocumentation<LeptonsJetsAnalysis> documentation
-    ("There is no documentation for the LeptonsJetsAnalysis class");
+    ("General-purpose analysis for processes with jets and leptons");
 
   static Reference<LeptonsJetsAnalysis,JetFinder> interfaceJetFinder
     ("JetFinder",

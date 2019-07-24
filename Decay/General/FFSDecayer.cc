@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // FFSDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -104,14 +104,14 @@ double FFSDecayer::me2(const int , const Particle & inpart,
       SpinorWaveFunction   ::calculateWaveFunctions(_wave,_rho,
 						    const_ptr_cast<tPPtr>(&inpart),
 						    incoming);
-      if(_wave[0].wave().Type() != u_spinortype)
+      if(_wave[0].wave().Type() != SpinorType::u)
 	for(unsigned int ix = 0; ix < 2; ++ix) _wave   [ix].conjugate();
     }
     else {
       SpinorBarWaveFunction::calculateWaveFunctions(_wavebar,_rho,
 						    const_ptr_cast<tPPtr>(&inpart),
 						    incoming);
-      if(_wavebar[0].wave().Type() != v_spinortype)
+      if(_wavebar[0].wave().Type() != SpinorType::v)
 	for(unsigned int ix = 0; ix < 2; ++ix) _wavebar[ix].conjugate();
     }
   }
@@ -211,13 +211,13 @@ double FFSDecayer::threeBodyME(const int , const Particle & inpart,
     if(ferm) {
       SpinorWaveFunction::calculateWaveFunctions(_wave3, _rho3, const_ptr_cast<tPPtr>(&inpart), 
 						 incoming);
-      if(_wave3[0].wave().Type() != u_spinortype)
+      if(_wave3[0].wave().Type() != SpinorType::u)
    	for(unsigned int ix = 0; ix < 2; ++ix) _wave3[ix].conjugate();
     }
     else {
       SpinorBarWaveFunction::calculateWaveFunctions(_wavebar3,_rho3, const_ptr_cast<tPPtr>(&inpart), 
 						    incoming);
-      if(_wavebar3[0].wave().Type() != v_spinortype)
+      if(_wavebar3[0].wave().Type() != SpinorType::v)
    	for(unsigned int ix = 0; ix < 2; ++ix) _wavebar3[ix].conjugate();
     }
   }

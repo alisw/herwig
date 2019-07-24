@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MatchboxXCombData.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef Herwig_MatchboxXCombData_H
@@ -11,6 +11,12 @@
 //
 // This is the declaration of the MatchboxXCombData class.
 //
+
+// work around a Boost 1.64 bug where ublas headers would fail otherwise
+#include <boost/version.hpp>
+#if (BOOST_VERSION / 100 >= 1064)
+#include <boost/serialization/array_wrapper.hpp>
+#endif
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
@@ -472,42 +478,42 @@ namespace Herwig {
      * the light flavours, which are contained in the
      * jet particle group.
      */
-    vector<int> nLightJetVec() const { return theNLightJetVec; }
+    vector<long> nLightJetVec() const { return theNLightJetVec; }
 
     /**
      * Set the elements of the vector that contains the PDG
      * ids of the light flavours, which are contained in the
      * jet particle group.
      */
-    void nLightJetVec(int n) { theNLightJetVec.push_back(n); }
+    void nLightJetVec(long n) { theNLightJetVec.push_back(n); }
 
     /**
      * Return the vector that contains the PDG ids of 
      * the heavy flavours, which are contained in the
      * jet particle group.
      */
-    vector<int> nHeavyJetVec() const { return theNHeavyJetVec; }
+    vector<long> nHeavyJetVec() const { return theNHeavyJetVec; }
 
     /**
      * Set the elements of the vector that contains the PDG
      * ids of the heavy flavours, which are contained in the
      * jet particle group.
      */
-    void nHeavyJetVec(int n) { theNHeavyJetVec.push_back(n); }
+    void nHeavyJetVec(long n) { theNHeavyJetVec.push_back(n); }
 
     /**
      * Return the vector that contains the PDG ids of 
      * the light flavours, which are contained in the
      * proton particle group.
      */
-    vector<int> nLightProtonVec() const { return theNLightProtonVec; }
+    vector<long> nLightProtonVec() const { return theNLightProtonVec; }
 
     /**
      * Set the elements of the vector that contains the PDG
      * ids of the light flavours, which are contained in the
      * proton particle group.
      */
-    void nLightProtonVec(int n) { theNLightProtonVec.push_back(n); }
+    void nLightProtonVec(long n) { theNLightProtonVec.push_back(n); }
 
     /**
      * Get the dimensionality of the colour basis for this process.
@@ -800,7 +806,7 @@ namespace Herwig {
      * The assignment operator is private and must never be called.
      * In fact, it should not even be implemented.
      */
-    MatchboxXCombData & operator=(const MatchboxXCombData &);
+    MatchboxXCombData & operator=(const MatchboxXCombData &) = delete;
 
   private:
 
@@ -977,25 +983,25 @@ namespace Herwig {
     /**
      * The number of light flavours to be considered for this process.
      */
-    unsigned int theNLight;
+    static unsigned int theNLight;
 
     /**
      * Vector with the PDG ids of the light quark flavours,
      * which are contained in the jet particle group.
      */
-    vector<int> theNLightJetVec;
+    static vector<long> theNLightJetVec;
 
     /**
      * Vector with the PDG ids of the heavy quark flavours,
      * which are contained in the jet particle group.
      */
-    vector<int> theNHeavyJetVec;
+    static vector<long> theNHeavyJetVec;
 
     /**
      * Vector with the PDG ids of the light quark flavours,
      * which are contained in the proton particle group.
      */
-    vector<int> theNLightProtonVec;
+    static vector<long> theNLightProtonVec;
 
     /**
      * The dimensionality of the colour basis for this process.

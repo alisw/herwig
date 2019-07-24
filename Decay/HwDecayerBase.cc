@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // HwDecayerBase.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -18,8 +18,8 @@
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
 #include "ThePEG/Repository/CurrentGenerator.h"
-#include "Herwig/Shower/Base/HardTree.h"
-#include "Herwig/Shower/Base/Branching.h"
+#include "Herwig/Shower/Core/Base/Branching.h"
+#include "Herwig/Shower/RealEmissionProcess.h"
 
 using namespace Herwig;
 
@@ -135,6 +135,16 @@ bool HwDecayerBase::softMatrixElementVeto(ShowerProgenitorPtr,
   return false;
 }
 
-HardTreePtr HwDecayerBase::generateHardest(ShowerTreePtr) {
-  return HardTreePtr();
+RealEmissionProcessPtr HwDecayerBase::generateHardest(RealEmissionProcessPtr) {
+  return RealEmissionProcessPtr();
+}
+
+void HwDecayerBase::initializeMECorrection(RealEmissionProcessPtr , double & ,
+			    double & ) {
+  assert(false);
+}
+
+RealEmissionProcessPtr HwDecayerBase::applyHardMatrixElementCorrection(RealEmissionProcessPtr) {
+  assert(false);
+  return RealEmissionProcessPtr();
 }

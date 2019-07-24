@@ -5,6 +5,7 @@
 //
 
 #include "GeneralQQHiggs.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
@@ -24,8 +25,10 @@ GeneralQQHiggs::GeneralQQHiggs() : quarkFlavour_(6), process_(0), shapeOpt_(2),
 			       mh_(), wh_(), alpha_(1.1)
 {}
 
-ClassDescription<GeneralQQHiggs> GeneralQQHiggs::initGeneralQQHiggs;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<GeneralQQHiggs,HwMEBase>
+describeHerwigGeneralQQHiggs("Herwig::GeneralQQHiggs", "Herwig.so");
 
 void GeneralQQHiggs::Init() {
 
@@ -221,7 +224,7 @@ bool GeneralQQHiggs::generateKinematics(const double * r) {
     try {
       p1 = SimplePhaseSpace::getMagnitude(sHat(), m13, mq);
       p2 = SimplePhaseSpace::getMagnitude(m132,mq,mh);
-    } catch ( ImpossibleKinematics ) {
+    } catch ( ImpossibleKinematics & e ) {
       return false;
     }
     Energy ptmin = lastCuts().minKT(mePartonData()[3]);
@@ -262,7 +265,7 @@ bool GeneralQQHiggs::generateKinematics(const double * r) {
     try {
       p1 = SimplePhaseSpace::getMagnitude(sHat(), m23, mq);
       p2 = SimplePhaseSpace::getMagnitude(m232,mq,mh);
-    } catch ( ImpossibleKinematics ) {
+    } catch ( ImpossibleKinematics & e ) {
       return false;
     }
     Energy ptmin = lastCuts().minKT(mePartonData()[2]);

@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // PScalarPScalarVectorDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -215,7 +215,7 @@ double PScalarPScalarVectorDecayer::me2( const int,
   // calculate the matrix element
   Lorentz5Momentum psum(inpart.momentum()+decay[0]->momentum());
   for(unsigned int ix=0;ix<3;++ix) {
-    (*ME())(0,0,ix)=_coupling[imode()]/inpart.mass()*(_vectors[ix]*psum);
+    (*ME())(0,0,ix)=Complex(_coupling[imode()]/inpart.mass()*(_vectors[ix]*psum));
   }
   // test of the matrix element
 //   double me=newME.contract(rhoin).real();

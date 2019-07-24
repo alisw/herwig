@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MEee2gZ2qq.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_MEee2gZ2qq_H
@@ -20,7 +20,7 @@
 #include "Herwig/MatrixElement/ProductionMatrixElement.h"
 #include "ThePEG/Helicity/WaveFunction/SpinorWaveFunction.h"
 #include "ThePEG/Helicity/WaveFunction/SpinorBarWaveFunction.h"
-#include "Herwig/Shower/Couplings/ShowerAlpha.h"
+#include "Herwig/Shower/Core/Couplings/ShowerAlpha.h"
 
 namespace Herwig {
 
@@ -65,13 +65,13 @@ public:
   /**
    *  Initialize the ME correction
    */
-  virtual void initializeMECorrection(ShowerTreePtr, double &,
+  virtual void initializeMECorrection(RealEmissionProcessPtr, double &,
 				      double & );
 
   /**
    *  Apply the hard matrix element correction to a given hard process or decay
    */
-  virtual void applyHardMatrixElementCorrection(ShowerTreePtr);
+  virtual RealEmissionProcessPtr applyHardMatrixElementCorrection(RealEmissionProcessPtr);
 
   /**
    * Apply the soft matrix element correction
@@ -88,8 +88,7 @@ public:
   /**
    *  Apply the POWHEG style correction
    */
-  virtual HardTreePtr generateHardest(ShowerTreePtr,
-				      vector<ShowerInteraction::Type>);
+  virtual RealEmissionProcessPtr generateHardest(RealEmissionProcessPtr,ShowerInteraction);
   //@}
 
   /** @name Virtual functions required by the MEBase class. */
@@ -271,7 +270,7 @@ protected:
   double meRatio(vector<cPDPtr> partons, 
 		 vector<Lorentz5Momentum> momenta,
 		 unsigned int iemitter,
-		 ShowerInteraction::Type inter,
+		 ShowerInteraction inter,
 		 bool subtract =false) const;
 
   /**
@@ -282,19 +281,24 @@ protected:
    */ 
   InvEnergy2 realME(const vector<cPDPtr> & partons, 
 		    const vector<Lorentz5Momentum> & momenta,
-		    ShowerInteraction::Type inter) const;
+		    ShowerInteraction inter) const;
 
 private:
 
   /**
    *  Generate the momenta for a hard configuration
    */
-  pair<Energy,ShowerInteraction::Type> 
-  generateHard(ShowerTreePtr tree, 
-	       vector<Lorentz5Momentum> & emission,
-	       unsigned int & iemit, unsigned int & ispect,
-	       bool applyVeto,
-	       vector<ShowerInteraction::Type>);
+  pair<Energy,ShowerInteraction> 
+  generateHard(RealEmissionProcessPtr, 
+  	       vector<Lorentz5Momentum> & emission,
+  	       unsigned int & iemit, unsigned int & ispect,
+  	       bool applyVeto,ShowerInteraction);
+
+  /**
+   *  Calculate the reall emission
+   */
+  RealEmissionProcessPtr calculateRealEmission(RealEmissionProcessPtr born, bool veto,
+					       ShowerInteraction inter);
 
   /**
    *  Calculate \f$\tilde{\kappa}\f$.
@@ -351,7 +355,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEee2gZ2qq & operator=(const MEee2gZ2qq &);
+  MEee2gZ2qq & operator=(const MEee2gZ2qq &) = delete;
 
 private:
 

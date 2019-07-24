@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MEff2vs.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -12,6 +12,7 @@
 //
 
 #include "MEff2vs.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -64,8 +65,10 @@ void MEff2vs::persistentInput(PersistentIStream & is, int) {
 			   PDT::Spin1,PDT::Spin0);
 }
 
-ClassDescription<MEff2vs> MEff2vs::initMEff2vs;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEff2vs,GeneralHardME>
+describeHerwigMEff2vs("Herwig::MEff2vs", "Herwig.so");
 
 void MEff2vs::Init() {
 

@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // LightClusterDecayer.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_LightClusterDecayer_H
@@ -59,8 +59,7 @@ public:
   /**
    * Default constructor.
    */
-  LightClusterDecayer() : _limBottom(), _limCharm(), _limExotic() 
-  {} 
+  LightClusterDecayer() {}
   //@}
 
   /**
@@ -117,7 +116,7 @@ private:
   /**
    * Private and non-existent assignment operator.
    */
-  LightClusterDecayer & operator=(const LightClusterDecayer &);
+  LightClusterDecayer & operator=(const LightClusterDecayer &) = delete;
 
   /**
    * This (private) method, called by decay(), takes care of the kinematical
@@ -141,19 +140,6 @@ private:
    * A pointer to a Herwig::HadronSelector object used for producing hadrons.
    */
   Ptr<HadronSelector>::pointer _hadronSelector;
-
-  /**
-   * @name A parameter used for determining when clusters are too light.
-   *
-   * This parameter is used for setting the lower threshold, \f$ t \f$ as
-   * \f[ t' = t(1 + r B^1_{\rm lim}) \f]
-   * where \f$ r \f$ is a random number [0,1].
-   */
-  //@{
-  double _limBottom;
-  double _limCharm;
-  double _limExotic;
-  //@}
 };
 
 }

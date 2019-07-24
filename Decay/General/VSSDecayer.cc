@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // VSSDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 // This is the implementation of the non-inlined, non-templated member
@@ -101,12 +101,10 @@ Energy VSSDecayer::partialWidth(PMPair inpart, PMPair outa,
     tcPDPtr in = inpart.first->CC() ? tcPDPtr(inpart.first->CC()) : inpart.first;
     _perturbativeVertex->setCoupling(sqr(inpart.second), in, outa.first,
 				     outb.first);
-    double mu1sq = sqr(outa.second/inpart.second);
-    double mu2sq = sqr(outb.second/inpart.second);
-    double me2 = sqr(mu1sq - mu2sq) - 2.*(mu1sq + mu2sq);
     Energy pcm = Kinematics::pstarTwoBodyDecay(inpart.second,outa.second,
 					outb.second);
-    Energy output = -norm(_perturbativeVertex->norm())*me2*pcm /
+    double me2 = 4.*sqr(pcm/inpart.second);
+    Energy output = norm(_perturbativeVertex->norm())*me2*pcm /
       (24.*Constants::pi);
     // colour factor
     output *= colourFactor(inpart.first,outa.first,outb.first);

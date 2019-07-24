@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // QTildeMatching.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -368,7 +368,7 @@ void QTildeMatching::calculateShowerVariables() const {
 
 double QTildeMatching::splitFn(const pair<Energy2,double>& vars) const {
   const Energy2& qtilde2 = vars.first;
-  const double& z = vars.second;
+  const double z = vars.second;
   double Nc = SM().Nc();
 
   // final state branching
@@ -491,16 +491,19 @@ void QTildeMatching::Init() {
     ("QTildeFinder",
      "Set the partner finder to calculate hard scales.",
      &QTildeMatching::theQTildeFinder, false, false, true, false, false);
+  interfaceQTildeFinder.rank(-1);
 
   static Reference<QTildeMatching,QTildeSudakov> interfaceQTildeSudakov
     ("QTildeSudakov",
      "Set the partner finder to calculate hard scales.",
      &QTildeMatching::theQTildeSudakov, false, false, true, false, false);
+  interfaceQTildeSudakov.rank(-1);
 
   static Reference<QTildeMatching,ShowerHandler> interfaceShowerHandler
     ("ShowerHandler",
-     "",
+     "The QTilde shower handler to use.",
      &QTildeMatching::theShowerHandler, false, false, true, true, false);
+  interfaceShowerHandler.rank(-1);
 
   static Switch<QTildeMatching,bool> interfaceCorrectForXZMismatch
     ("CorrectForXZMismatch",
@@ -516,6 +519,7 @@ void QTildeMatching::Init() {
      "No",
      "Do not include the correction factor.",
      false);
+  interfaceCorrectForXZMismatch.rank(-1);
 
 }
 

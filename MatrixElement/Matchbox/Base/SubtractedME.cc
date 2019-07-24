@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // SubtractedME.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -13,10 +13,6 @@
 
 #include "SubtractedME.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
-#include "ThePEG/Interface/Reference.h"
-#include "ThePEG/Interface/RefVector.h"
-#include "ThePEG/Interface/Switch.h"
-#include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Repository/Repository.h"
 #include "ThePEG/Repository/EventGenerator.h"
@@ -36,7 +32,7 @@ using namespace Herwig;
 SubtractedME::SubtractedME() 
   : MEGroup(), 
     theRealShowerSubtraction(false), theVirtualShowerSubtraction(false),
-    theLoopSimSubtraction(false), theSubProcessGroups(false) {}
+    theLoopSimSubtraction(false) {}
 
 SubtractedME::~SubtractedME() {}
 
@@ -47,7 +43,7 @@ void SubtractedME::factory(Ptr<MatchboxFactory>::tcptr f) { theFactory = f; }
 bool SubtractedME::subProcessGroups() const { 
   return 
     (factory()->subProcessGroups() && !showerApproximation()) ||
-    factory()->subtractionData() != "" || theSubProcessGroups;
+    factory()->subtractionData() != "";
 }
 
 Ptr<ShowerApproximation>::tptr SubtractedME::showerApproximation() const { return factory()->showerApproximation(); }
@@ -611,7 +607,10 @@ dump(const std::string& prefix,
   ofstream out((prefix+fname.str()+".dat").c_str());
   for ( map<double,pair<double,double> >::const_iterator b = bins.begin();
 	b != bins.end(); ++b ) {
-    map<double,pair<double,double> >::const_iterator bp = b; --bp;
+    map<double,pair<double,double> >::const_iterator bp = b; 
+    if (bp== bins.begin())continue;
+    --bp;
+
     if ( b->second.first != Constants::MaxDouble ||
 	 b->second.second != 0.0 ) {
       if ( b != bins.begin() ){
@@ -763,8 +762,7 @@ void SubtractedME::persistentOutput(PersistentOStream & os) const {
      << collinearHistograms << softHistograms 
      << fnamesSoftSubtraction
      << theRealShowerSubtraction << theVirtualShowerSubtraction
-     << theLoopSimSubtraction
-     << theSubProcessGroups;
+     << theLoopSimSubtraction;
 }
 
 void SubtractedME::persistentInput(PersistentIStream & is, int) {
@@ -772,8 +770,7 @@ void SubtractedME::persistentInput(PersistentIStream & is, int) {
      >> collinearHistograms >> softHistograms 
      >> fnamesSoftSubtraction
      >> theRealShowerSubtraction >> theVirtualShowerSubtraction
-     >> theLoopSimSubtraction
-     >> theSubProcessGroups;
+     >> theLoopSimSubtraction;
   lastMatchboxXComb(theLastXComb);
 }
 

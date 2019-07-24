@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // PhasespaceHelpers.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_PhasespaceHelpers_H
@@ -26,7 +26,7 @@ using namespace ThePEG;
     /**
      * \ingroup Matchbox
      * \author Simon Platzer
-     * \brief General information for phasespace generation
+     * \brief General information for phase space generation
      */
     struct PhasespaceInfo {
 
@@ -41,7 +41,7 @@ using namespace ThePEG;
       Energy sqrtSHat;
 
       /**
-       * The phasespace weight.
+       * The phase space weight.
        */
       double weight;
 
@@ -92,7 +92,7 @@ using namespace ThePEG;
     /**
      * \ingroup Matchbox
      * \author Simon Platzer, Ken Arnold
-     * \brief A phasespace tree.
+     * \brief A phase space tree.
      */
     struct PhasespaceTree {
 
@@ -166,12 +166,12 @@ using namespace ThePEG;
 			      vector<Lorentz5Momentum>&);
 
       /**
-       * Write phasespace tree to ostream
+       * Write phase space tree to ostream
        */
       void put(PersistentOStream&) const;
 
       /**
-       * Read phasespace tree from istream
+       * Read phase space tree from istream
        */
       void get(PersistentIStream&);
 

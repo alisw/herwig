@@ -13,18 +13,6 @@ newdef /Herwig/Particles/e-:PDF LeptonPDF
 newdef /Herwig/Particles/e+:PDF LeptonPDF
 
 # Handle hadrons
-# OLD CHOICE FROM Herwig++ 2.7
-create Herwig::MRST MRST-old HwMRST.so
-setup MRST-old @HERWIG_PDF_DEFAULT@
-newdef MRST-old:RemnantHandler HadronRemnants
-
-# NLO PDFs (needed for NLO matrix elements)
-create Herwig::MRST MRST-NLO-old HwMRST.so
-newdef MRST-NLO-old:Interpolation Cubic
-setup MRST-NLO-old @HERWIG_PDF_NLO@
-newdef MRST-NLO-old:RemnantHandler HadronRemnants
-
-# photons from leptons in
 # NEW DEFAULT for Hw 7
 library ThePEGLHAPDF.so
 
@@ -69,6 +57,10 @@ newdef /Herwig/Partons/WWPDF:RemnantHandler /Herwig/Partons/LeptonGammaRemnants
 create ThePEG::BudnevPDF BudnevPDF BudnevPDF.so
 create ThePEG::UnResolvedRemnant /Herwig/Partons/HadronGammaRemnants 
 newdef /Herwig/Partons/BudnevPDF:RemnantHandler /Herwig/Partons/HadronGammaRemnants
+
+# partons inside photons
+create Herwig::SaSPhotonPDF /Herwig/Partons/SaSPDF HwSaSPhotonPDF.so
+set /Herwig/Partons/SaSPDF:RemnantHandler /Herwig/Partons/HadronRemnants
 
 # pomerons
 create Herwig::PomeronFlux PomeronFlux HwPomeronFlux.so

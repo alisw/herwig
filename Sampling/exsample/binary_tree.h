@@ -2,9 +2,9 @@
 //
 // binary_tree.h is part of ExSample -- A Library for Sampling Sudakov-Type Distributions
 //
-// Copyright (C) 2008-2011 Simon Platzer -- simon.plaetzer@desy.de
+// Copyright (C) 2008-2017 Simon Platzer -- simon.plaetzer@desy.de, The Herwig Collaboration
 //
-// ExSample is licenced under version 2 of the GPL, see COPYING for details.
+// ExSample is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -424,12 +424,6 @@ namespace exsample {
       if(leaf()) return this;
       return right_child().right_most();
     }
-
-    /// the iterator is a good friend
-    friend class binary_tree<value_type>::iterator;
-
-    /// the iterator is a good friend
-    friend class binary_tree<value_type>::const_iterator;
 
     /// the left and right neighbours of this node
     std::pair<binary_tree*,binary_tree*> neighbours_;
@@ -870,11 +864,11 @@ namespace exsample {
     binary_tree * parent_;
 
     /// the cell held by this node
-    boost::scoped_ptr<value_type> value_;
+    std::unique_ptr<value_type> value_;
 
     /// the children of this node
-    std::pair<boost::scoped_ptr<binary_tree>,
-	      boost::scoped_ptr<binary_tree> > children_;
+    std::pair<std::unique_ptr<binary_tree>,
+	      std::unique_ptr<binary_tree> > children_;
 
   };
 

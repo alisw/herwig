@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MEPP2HiggsJet.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_MEPP2HiggsJet_H
@@ -365,7 +365,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEPP2HiggsJet & operator=(const MEPP2HiggsJet &);
+  MEPP2HiggsJet & operator=(const MEPP2HiggsJet &) = delete;
 
 private:
 

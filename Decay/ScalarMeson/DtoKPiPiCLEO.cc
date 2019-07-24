@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // DtoKPiPiCLEO.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -972,7 +972,7 @@ double DtoKPiPiCLEO::me2(const int ichan,
       amp=_c2f980/GeV2  *amplitude(0,_f0opt,mD,mB,mC,mA,mBC,mAB,mAC,_mf980  ,_wf980  );
     }
     else if(ichan==5) {
-      amp=_c2f2*GeV2    *amplitude(2,false ,mD,mB,mC,mA,mBC,mAB,mAC,_mf2    ,_wf2    );
+      amp=Complex(_c2f2*GeV2    *amplitude(2,false ,mD,mB,mC,mA,mBC,mAB,mAC,_mf2    ,_wf2    ));
     }
     else if(ichan==6) {
       amp=_c2f1370/GeV2 *amplitude(0,false ,mD,mB,mC,mA,mBC,mAB,mAC,_mf1370 ,_wf1370 );
@@ -981,7 +981,7 @@ double DtoKPiPiCLEO::me2(const int ichan,
       amp=_c2K14300/GeV2*amplitude(0,false ,mD,mA,mC,mB,mAC,mAB,mBC,_mK14300,_wK14300);
     }
     else if(ichan==8) {
-      amp=_c2K14302*GeV2*amplitude(2,false ,mD,mA,mC,mB,mAC,mAB,mBC,_mK14302,_wK14302);
+      amp=Complex(_c2K14302*GeV2*amplitude(2,false ,mD,mA,mC,mB,mAC,mAB,mBC,_mK14302,_wK14302));
     }
     else if(ichan==9) {
       amp=_c2K1680      *amplitude(1,false ,mD,mA,mC,mB,mAC,mAB,mBC,_mK1680 ,_wK1680 );

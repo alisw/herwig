@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // LeptoquarkModelSLQSLQGGVertex.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_LeptoquarkModelSLQSLQGGVertex_H
@@ -103,7 +103,7 @@ private:
   /**
    * Private and non-existent assignment operator.
    */
-  LeptoquarkModelSLQSLQGGVertex & operator=(const LeptoquarkModelSLQSLQGGVertex &);
+  LeptoquarkModelSLQSLQGGVertex & operator=(const LeptoquarkModelSLQSLQGGVertex &) = delete;
   
   /**
    * Pointer to the model.

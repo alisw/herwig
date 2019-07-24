@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // BinSampler.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -18,6 +18,8 @@
 #include "ThePEG/Repository/EventGenerator.h"
 #include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Repository/Repository.h"
+
+#include "ThePEG/Utilities/ColourOutput.h"
 
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/Switch.h"
@@ -185,7 +187,7 @@ void BinSampler::fillRemappers(bool progress) {
 
   boost::progress_display* progressBar = 0;
   if ( progress ) {
-    Repository::clog() << "warming up " << process();
+    Repository::clog() << "warming up " << ANSI::red << process() << ANSI::reset;
     progressBar = new boost::progress_display(theRemapperPoints,Repository::clog());
   }
 
@@ -204,7 +206,7 @@ void BinSampler::fillRemappers(bool progress) {
       throw;
     }
 
-    if ( std::isnan(w) || std::isinf(w) )
+    if ( ! isfinite(w) )
       ++nanPoints;
     
     if ( theNonZeroInPresampling &&  w==0. ){
@@ -272,7 +274,7 @@ void BinSampler::readIntegrationData() {
     theIntegrated = true;
   } else {
     throw Exception()
-      << "\n--------------------------------------------------------------------------------\n\n"
+      << "\n---------------------------------------------------\n\n"
       << "Expected integration data.\n\n"
       << "* When using the build setup make sure the integrate command has been run.\n\n"
       << "* Check the [EventGenerator].log file for further information.\n\n"
@@ -280,7 +282,7 @@ void BinSampler::readIntegrationData() {
       << "* If you have split the integration jobs, make sure that each integration job was finished.\n"
       << "  Afterwards delete the global HerwigGrids.xml file in the Herwig subfolder\n"
       << "  to automatically create an updated version of the global HerwigGrids.xml file.\n\n"
-      << "--------------------------------------------------------------------------------\n"
+      << "---------------------------------------------------\n"
       << Exception::abortnow;
   }
 
@@ -396,7 +398,7 @@ void BinSampler::runIteration(unsigned long points, bool progress) {
 
   boost::progress_display* progressBar = 0;
   if ( progress ) {
-    Repository::clog() << "integrating " << process() << " , iteration "
+    Repository::clog() << "integrating " << ANSI::red << process()<< ANSI::reset << ", iteration "
 		       << (iterations().size() + 1);
     progressBar = new boost::progress_display(points,Repository::clog());
   }
@@ -421,7 +423,7 @@ void BinSampler::runIteration(unsigned long points, bool progress) {
         numlastmax<(int)(points/2.)){
       if(++newmax>theMaxNewMax){
           throw Exception()
-             << "\n--------------------------------------------------------------------------------\n\n"
+             << "\n---------------------------------------------------\n\n"
              << "To many new Maxima.\n\n"
              << "* With the option:\n\n"
              << "* set Sampler:BinSampler:HalfPoints Yes\n\n"
@@ -431,7 +433,7 @@ void BinSampler::runIteration(unsigned long points, bool progress) {
              << "* Did you apply reasonable cuts to the process?\n"
              << "* You can set the maximum allowed new maxima by:"
              << "* set Sampler:BinSampler:MaxNewMax N\n\n"  
-             << "--------------------------------------------------------------------------------\n"
+             << "---------------------------------------------------\n"
              << Exception::abortnow;
       }
 
@@ -448,14 +450,14 @@ void BinSampler::runIteration(unsigned long points, bool progress) {
   }
 
   if ( progress ) {
-    Repository::clog() << "integrated ( " 
+    Repository::clog() << "integrated ( " << ANSI::yellow 
 		       << averageWeight() << " +/- " << sqrt(averageWeightVariance())
-		       << " ) nb\nepsilon = "
+		       << ANSI::reset << " ) nb\nepsilon = "
 		       << (abs(maxWeight()) != 0. ? averageAbsWeight()/abs(maxWeight()) : 0.);
     if ( !iterations().empty() )
       Repository::clog() << " chi2 = " << chi2();
     Repository::clog() << "\n";
-    Repository::clog() << "--------------------------------------------------------------------------------\n";
+    Repository::clog() << "---------------------------------------------------\n";
   }
 
   if ( progressBar )

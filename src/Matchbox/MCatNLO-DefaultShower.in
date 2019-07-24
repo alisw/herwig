@@ -1,13 +1,13 @@
 # -*- ThePEG-repository -*-
 
-set /Herwig/Shower/Evolver:HardVetoReadOption PrimaryCollision
-set /Herwig/Shower/Evolver:SpinCorrelations No
-set /Herwig/Shower/Evolver:HardEmissionMode DecayMECorrection
+set /Herwig/Shower/ShowerHandler:HardVetoReadOption PrimaryCollision
+set /Herwig/Shower/ShowerHandler:SpinCorrelations No
+set /Herwig/Shower/ShowerHandler:HardEmission MECorrection
 set /Herwig/Shower/KinematicsReconstructor:InitialStateReconOption SofterFraction
 set /Herwig/Shower/PartnerFinder:PartnerMethod 0
 set /Herwig/Shower/PartnerFinder:ScaleChoice 0
 
-set /Herwig/Shower/ShowerHandler:RestrictPhasespace On
+set /Herwig/Shower/ShowerHandler:RestrictPhasespace Yes
 set /Herwig/Shower/ShowerHandler:MaxPtIsMuF Yes
 set /Herwig/Shower/ShowerHandler:HardScaleProfile /Herwig/MatrixElements/Matchbox/HardScaleProfile
 
@@ -18,9 +18,6 @@ set EventHandler:CascadeHandler /Herwig/Shower/ShowerHandler
 cd /Herwig/MatrixElements/Matchbox
 
 set Factory:ShowerApproximation QTildeMatching
-
-# tunes
-read Matchbox/MCatNLO-Default-HardAlphaSTune.in
 
 cd /Herwig/Analysis
 

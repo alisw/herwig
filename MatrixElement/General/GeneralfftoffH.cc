@@ -5,6 +5,7 @@
 //
 
 #include "GeneralfftoffH.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -31,8 +32,10 @@ void GeneralfftoffH::persistentInput(PersistentIStream & is, int) {
   is >> ienum(_proc);
 }
 
-ClassDescription<GeneralfftoffH> GeneralfftoffH::initGeneralfftoffH;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<GeneralfftoffH,MEfftoffH>
+describeHerwigGeneralfftoffH("Herwig::GeneralfftoffH", "Herwig.so");
 
 void GeneralfftoffH::Init() {
 
@@ -74,6 +77,7 @@ void GeneralfftoffH::getDiagrams() const {
 	if (minFlavour()<=2)
 	  parentpair.push_back(make_pair(getParticleData(ParticleID::b),
 					 getParticleData(ParticleID::u)));
+	[[fallthrough]];
       case 4:
 	if (minFlavour()<=3)
 	  parentpair.push_back(make_pair(getParticleData(ParticleID::s),
@@ -81,14 +85,17 @@ void GeneralfftoffH::getDiagrams() const {
 	if (minFlavour()<=1)
 	  parentpair.push_back(make_pair(getParticleData(ParticleID::d),
 					 getParticleData(ParticleID::c)));
+	[[fallthrough]];
       case 3:
 	if (minFlavour()<=2)
 	  parentpair.push_back(make_pair(getParticleData(ParticleID::s),
 					 getParticleData(ParticleID::u)));
+	[[fallthrough]];
       case 2:
 	if (minFlavour()<=1)
 	  parentpair.push_back(make_pair(getParticleData(ParticleID::d),
 					 getParticleData(ParticleID::u)));
+	[[fallthrough]];
       default:
 	;
       }

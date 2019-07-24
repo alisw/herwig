@@ -34,7 +34,7 @@ public:
   /**
    *  Apply the POWHEG style correction
    */
-  virtual HardTreePtr generateHardest(ShowerTreePtr);
+  virtual RealEmissionProcessPtr generateHardest(RealEmissionProcessPtr);
 
   /** @name Functions used by the persistent I/O system. */
   //@{
@@ -120,7 +120,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  SMTopPOWHEGDecayer & operator=(const SMTopPOWHEGDecayer &);
+  SMTopPOWHEGDecayer & operator=(const SMTopPOWHEGDecayer &) = delete;
 
 private:
 

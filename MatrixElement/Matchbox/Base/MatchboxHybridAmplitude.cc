@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MatchboxHybridAmplitude.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -145,7 +145,7 @@ double MatchboxHybridAmplitude::symmetryRatio() const {
 
 }
 
-void MatchboxHybridAmplitude::cloneDependencies(const std::string& prefix) {
+void MatchboxHybridAmplitude::cloneDependencies(const std::string& prefix,bool slim) {
 
   if ( treeLevelAmplitude() ) {
     Ptr<MatchboxAmplitude>::ptr myTreeLevelAmplitude = treeLevelAmplitude()->cloneMe();
@@ -167,7 +167,7 @@ void MatchboxHybridAmplitude::cloneDependencies(const std::string& prefix) {
     oneLoopAmplitude(myOneLoopAmplitude);
   }
 
-  MatchboxAmplitude::cloneDependencies(prefix);
+  MatchboxAmplitude::cloneDependencies(prefix,slim);
 
 }
 
@@ -227,7 +227,8 @@ void MatchboxHybridAmplitude::Init() {
 
   static Switch<MatchboxHybridAmplitude,bool> interfaceUseOLPCorrelators
     ("UseOLPCorrelators",
-     "",
+     "Obtain correlated matrix elements from the OLP instead of "
+     "the tree-level amplitude.",
      &MatchboxHybridAmplitude::theUseOLPCorrelators, false, false, false);
   static SwitchOption interfaceUseOLPCorrelatorsYes
     (interfaceUseOLPCorrelators,
@@ -239,6 +240,7 @@ void MatchboxHybridAmplitude::Init() {
      "No",
      "",
      false);
+  interfaceUseOLPCorrelators.rank(-1);
 
 }
 

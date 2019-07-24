@@ -1,16 +1,16 @@
 // -*- C++ -*-
 //
 // HeavyDecayer.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_HeavyDecayer_H
 #define HERWIG_HeavyDecayer_H
 // This is the declaration of the HeavyDecayer class.
 
-#include <PartonicDecayerBase.h>
+#include "PartonicDecayerBase.h"
 
 namespace Herwig {
 
@@ -131,7 +131,7 @@ private:
   /**
    *  Private and non-existent assignment operator.
    */
-  const HeavyDecayer & operator=(const HeavyDecayer &);
+  const HeavyDecayer & operator=(const HeavyDecayer &) = delete;
 
 private:
 

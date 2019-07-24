@@ -278,12 +278,12 @@ void JetsPlusAnalysis::dofinish() {
     h->second.finalize(xhistos);
   }
 
-  for ( map<boost::tuple<unsigned int,unsigned int,unsigned int>,ObjectProperties>::iterator h =
+  for ( map<std::tuple<unsigned int,unsigned int,unsigned int>,ObjectProperties>::iterator h =
 	  theThreeJetProperties.begin(); h != theThreeJetProperties.end(); ++h ) {
     h->second.finalize(xhistos);
   }
 
-  for ( map<boost::tuple<unsigned int,unsigned int,unsigned int,unsigned int>,ObjectProperties>::iterator h =
+  for ( map<std::tuple<unsigned int,unsigned int,unsigned int,unsigned int>,ObjectProperties>::iterator h =
 	  theFourJetProperties.begin(); h != theFourJetProperties.end(); ++h ) {
     h->second.finalize(xhistos);
   }
@@ -292,7 +292,7 @@ void JetsPlusAnalysis::dofinish() {
 
   elem.append(xhistos);
 
-  string fname = name() + ".xml";
+  string fname = generator()->filename() + string("-") + name() + string(".xml");
   ofstream runXML(fname.c_str());
   runXML << setprecision(16);
   XML::ElementIO::put(elem,runXML);

@@ -2,14 +2,13 @@
 
 read Matchbox/Powheg.in
 
-set /Herwig/Shower/Evolver:HardVetoReadOption PrimaryCollision
-set /Herwig/Shower/Evolver:MECorrMode No
-set /Herwig/Shower/Evolver:SpinCorrelations No
+set /Herwig/Shower/PowhegShowerHandler:HardVetoReadOption PrimaryCollision
+set /Herwig/Shower/PowhegShowerHandler:SpinCorrelations No
 set /Herwig/Shower/KinematicsReconstructor:InitialStateReconOption SofterFraction
 set /Herwig/Shower/PartnerFinder:PartnerMethod 0
 set /Herwig/Shower/PartnerFinder:ScaleChoice 0
 
-set /Herwig/Shower/PowhegShowerHandler:RestrictPhasespace On
+set /Herwig/Shower/PowhegShowerHandler:RestrictPhasespace Yes
 set /Herwig/Shower/PowhegShowerHandler:MaxPtIsMuF Yes
 set /Herwig/Shower/PowhegShowerHandler:HardScaleProfile NULL
 
@@ -21,10 +20,7 @@ cd /Herwig/Shower
 
 set PowhegShowerHandler:Factory /Herwig/MatrixElements/Matchbox/Factory
 
-set Evolver:HardEmissionMode FullPOWHEG
-
-# tunes
-read Matchbox/Powheg-Default-HardAlphaSTune.in
+set PowhegShowerHandler:HardEmission POWHEG
 
 cd /Herwig/Analysis
 

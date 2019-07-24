@@ -5,6 +5,7 @@
 //
 
 #include "MEvv2tv.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -31,8 +32,10 @@ void MEvv2tv::persistentInput(PersistentIStream & is, int) {
 			   PDT::Spin2, PDT::Spin1);
 }
 
-ClassDescription<MEvv2tv> MEvv2tv::initMEvv2tv;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEvv2tv,GeneralHardME>
+describeHerwigMEvv2tv("Herwig::MEvv2tv", "Herwig.so");
 
 void MEvv2tv::Init() {
 
@@ -103,7 +106,7 @@ void MEvv2tv::doinit() {
 	throw InitException() << "MEvv2tv:doinit() - Cannot find correct "
 			      << "s-channel from diagram. Vertex not cast! "
 			      << Exception::runerror;
-	vector_[i] = 
+      vector_[i] = 
 	  make_pair(dynamic_ptr_cast<AbstractVVVVertexPtr>(current.vertices.first ), 
 		    dynamic_ptr_cast<AbstractVVTVertexPtr>(current.vertices.second));
       

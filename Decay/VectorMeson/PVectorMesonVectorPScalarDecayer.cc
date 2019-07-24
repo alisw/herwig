@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // PVectorMesonVectorPScalarDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -346,8 +346,8 @@ double PVectorMesonVectorPScalarDecayer::me2(const int,
     else {
       epsdot=_vectors[1][ix]*inpart.momentum();
       for(unsigned int iy=0;iy<3;++iy)
-	(*ME())(iy,ix,0)=pre*_vectors[0][iy].dot(p0dotpv*_vectors[1][ix]
-					 -epsdot*decay[0]->momentum());
+	(*ME())(iy,ix,0)=Complex(pre*_vectors[0][iy].dot(p0dotpv*_vectors[1][ix]
+							 -epsdot*decay[0]->momentum()));
     }
   }
   // test of the matrix element

@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // METRP2to2.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2009-2011 The Herwig Collaboration
+// Copyright (C) 2009-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_METRP2to2_H
@@ -24,6 +24,8 @@ using namespace ThePEG;
 /**
  * The METRP2to2 class implements the matrix elements for
  * Transplanckian \f$2\to2\f$ scattering process
+ *
+ * @see \ref METRP2to2Interfaces "The interfaces" defined for METRP2to2.
  */
 class METRP2to2: public HwMEBase {
 
@@ -199,7 +201,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  METRP2to2 & operator=(const METRP2to2 &);
+  METRP2to2 & operator=(const METRP2to2 &) = delete;
 
 private:
 

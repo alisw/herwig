@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MEHiggsPair.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2009-2011 The Herwig Collaboration
+// Copyright (C) 2009-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_MEHiggsPair_H
@@ -268,7 +268,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEHiggsPair & operator=(const MEHiggsPair &);
+  MEHiggsPair & operator=(const MEHiggsPair &) = delete;
 
 
   /**
@@ -315,7 +315,25 @@ private:
    */
   Energy _heavyHwidth;
 
+  /*					       
+   * top yukawa multiplier, Heavy
+   */
+  double _yH;
 
+   /*					       
+   * top yukawa multiplier, light
+   */
+  double _yh;
+
+   /*					       
+   * bottom yukawa multiplier, Heavy
+   */
+  double _ybH;
+
+   /*					       
+   * bottom yukawa multiplier, light
+   */
+  double _ybh;
 
 private:
 

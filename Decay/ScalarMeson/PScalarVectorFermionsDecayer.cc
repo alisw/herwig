@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // PScalarVectorFermionsDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -286,7 +286,7 @@ double PScalarVectorFermionsDecayer::me2(const int,
       // compute the current for this part
       eps = epsilon(decay[0]->momentum(),pff,fcurrent);
       for(ispin[1]=0;ispin[1]<3;++ispin[1]) {
-	(*ME())(ispin)=pre *_vectors[ispin[1]].dot(eps);
+	(*ME())(ispin) = Complex(pre *_vectors[ispin[1]].dot(eps));
       }
     }	  
   }

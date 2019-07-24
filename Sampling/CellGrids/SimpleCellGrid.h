@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // SimpleCellGrid.hpp is a part of ExSample
-// Copyright (C) 2012-2013 Simon Platzer
+// Copyright (C) 2012-2017 Simon Platzer, The Herwig Collaboration
 //
-// ExSample is licenced under version 2 of the GPL, see COPYING for details.
+// ExSample is licenced under version 3 of the GPL, see COPYING for details.
 //
 
 #ifndef EXSAMPLE_SimpleCellGrid_hpp_included
@@ -14,8 +14,6 @@
 
 namespace ExSample {
 
-using std::isnan;
-using std::isinf;
 
   /**
    * \brief A simple cell grid providing basic adaption and sampling
@@ -251,7 +249,7 @@ using std::isinf;
       for ( std::size_t k = 0; k < nPoints; ++k ) {
 	sampleFlatPoint(point,rnd);
 	double w = f.evaluate(point);
-	if ( std::isnan(w) || std::isinf(w) ) {
+	if ( ! std::isfinite(w) ) {
 	  ++nanPoints;
 	  continue;
 	}

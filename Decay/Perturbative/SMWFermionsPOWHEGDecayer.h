@@ -41,7 +41,7 @@ public:
   /**
    *  Apply the POWHEG style correction
    */
-  virtual HardTreePtr generateHardest(ShowerTreePtr);
+  virtual RealEmissionProcessPtr generateHardest(RealEmissionProcessPtr);
   //@}
 
   virtual double me2(const int ichan, const Particle & part,
@@ -114,7 +114,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  SMWFermionsPOWHEGDecayer & operator=(const SMWFermionsPOWHEGDecayer &);
+  SMWFermionsPOWHEGDecayer & operator=(const SMWFermionsPOWHEGDecayer &) = delete;
 
   /**
    *  Pointer to the fermion-antifermion W vertex

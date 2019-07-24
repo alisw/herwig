@@ -20,29 +20,21 @@
 #include "ThePEG/PDT/WidthGenerator.h"
 #include "ThePEG/PDT/DecayMode.h"
 
-using namespace Herwig;
+#include "PrototypeVertex.h"
 
-namespace {
-struct ParticleOrdering {
-  bool operator()(tcPDPtr p1, tcPDPtr p2) {
-    return abs(p1->id()) > abs(p2->id()) ||
-      ( abs(p1->id()) == abs(p2->id()) && p1->id() > p2->id() ) ||
-      ( p1->id() == p2->id() && p1->fullName() > p2->fullName() );
-  }
-};
-}
+using namespace Herwig;
 
 BSMModel::BSMModel() : decayFile_(), readDecays_(true),
 		       topModesFromFile_(false),
-		       tolerance_(1e-6)
+		       tolerance_(1e-6), allowedToResetSMWidths_(false)
 {}
 
 void BSMModel::persistentOutput(PersistentOStream & os) const {
-  os << decayFile_ << topModesFromFile_ << tolerance_;
+  os << decayFile_ << topModesFromFile_ << tolerance_ << allowedToResetSMWidths_;
 }
 
 void BSMModel::persistentInput(PersistentIStream & is, int) {
-  is >> decayFile_ >> topModesFromFile_ >> tolerance_;
+  is >> decayFile_ >> topModesFromFile_ >> tolerance_ >> allowedToResetSMWidths_;
 }
 
 DescribeAbstractClass<BSMModel,Herwig::StandardModel>
@@ -80,6 +72,21 @@ void BSMModel::Init() {
      &BSMModel::tolerance_, 1e-6, 1e-8, 0.01,
      false, false, Interface::limited);
 
+  static Switch<BSMModel,bool> interfaceAllowedToResetSMWidths
+    ("AllowedToResetSMWidths",
+     "Whether or not the widths of SM particles can be reset via the SLHA file",
+     &BSMModel::allowedToResetSMWidths_, false, false, false);
+  static SwitchOption interfaceAllowedToResetSMWidthsNo
+    (interfaceAllowedToResetSMWidths,
+     "No",
+     "Not allowed",
+     false);
+  static SwitchOption interfaceAllowedToResetSMWidthsYes
+    (interfaceAllowedToResetSMWidths,
+     "Yes",
+     "Allowed",
+     true);
+
 }
 
 void BSMModel::doinit() {
@@ -108,7 +115,7 @@ void BSMModel::decayRead() {
   DecaySet::const_iterator dend = h0->decayModes().end();
   for( ; dit != dend; ++dit ) {
     generator()->preinitInterface(*dit, "BranchingRatio", "set", "0.");
-    generator()->preinitInterface(*dit, "OnOff", "set", "Off");
+    generator()->preinitInterface(*dit, "Active", "set", "No");
   }
   // if taking the top modes from the file
   // delete the SM stuff
@@ -120,7 +127,7 @@ void BSMModel::decayRead() {
     DecaySet::const_iterator dend = top->decayModes().end();
     for( ; dit != dend; ++dit ) {
       generator()->preinitInterface(*dit, "BranchingRatio", "set", "0.");
-      generator()->preinitInterface(*dit, "OnOff", "set", "Off");
+      generator()->preinitInterface(*dit, "Active", "set", "No");
     }
   }
   // read first line and check if this is a Les Houches event file
@@ -167,13 +174,6 @@ void BSMModel::readDecay(CFileLineReader & cfile,
   string dummy;
   iss >> dummy >> parent >> iunit(width, GeV);
   PDPtr inpart = getBSMParticleData(parent);
-  // check this ain't a SM particle
-  if(abs(parent)<=5||abs(parent)==23||abs(parent)==24||
-     (abs(parent)>=11&&abs(parent)<=16))
-    cerr << "BSMModel::readDecay() Resetting width of " 
-	   << inpart->PDGName() << " using SLHA "
-	   << "file,\nthis can affect parts of the Standard Model simulation and"
-	   << " is strongly discouraged.\n";
   if(!topModesFromFile_&&abs(parent)==ParticleID::t) {
     cfile.readline();
     return;
@@ -183,9 +183,32 @@ void BSMModel::readDecay(CFileLineReader & cfile,
   		 << "A ParticleData object with the PDG code "
   		 << parent << " does not exist. " 
   		 << Exception::runerror;
-  inpart->width(width);
-  if( width > ZERO ) inpart->cTau(hbarc/width);
-  inpart->widthCut(5.*width);
+  // check this ain't a SM particle
+  if(abs(parent)<=5||abs(parent)==23||abs(parent)==24||
+     (abs(parent)>=11&&abs(parent)<=16)) {
+    if(allowedToResetSMWidths_) {
+      cerr << "BSMModel::readDecay() Resetting width of " 
+	   << inpart->PDGName() << " using SLHA "
+	   << "file,\nthis can affect parts of the Standard Model simulation and"
+	   << " is strongly discouraged.\n";
+      inpart->width(width);
+      if( width > ZERO ) inpart->cTau(hbarc/width);
+      inpart->widthCut(5.*width);
+    }
+    else {
+      cerr << "BSMModel::readDecay() You have tried to Reset the width of " 
+	   << inpart->PDGName() << " using an SLHA "
+	   << "file,\nthis can affect parts of the Standard Model simulation and"
+	   << " is not allowed by default.\n If you really want to be this stupid"
+	   << " set AllowedToResetSMWidths to Yes for this model.\n";
+    }
+  }
+  else {
+    inpart->width(width);
+    if( width > ZERO ) inpart->cTau(hbarc/width);
+    inpart->widthCut(5.*width);
+  }
+  
   Energy inMass = inpart->mass();
   string prefix(inpart->name() + "->");
   double brsum(0.);
@@ -280,12 +303,12 @@ void BSMModel::readDecay(CFileLineReader & cfile,
 	     << "are used, this may have unintended consequences\n";
 	for(DecaySet::iterator it=inpart->decayModes().begin();
 	    it!=inpart->decayModes().end();++it) {
-	  generator()->preinitInterface(*it, "OnOff", "set", "Off");
+	  generator()->preinitInterface(*it, "Active", "set", "No");
 	}
 	if(inpart->CC()) {
 	  for(DecaySet::iterator it=inpart->CC()->decayModes().begin();
 	      it!=inpart->CC()->decayModes().end();++it) {
-	    generator()->preinitInterface(*it, "OnOff", "set", "Off");
+	    generator()->preinitInterface(*it, "Active", "set", "No");
 	  }
 	}
       }
@@ -378,13 +401,13 @@ void BSMModel::readDecay(CFileLineReader & cfile,
 void BSMModel::createDecayMode(string tag, double brat) const {
   tDMPtr dm = generator()->findDecayMode(tag);
   if(!dm) dm = generator()->preinitCreateDecayMode(tag);
-  generator()->preinitInterface(dm, "OnOff", "set", "On");
+  generator()->preinitInterface(dm, "Active", "set", "Yes");
   generator()->preinitInterface(dm, "Decayer", "set","/Herwig/Decays/Mambo");
   ostringstream brf;
   brf << setprecision(13)<< brat;
   generator()->preinitInterface(dm, "BranchingRatio","set", brf.str());
   if(dm->CC()) {
-    generator()->preinitInterface(dm->CC(), "OnOff", "set", "On");
+    generator()->preinitInterface(dm->CC(), "Active", "set", "Yes");
     generator()->preinitInterface(dm->CC(), "Decayer", "set","/Herwig/Decays/Mambo");
     generator()->preinitInterface(dm->CC(), "BranchingRatio","set", brf.str());
   }

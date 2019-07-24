@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // MatchboxXComb.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef Herwig_LastMatchboxXCombInfo_H
@@ -214,21 +214,21 @@ public:
    * the light flavours, which are contained in the
    * jet particle group.
    */
-  vector<int> nLightJetVec() const { return lastMatchboxXComb()->nLightJetVec(); }
+  vector<long> nLightJetVec() const { return lastMatchboxXComb()->nLightJetVec(); }
 
   /**
    * Return the vector that contains the PDG ids of 
    * the heavy flavours, which are contained in the
    * jet particle group.
    */
-  vector<int> nHeavyJetVec() const { return lastMatchboxXComb()->nHeavyJetVec(); }
+  vector<long> nHeavyJetVec() const { return lastMatchboxXComb()->nHeavyJetVec(); }
 
   /**
    * Return the vector that contains the PDG ids of 
    * the light flavours, which are contained in the
    * proton particle group.
    */
-  vector<int> nLightProtonVec() const { return lastMatchboxXComb()->nLightProtonVec(); }
+  vector<long> nLightProtonVec() const { return lastMatchboxXComb()->nLightProtonVec(); }
 
   /**
    * Get the dimensionality of the colour basis for this process.

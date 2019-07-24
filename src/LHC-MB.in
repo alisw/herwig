@@ -5,45 +5,57 @@
 # tunes and tunes for other centre-of-mass energies as well as more usage
 # instructions can be obtained from this Herwig wiki page:
 # http://projects.hepforge.org/herwig/trac/wiki/MB_UE_tunes
+# The model for soft interactions and diffractions is explained in
+# [S. Gieseke, P. Kirchgaesser, F. Loshaj, arXiv:1612.04701]
 ################################################################################
+
+read snippets/PPCollider.in
 
 ##################################################
 # Technical parameters for this run
 ##################################################
 cd /Herwig/Generators
-set LHCGenerator:NumberOfEvents 10000000
-set LHCGenerator:RandomNumberGenerator:Seed 31122001
-set LHCGenerator:PrintEvent 10
-set LHCGenerator:MaxErrors 1000000
-
-set LHCGenerator:DebugLevel 0
-set LHCGenerator:DumpPeriod -1
-set LHCGenerator:DebugEvent 0
-
-
 ##################################################
 # LHC physics parameters (override defaults here) 
 ##################################################
-set LHCGenerator:EventHandler:LuminosityFunction:Energy 13000.0
+set EventGenerator:EventHandler:LuminosityFunction:Energy 7000.0
 
-# Intrinsic pT tune extrapolated to LHC energy
-set /Herwig/Shower/Evolver:IntrinsicPtGaussian 2.2*GeV
+
+# Minimum Bias
+read snippets/MB.in
+
+# Read in parameters of the soft model recommended for MB/UE simulations
+read snippets/SoftTune.in
+
+# Diffraction model
+read snippets/Diffraction.in
+
+# Read in snippet in order to use baryonic reconnection model with modified gluon splitting (uds)
+# For more details see [S. Gieseke, P. Kirchgaeßer, S. Plätzer. arXiv:1710.10906]]
+##############################################################################################
+
+# read snippets/BaryonicReconnection.in
+
 
 ##################################################
-# Matrix Elements for hadron-hadron collisions 
+# Analyses
 ##################################################
-cd /Herwig/MatrixElements/
-insert SimpleQCD:MatrixElements[0] MEMinBias
 
 
-# MPI model settings
-set /Herwig/UnderlyingEvent/MPIHandler:IdenticalToUE 0
-cd /Herwig/Generators
+# cd /Herwig/Analysis
+# create ThePEG::RivetAnalysis RivetAnalysis RivetAnalysis.so
 
-# Change to have no pT cuts for MinBias
-set LHCGenerator:EventHandler:Cuts /Herwig/Cuts/MinBiasCuts
+# cd /Herwig/Generators
+# insert EventGenerator:AnalysisHandlers 0 /Herwig/Analysis/RivetAnalysis
 
-#insert LHCGenerator:AnalysisHandlers 0 /Herwig/Analysis/HepMCFile
+# insert /Herwig/Analysis/RivetAnalysis:Analyses 0 ATLAS_20XX_XXXXXXX
+
+
+#set /Herwig/Analysis/Plot:EventNumber 54
+#cd /Herwig/Generators
+#insert EventGenerator:AnalysisHandlers 0 /Herwig/Analysis/Plot
+
+#insert EventGenerator:AnalysisHandlers 0 /Herwig/Analysis/HepMCFile
 #set /Herwig/Analysis/HepMCFile:PrintEvent 1000000
 #set /Herwig/Analysis/HepMCFile:Format GenEvent
 #set /Herwig/Analysis/HepMCFile:Units GeV_mm
@@ -52,5 +64,6 @@ set LHCGenerator:EventHandler:Cuts /Herwig/Cuts/MinBiasCuts
 ##################################################
 # Save run for later usage with 'Herwig run'
 ##################################################
-saverun LHC-MB LHCGenerator
+cd /Herwig/Generators
+saverun LHC-MB EventGenerator
 

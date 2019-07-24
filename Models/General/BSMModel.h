@@ -146,7 +146,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  BSMModel & operator=(const BSMModel &);
+  BSMModel & operator=(const BSMModel &) = delete;
 
 private:
 
@@ -175,6 +175,11 @@ private:
    *  Map of ids from files to those used by Herwig
    */
   map<long,long> idMap_;
+
+  /**
+   *  Whether or not to allow the width of SM particles to be reset
+   */
+  bool allowedToResetSMWidths_;
 
 };
 

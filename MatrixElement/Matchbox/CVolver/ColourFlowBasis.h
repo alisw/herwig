@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // ColourFlowBasis.h is a part of CVolver
-// Copyright (C) 2013-2014 Simon Platzer
+// Copyright (C) 2013-2017 Simon Platzer, The Herwig Collaboration
 //
-// CVolver is licenced under version 2 of the GPL, see COPYING for details.
+// CVolver is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef CVOLVER_ColourFlowBasis_H
@@ -202,7 +202,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  ColourFlowBasis & operator=(const ColourFlowBasis &);
+  ColourFlowBasis & operator=(const ColourFlowBasis &) = delete;
 
 };
 

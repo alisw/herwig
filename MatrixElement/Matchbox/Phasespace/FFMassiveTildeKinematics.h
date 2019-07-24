@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // FFMassiveTildeKinematics.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef HERWIG_FFMassiveTildeKinematics_H
@@ -20,7 +20,7 @@ using namespace ThePEG;
 
 /**
  * \ingroup Matchbox
- * \author Simon Platzer
+ * \author Simon Platzer, Stephen Webster
  *
  * \brief FFMassiveTildeKinematics implements the 'tilde' kinematics for
  * a final-final subtraction dipole.
@@ -59,6 +59,17 @@ public:
    * Return the pt associated to the last merged splitting.
    */
   virtual Energy lastPt() const;
+  
+  /**
+   * Given a pt, return the boundaries on z
+   */
+  virtual pair<double,double> zBounds(Energy pt, Energy hardPt ) const;
+  
+  /**
+   * Return the pt associated to emitter emission and sppectator momentum.
+   */
+  virtual Energy lastPt(Lorentz5Momentum,Lorentz5Momentum,Lorentz5Momentum) const ;
+
 
   /**
    * Return the momentum fraction associated to the last splitting.
@@ -128,7 +139,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  FFMassiveTildeKinematics & operator=(const FFMassiveTildeKinematics &);
+  FFMassiveTildeKinematics & operator=(const FFMassiveTildeKinematics &) = delete;
 
 };
 

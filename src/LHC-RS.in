@@ -12,8 +12,10 @@
 # The second section contains the user settings.
 ###################################################
 
+read snippets/PPCollider.in
+
 # Set emission to POWHEG for radiation in decays
-set /Herwig/Shower/Evolver:HardEmissionMode POWHEG
+set /Herwig/Shower/ShowerHandler:HardEmission POWHEG
 
 read RS.model
 cd /Herwig/NewPhysics
@@ -41,15 +43,16 @@ insert ResConstructor:Outgoing 3 /Herwig/Particles/gamma
 # coupling
 set RS/Model:Lambda_pi 10000*GeV
 
-# Intrinsic pT tune extrapolated to LHC energy
-set /Herwig/Shower/Evolver:IntrinsicPtGaussian 2.2*GeV
+
+##################################################
+## prepare for Rivet analysis or HepMC output
+## when running with parton shower
+##################################################
+#read snippets/Rivet.in
+#insert /Herwig/Analysis/Rivet:Analyses 0 XXX_2015_ABC123
+#read snippets/HepMC.in
+#set /Herwig/Analysis/HepMC:PrintEvent NNN
 
 # Other parameters for run
 cd /Herwig/Generators
-set LHCGenerator:NumberOfEvents 10000000
-set LHCGenerator:RandomNumberGenerator:Seed 31122001
-set LHCGenerator:PrintEvent 10
-set LHCGenerator:MaxErrors 10000
-set LHCGenerator:EventHandler:LuminosityFunction:Energy 13000.0
-
-saverun LHC-RS LHCGenerator
+saverun LHC-RS EventGenerator

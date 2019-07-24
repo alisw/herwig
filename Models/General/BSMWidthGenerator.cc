@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // BSMWidthGenerator.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -12,6 +12,7 @@
 //
 
 #include "BSMWidthGenerator.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -35,8 +36,10 @@ void BSMWidthGenerator::persistentInput(PersistentIStream & is, int) {
   is >> theModes;
 }
 
-ClassDescription<BSMWidthGenerator> BSMWidthGenerator::initBSMWidthGenerator;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<BSMWidthGenerator,GenericWidthGenerator>
+describeHerwigBSMWidthGenerator("Herwig::BSMWidthGenerator", "Herwig.so");
 
 void BSMWidthGenerator::Init() {
 
@@ -63,9 +66,13 @@ Energy BSMWidthGenerator::partial2BodyWidth(int iloc, Energy m0,
   tcPDPtr partb = *pit;
   int dummya(0);
   double dummyb(0.);
-  if( !theModes[iloc].second->twoBodyMEcode(*dm, dummya, dummyb) ) 
-    swap(parta, partb);
-  return theModes[iloc].second->partialWidth(make_pair(dm->parent(), m0), 
-					     make_pair(parta, m1),
-					     make_pair(partb, m2));
+  if(theModes[iloc].second) {
+    if( !theModes[iloc].second->twoBodyMEcode(*dm, dummya, dummyb) )
+      swap(parta, partb);
+    return theModes[iloc].second->partialWidth(make_pair(dm->parent(), m0),
+					       make_pair(parta, m1),
+					       make_pair(partb, m2));
+  }
+  else
+    return ZERO;
 }

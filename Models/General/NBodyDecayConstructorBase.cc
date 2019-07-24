@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // NBodyDecayConstructorBase.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -52,9 +52,10 @@ void NBodyDecayConstructorBase::persistentInput(PersistentIStream & is , int) {
 DescribeAbstractClass<NBodyDecayConstructorBase,Interfaced>
 describeThePEGNBodyDecayConstructorBase("Herwig::NBodyDecayConstructorBase", "Herwig.so");
 
-AbstractClassDescription<NBodyDecayConstructorBase> 
-NBodyDecayConstructorBase::initNBodyDecayConstructorBase;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeAbstractClass<NBodyDecayConstructorBase,Interfaced>
+describeHerwigNBodyDecayConstructorBase("Herwig::NBodyDecayConstructorBase", "Herwig.so");
 
 void NBodyDecayConstructorBase::Init() {
 
@@ -66,12 +67,12 @@ void NBodyDecayConstructorBase::Init() {
     ("InitializeDecayers",
      "Initialize new decayers",
      &NBodyDecayConstructorBase::init_, true, false, false);
-  static SwitchOption interfaceInitializeDecayersInitializeDecayersOn
+  static SwitchOption interfaceInitializeDecayersInitializeDecayersYes
     (interfaceInitializeDecayers,
      "Yes",
      "Initialize new decayers to find max weights",
      true);
-  static SwitchOption interfaceInitializeDecayersoff
+  static SwitchOption interfaceInitializeDecayersNo
     (interfaceInitializeDecayers,
      "No",
      "Use supplied weights for integration",
@@ -93,12 +94,12 @@ void NBodyDecayConstructorBase::Init() {
     ("OutputInfo",
      "Whether to output information about the decayers",
      &NBodyDecayConstructorBase::info_, false, false, false);
-  static SwitchOption interfaceOutputInfoOff
+  static SwitchOption interfaceOutputInfoNo
     (interfaceOutputInfo,
      "No",
      "Do not output information regarding the created decayers",
      false);
-  static SwitchOption interfaceOutputInfoOn
+  static SwitchOption interfaceOutputInfoYes
     (interfaceOutputInfo,
      "Yes",
      "Output information regarding the decayers",
@@ -108,12 +109,12 @@ void NBodyDecayConstructorBase::Init() {
     ("CreateDecayModes",
      "Whether to create the ThePEG::DecayMode objects as well as the decayers",
      &NBodyDecayConstructorBase::createModes_, true, false, false);
-  static SwitchOption interfaceCreateDecayModesOn
+  static SwitchOption interfaceCreateDecayModesYes
     (interfaceCreateDecayModes,
      "Yes",
      "Create the ThePEG::DecayMode objects",
      true);
-  static SwitchOption interfaceCreateDecayModesOff
+  static SwitchOption interfaceCreateDecayModesNo
     (interfaceCreateDecayModes,
      "No",
      "Only create the Decayer objects",
@@ -285,12 +286,22 @@ void NBodyDecayConstructorBase::Init() {
 }
 
 void NBodyDecayConstructorBase::setBranchingRatio(tDMPtr dm, Energy pwidth) {
-  //Need width and branching ratios for all currently created decay modes
+  // if zero width just set BR to zero
+  if(pwidth==ZERO) {
+    generator()->preinitInterface(dm, "BranchingRatio","set", "0.");
+    generator()->preinitInterface(dm, "OnOff","set", "Off");
+    return;
+  }
+  // Need width and branching ratios for all currently created decay modes
   PDPtr parent = const_ptr_cast<PDPtr>(dm->parent());
   DecaySet modes = parent->decayModes();
-  if( modes.empty() ) return;
+  unsigned int nmodes=0;
+  for( auto dm : modes ) {
+    if(dm->on()) ++nmodes;
+  }
+  if( nmodes==0 ) return;
   double dmbrat(0.);
-  if( modes.size() == 1 ) {
+  if( nmodes == 1 ) {
     parent->width(pwidth);
     if( pwidth > ZERO ) parent->cTau(hbarc/pwidth);
     dmbrat = 1.;
@@ -362,11 +373,6 @@ void NBodyDecayConstructorBase::doinit() {
 }
 
 namespace {
-
-double factorial(const int i) {
-  if(i>1) return i*factorial(i-1);
-  else    return 1.;
-}
 
 void constructIdenticalSwaps(unsigned int depth,
 			     vector<vector<unsigned int> > identical,

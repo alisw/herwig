@@ -7,7 +7,7 @@
 
 #include "SMHiggsFermionsDecayer.h"
 #include "Herwig/Utilities/Maths.h"
-#include "Herwig/Shower/Couplings/ShowerAlpha.fh"
+#include "Herwig/Shower/Core/Couplings/ShowerAlpha.fh"
 
 namespace Herwig {
 
@@ -41,7 +41,7 @@ public:
   /**
    *  Apply the POWHEG style correction
    */
-  virtual HardTreePtr generateHardest(ShowerTreePtr);
+  virtual RealEmissionProcessPtr generateHardest(RealEmissionProcessPtr);
   //@}
 
   virtual double me2(const int ichan, const Particle & part,
@@ -114,7 +114,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  SMHiggsFermionsPOWHEGDecayer & operator=(const SMHiggsFermionsPOWHEGDecayer &);
+  SMHiggsFermionsPOWHEGDecayer & operator=(const SMHiggsFermionsPOWHEGDecayer &) = delete;
 
   /**
    *  Calcluate the Kallen function

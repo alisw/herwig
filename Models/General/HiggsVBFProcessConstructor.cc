@@ -5,6 +5,7 @@
 //
 
 #include "HiggsVBFProcessConstructor.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/Interface/RefVector.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
@@ -34,9 +35,10 @@ void HiggsVBFProcessConstructor::persistentInput(PersistentIStream & is, int) {
   is >> _higgs >> _type >> _shapeOpt;
 }
 
-ClassDescription<HiggsVBFProcessConstructor> 
-HiggsVBFProcessConstructor::initHiggsVBFProcessConstructor;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<HiggsVBFProcessConstructor,HardProcessConstructor>
+describeHerwigHiggsVBFProcessConstructor("Herwig::HiggsVBFProcessConstructor", "Herwig.so");
 
 void HiggsVBFProcessConstructor::Init() {
 
@@ -63,7 +65,7 @@ void HiggsVBFProcessConstructor::Init() {
      "MassGenerator",
      "Use the mass generator to give the shape",
      2);
-  static SwitchOption interfaceStandardShapeOn
+  static SwitchOption interfaceStandardShapeYes
     (interfaceShapeOption,
      "OnShell",
      "Produce the Higgs on-shell",

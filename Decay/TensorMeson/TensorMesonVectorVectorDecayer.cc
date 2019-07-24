@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // TensorMesonVectorVectorDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -264,7 +264,7 @@ double TensorMesonVectorVectorDecayer::me2(const int,const Particle & inpart,
 	      -p1eps2[iy]*(_vectors[0][ix].dot(pleft[1][inhel]+pright[1][inhel]))
 	      +pboth[inhel]*e1e2
 	      +(p2eps1[ix]*p1eps2[iy]-e1e2*p1p2)*trace[inhel]);
-	(*ME())(inhel,ix,iy)=fact*me;
+	(*ME())(inhel,ix,iy)=Complex(fact*me);
       }    
     }
   }

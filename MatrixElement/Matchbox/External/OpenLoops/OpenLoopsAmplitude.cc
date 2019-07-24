@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // OpenLoopsAmplitude.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -45,8 +45,7 @@ using namespace Herwig;
 #endif
 
 OpenLoopsAmplitude::OpenLoopsAmplitude() :
-  theHiggsEff(false), use_cms(true), psp_tolerance(12),
-  OpenLoopsLibs_(OPENLOOPSLIBS), OpenLoopsPrefix_(OPENLOOPSPREFIX) {
+  theHiggsEff(false), use_cms(true), psp_tolerance(12){
 }
 
 OpenLoopsAmplitude::~OpenLoopsAmplitude() {
@@ -74,15 +73,21 @@ void OpenLoopsAmplitude::doinitrun() {
   MatchboxOLPME::doinitrun();
 }
 
+vector<int> OpenLoopsAmplitude::idpair=vector<int>();
+
 void OpenLoopsAmplitude::startOLP(const string& contract, int& status) {
+
+        
+
 	string tempcontract=contract;
+       
 
 	if ( ! (DynamicLoader::load(OpenLoopsLibs_+"/libopenloops.so") ||
 		DynamicLoader::load(OpenLoopsPrefix_+"/lib/libopenloops.so") ||
 		DynamicLoader::load("libopenloops.so") ||
 		DynamicLoader::load(OpenLoopsLibs_+"/libopenloops.dylib") ||
-		DynamicLoader::load(OpenLoopsPrefix_+"/lib/libopenloops.dylib") ||
-		DynamicLoader::load("libopenloops.dylib") ) ) {
+                DynamicLoader::load("libopenloops.dylib")||
+		DynamicLoader::load(OpenLoopsPrefix_+"/lib/libopenloops.dylib")  ) ) {
 	  throw Exception() << "OpenLoopsAmplitude::startOLP(): Failed to load libopenloops.so/dylib\n"
 			    << DynamicLoader::lastErrorMessage
 			    << Exception::runerror;
@@ -127,7 +132,13 @@ void OpenLoopsAmplitude::startOLP(const string& contract, int& status) {
 }
 
 void OpenLoopsAmplitude::fillOrderFile(const map<pair<Process, int>, int>& procs) {
-	string orderFileName = factory()->buildStorage() + name() + ".OLPContract.lh";
+	
+	string orderFileName =
+      optionalContractFile().empty() ?
+      factory()->buildStorage() + name() + ".OLPContract.lh" :
+      optionalContractFile();
+
+
 	ofstream orderFile(orderFileName.c_str());
 	size_t asPower = 100;
 	size_t minlegs = 100;
@@ -145,12 +156,18 @@ void OpenLoopsAmplitude::fillOrderFile(const map<pair<Process, int>, int>& procs
 	orderFile << "extra answerfile      " << (factory()->buildStorage() + name() + ".OLPAnswer.lh") << "\n";
 	orderFile << "extra psp_tolerance "<<psp_tolerance<<"\n";
 	orderFile << "extra use_cms "<<(use_cms?"1":"0")<< "\n";
-	if (theHiggsEff)
+	if (theCollierLib) { 
+		orderFile << "extra preset 2 "<<"\n";
+	   if(theHiggsEff){
+	        orderFile << "extra stability_mode 14\n";
+		orderFile << "extra redlib1 1\n";	
+	   }
+	}
+	if (theHiggsEff){
 		orderFile << "model heft\n";
+	}
 	orderFile << "\n";
 
-	if (extraOpenLoopsPath!="")
-	    orderFile << "Extra OpenLoopsPath  " << extraOpenLoopsPath << "\n";
 	for ( map<pair<Process, int>, int>::const_iterator p = procs.begin() ; p != procs.end() ; ++p ) {
 		std::stringstream Processstr;
 		std::stringstream Typestr;
@@ -227,31 +244,26 @@ bool OpenLoopsAmplitude::checkOLPContract() {
 			}
 		}
 	}
-	string ids = factory()->buildStorage() + "OpenLoops.ids.dat";
-	ofstream IDS(ids.c_str());
-
+  
+    idpair.clear();
+    for (size_t i=0;i<processmap.size();i++)idpair.push_back(-1);
+        idpair.push_back(-1);
 	for ( map<int, OpenLoopsProcInfo>::iterator p = processmap.begin() ; p != processmap.end() ; p++ ) {
-	    idpair.insert ( std::pair<int,int>((*p).second.HID(),(*p).second.GID()) );
-	    IDS << (*p).second.HID() << " " << (*p).second.GID() << "\n";
+	    idpair[(*p).second.HID()]=(*p).second.GID();
 	    if ( (*p).second.GID() == -1 ) return 0;
 	}
-	IDS << flush;
 	return 1;
 }
 
-void OpenLoopsAmplitude::getids() const{
-	string line = factory()->buildStorage() + "OpenLoops.ids.dat";
-	ifstream infile(line.c_str());
-	int hid;
-	int gid;
-	while (std::getline(infile, line)) {
-	   istringstream(line) >> hid>>gid;
-	   idpair.insert ( std::pair<int,int>(hid,gid) );
-	}
-}
+
 bool OpenLoopsAmplitude::startOLP(const map<pair<Process, int>, int>& procs) {
 	string contractFileName =  factory()->buildStorage() + name() + ".OLPAnswer.lh";
-	string orderFileName = factory()->buildStorage() + name() + ".OLPContract.lh";
+
+        string orderFileName =
+        optionalContractFile().empty() ?
+        factory()->buildStorage() + name() + ".OLPContract.lh" :
+        optionalContractFile();
+
 	fillOrderFile(procs);
  	int status = -1;
 	startOLP(orderFileName, status);
@@ -279,17 +291,9 @@ void OpenLoopsAmplitude::evalSubProcess() const {
 
 	int id = olpId()[ProcessType::oneLoopInterference] ? olpId()[ProcessType::oneLoopInterference] : olpId()[ProcessType::treeME2];
 
-	if ( idpair.size() == 0 ) {
-		getids();
-		if ( Debug::level > 1 ) {
-		  string parfile=factory()->runStorage() + name() + ".Parameters.dat";
-		  OLP_PrintParameter(parfile.c_str());
-		}
-		
-    }
-  
-
-	OLP_EvalSubProcess2(&((*(idpair.find(id))).second), olpMomenta(), &scale, out,&acc );
+    assert ( idpair.size() != 0 );
+ 
+	OLP_EvalSubProcess2(&idpair[id], olpMomenta(), &scale, out,&acc );
   
   
 	if ( olpId()[ProcessType::oneLoopInterference] ) {
@@ -315,19 +319,12 @@ void OpenLoopsAmplitude::evalColourCorrelator(pair<int, int>  ) const {
 	int n = lastXComb().meMomenta().size();
 
 	colourCorrelatorResults.resize(n * (n - 1) / 2);
-	if ( idpair.size() == 0 ) {
-		getids();
-		if ( Debug::level > 1 ) {
-		  string parfile=factory()->runStorage() + name() + ".Parameters.dat";
-		  OLP_PrintParameter(parfile.c_str());
-		}
-		
-	}
+  assert ( idpair.size() != 0 );
 
 
 	int id = olpId()[ProcessType::colourCorrelatedME2];
 
-	OLP_EvalSubProcess2(&((*(idpair.find(id))).second), olpMomenta(), &scale, &colourCorrelatorResults[0],&acc );
+	OLP_EvalSubProcess2(&idpair[id], olpMomenta(), &scale, &colourCorrelatorResults[0],&acc );
 	for ( int i = 0 ; i < n ; ++i ){
 	    for ( int j = i + 1 ; j < n ; ++j ) {
 			lastColourCorrelator(make_pair(i, j), colourCorrelatorResults[i+j*(j-1)/2] * units);
@@ -356,15 +353,8 @@ double OpenLoopsAmplitude::spinColourCorrelatedME2(pair<int,int> ij,
 	int emitter=ij.first+1;
 	int n = lastXComb().meMomenta().size();
 
-	if ( idpair.size() == 0 ) {
-		getids();
-		if ( Debug::level > 1 ) {
-		  string parfile=factory()->runStorage() + name() + ".Parameters.dat";
-		  OLP_PrintParameter(parfile.c_str());
-		}
-		
-	}
-	int id = (*(idpair.find(olpId()[ProcessType::spinColourCorrelatedME2]))).second;
+    assert ( idpair.size() != 0 ) ;
+	int id =idpair[olpId()[ProcessType::spinColourCorrelatedME2]];
 	//double * outx =new double[n];
 	spinColourCorrelatorResults.resize(n);
         double polvec[4];
@@ -399,15 +389,38 @@ double OpenLoopsAmplitude::spinColourCorrelatedME2(pair<int,int> ij,
 
 
 
+string OpenLoopsAmplitude::OpenLoopsLibs_=OPENLOOPSLIBS;
+string OpenLoopsAmplitude::OpenLoopsPrefix_=OPENLOOPSPREFIX;
+
+void OpenLoopsAmplitude::setOpenLoopsLibs(string p){
+  OpenLoopsLibs_=p;
+}
+string OpenLoopsAmplitude::getOpenLoopsLibs() const{
+  return OpenLoopsLibs_;
+}
+
+
+void OpenLoopsAmplitude::setOpenLoopsPrefix(string p){
+  OpenLoopsPrefix_=p;
+}
+string OpenLoopsAmplitude::getOpenLoopsPrefix() const{
+  return OpenLoopsPrefix_;
+}
+
+
 // If needed, insert default implementations of virtual function defined
 // in the InterfacedBase class here (using ThePEG-interfaced-impl in Emacs).
 
 void OpenLoopsAmplitude::persistentOutput(PersistentOStream & os) const {
-  os << idpair << OpenLoopsLibs_ << OpenLoopsPrefix_;
+  os << idpair << theHiggsEff << use_cms << theCollierLib << OpenLoopsLibs_ << OpenLoopsPrefix_;
+  OpenLoopsLibs_.clear();
+  OpenLoopsPrefix_.clear();
 }
 
 void OpenLoopsAmplitude::persistentInput(PersistentIStream & is, int) {
-  is >> idpair >> OpenLoopsLibs_ >> OpenLoopsPrefix_;
+  is >> idpair >> theHiggsEff >> use_cms >> theCollierLib ;
+  string input=""; is>>input; if (!input.empty())OpenLoopsLibs_=input;
+  input=""; is>>input; if (!input.empty())OpenLoopsPrefix_=input;
 }
 
 // *** Attention *** The following static variable is needed for the type
@@ -433,32 +446,48 @@ void OpenLoopsAmplitude::Init() {
          ("HiggsEff",
           "Switch On/Off for effective higgs model.",
           &OpenLoopsAmplitude::theHiggsEff, false, false, false);
-  static SwitchOption interfaceHiggsEffOn
+  static SwitchOption interfaceHiggsEffYes
          (interfaceHiggsEff,
-          "On",
-          "On",
+          "Yes",
+          "Yes",
           true);
-  static SwitchOption interfaceHiggsEffOff
+  static SwitchOption interfaceHiggsEffNo
          (interfaceHiggsEff,
-          "Off",
-          "Off",
+          "No",
+          "No",
           false);
 
   static Switch<OpenLoopsAmplitude,bool> interfaceUseComplMass
   ("ComplexMassScheme",
    "Switch on or off if Complex Masses.",
    &OpenLoopsAmplitude::use_cms, true, false, false);
-  static SwitchOption interfaceUseComplMassOn
+  static SwitchOption interfaceUseComplMassYes
   (interfaceUseComplMass,
-   "True",
+   "Yes",
    "True for Complex Masses.",
    true);
-  static SwitchOption interfaceUseComplMassOff
+  static SwitchOption interfaceUseComplMassNo
   (interfaceUseComplMass,
-   "False",
+   "No",
    "False for no Complex Masses.",
    false);
-  
+ 
+  static Switch<OpenLoopsAmplitude,bool> interfaceCollier
+         ("UseCollier",
+          "Switch On/Off for using the Collier Lib (arXiv:1604.06792).",
+          &OpenLoopsAmplitude::theCollierLib, true, false, false);
+  static SwitchOption interfaceCollierYes
+         (interfaceCollier,
+          "Yes",
+          "Yes",
+          true);
+  static SwitchOption interfaceCollierNo
+         (interfaceCollier,
+          "No",
+          "No",
+          false);
+
+ 
   static Parameter<OpenLoopsAmplitude,int> interfacepsp_tolerance
   ("PSP_tolerance",
    "(Debug)Phase Space Tolerance. Better use e.g.: set OpenLoops:Massless 13",
@@ -468,14 +497,18 @@ void OpenLoopsAmplitude::Init() {
   static Parameter<OpenLoopsAmplitude,string> interfaceOpenLoopsLibs
     ("OpenLoopsLibs",
      "The location of OpenLoops libraries",
-     &OpenLoopsAmplitude::OpenLoopsLibs_, string(OPENLOOPSLIBS),
-     false, false);
+     0, string(OPENLOOPSLIBS),
+     false, false,
+     &OpenLoopsAmplitude::setOpenLoopsLibs,
+     &OpenLoopsAmplitude::getOpenLoopsLibs);
     
   static Parameter<OpenLoopsAmplitude,string> interfaceOpenLoopsPrefix
     ("OpenLoopsPrefix",
      "The location of OpenLoops libraries",
-     &OpenLoopsAmplitude::OpenLoopsPrefix_, string(OPENLOOPSPREFIX),
-     false, false);
+     0, string(OPENLOOPSPREFIX),
+     false, false,
+     &OpenLoopsAmplitude::setOpenLoopsPrefix,
+     &OpenLoopsAmplitude::getOpenLoopsPrefix);
   
 }
 

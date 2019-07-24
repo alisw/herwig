@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // ShowerApproximation.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2012 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #ifndef Herwig_ShowerApproximation_H
@@ -435,6 +435,17 @@ protected:
    */
   virtual Energy hardScale() const;
 
+  /**
+   * Use the maximum available phase space for the momentum fraction
+   */
+  void useOpenZ(bool yes) { theOpenZ = yes; }
+
+  /**
+   * Return true if the maximum available phase space should be used
+   * for the momentum fraction
+   */
+  bool openZ() const { return theOpenZ; }
+
 public:
 
   /**
@@ -473,6 +484,19 @@ public:
    * when this class is dynamically loaded.
    */
   static void Init();
+
+
+protected:
+
+  /** @name Standard Interfaced functions. */
+  //@{
+  /**
+   * Initialize this object after the setup phase before saving an
+   * EventGenerator to disk.
+   * @throws InitException if object could not be initialized properly.
+   */
+  virtual void doinit();
+  //@}
 
 
 // If needed, insert declarations of virtual function defined in the
@@ -647,13 +671,18 @@ private:
    */
   Ptr<HardScaleProfile>::ptr theHardScaleProfile;
 
+  /**
+   * Use the maximum available phase space for the momentum fraction
+   */
+  bool theOpenZ;
+
 private:
 
   /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  ShowerApproximation & operator=(const ShowerApproximation &);
+  ShowerApproximation & operator=(const ShowerApproximation &) = delete;
 
 };
 

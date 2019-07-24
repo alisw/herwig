@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // ScalarVectorVectorDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2011 The Herwig Collaboration
+// Copyright (C) 2002-2017 The Herwig Collaboration
 //
-// Herwig is licenced under version 2 of the GPL, see COPYING for details.
+// Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 //
@@ -203,9 +203,9 @@ double ScalarVectorVectorDecayer::me2(const int,
   unsigned int ix,iy;
   for(ix=0;ix<3;++ix) {
     for(iy=0;iy<3;++iy) {
-      (*ME())(0,ix,iy)=fact*(p1p2*_vectors[0][ix].dot(_vectors[1][iy])-
-			  (_vectors[1][iy]*decay[0]->momentum())*
-			  (_vectors[0][ix]*decay[1]->momentum()));
+      (*ME())(0,ix,iy)=Complex(fact*(p1p2*_vectors[0][ix].dot(_vectors[1][iy])-
+				     (_vectors[1][iy]*decay[0]->momentum())*
+				     (_vectors[0][ix]*decay[1]->momentum())));
     }
   }
   // test of the matrix element
