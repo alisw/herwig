@@ -40,7 +40,7 @@ def fillprocs(model,oras,orew):
   bornlist=[]
   virtlist=[]
   fileproc=open("proc.dat","w")
-  fileproc.write("set fortran_compiler gfortran-mp-6 --no_save\n")
+  fileproc.write("set fortran_compiler gfortran --no_save\n")
   fileproc.write("import model "+model+"\n")
   borns="BornAmplitudes.dat"
   virts="VirtAmplitudes.dat"
@@ -372,7 +372,7 @@ if Virtlist!=[]:
         file.write("\nLINKLIBS += -L$(LIBDIR)/golem95_lib -lgolem") 
      
     
-file.write("\nPROCESS= InterfaceMadGraph.f "+make+"\n\nall:  \n\t gfortran-mp-6  -g -O2 -w -fbounds-check -ffixed-line-length-132 -fPIC -fno-f2c -shared -s -o  InterfaceMadGraph.so -IMG5/SubProcesses/" )
+file.write("\nPROCESS= InterfaceMadGraph.f "+make+"\n\nall:  \n\t gfortran  -g -O2 -w -fbounds-check -ffixed-line-length-132 -fPIC -fno-f2c -shared -s -o  InterfaceMadGraph.so -IMG5/SubProcesses/" )
 if Virtlist!=[]:
   if (os.path.exists("MG5/lib/golem95_include")):
       file.write(" -IMG5/lib/golem95_include ")

@@ -128,7 +128,7 @@ namespace Herwig {
     	theMergePt = factor * centralMergePt();
     }
       /// true if the phase space for initial emissions should not be restricted in z.
-    int openZBoundaries()const{return theOpenZBoundaries;}
+    int openZBoundaries()const{return DSH()->showerPhaseSpaceOption();}
       /// return the current ME
     MatchboxMEBasePtr currentME() const { return theCurrentME; }
       /// return the current Node
@@ -270,8 +270,6 @@ namespace Herwig {
     bool isUnitarized = true;
       /// true if NLO contributions should be unitarised
     bool isNLOUnitarized = true;
-      /// no z-restricions on initial state emissions in clustering
-    int theOpenZBoundaries = 0;
       /// history weight choice
     int theChooseHistory = 0;
       /// legsize of production process
@@ -279,7 +277,7 @@ namespace Herwig {
       /// calculate only the N particle contribution
     int theOnlyN = -1;
       /// the current maxlegs (either LO or NLO maxlegs)
-    size_t theCurrentMaxLegs = -1;
+    int theCurrentMaxLegs = -1;
       /// current weight and weight of clustered born
     double weight = 1.0;
     double weightCB = 1.0;

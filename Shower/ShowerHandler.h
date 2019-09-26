@@ -87,6 +87,14 @@ public:
    * process masses.
    */
   virtual bool isReshuffling() const { return true; }
+  
+  /**
+   * Return true, if this cascade handler will put the final state
+   * particles to their constituent mass. If false the nominal mass is used.
+   */
+  virtual bool retConstituentMasses() const { return useConstituentMasses_; }
+  
+  
 
   /**
    * Return true, if the shower handler can generate a truncated 
@@ -255,6 +263,14 @@ public:
    * Return the relevant hard scale to be used in the profile scales
    */
   virtual Energy hardScale() const;
+
+  /**
+   * Return information about shower phase space choices
+   */
+  virtual int showerPhaseSpaceOption() const {
+    assert(false && "not implemented in general");
+    return -1;
+  }
   //@}
 
 public:
@@ -565,7 +581,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  ShowerHandler & operator=(const ShowerHandler &);
+  ShowerHandler & operator=(const ShowerHandler &) = delete;
 
 private:
 
@@ -789,6 +805,16 @@ private:
   Energy2 vMin_;
   //@}
 
+
+private:
+  
+  /**
+   *  Parameters for the constituent mass treatment.
+   */
+    //@{
+  // True if shower should return constituent masses.
+  bool useConstituentMasses_=true;
+  //@}
 private:
 
   /**

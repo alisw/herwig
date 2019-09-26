@@ -236,24 +236,24 @@ create ColorFull::TraceBasis TraceBasis
 
 create Herwig::MatchboxHybridAmplitude GenericProcesses
 
-# library HwMatchboxMadGraph.so
-# create Herwig::MadGraphAmplitude MadGraph
-# set MadGraph:ColourBasis TraceBasis
+library HwMatchboxMadGraph.so
+create Herwig::MadGraphAmplitude MadGraph
+set MadGraph:ColourBasis TraceBasis
 
-# library HwMatchboxGoSam.so
-# create Herwig::GoSamAmplitude GoSam
+library HwMatchboxGoSam.so
+create Herwig::GoSamAmplitude GoSam
 
-# library HwMatchboxNJet.so
-# create Herwig::NJetsAmplitude NJet
+library HwMatchboxNJet.so
+create Herwig::NJetsAmplitude NJet
 
-# do NJet:Massless 5
-# do NJet:Massless -5
+do NJet:Massless 5
+do NJet:Massless -5
 
-# library HwMatchboxOpenLoops.so
-# create Herwig::OpenLoopsAmplitude OpenLoops
+library HwMatchboxOpenLoops.so
+create Herwig::OpenLoopsAmplitude OpenLoops
 
-# library HwMatchboxVBFNLO.so
-# create Herwig::VBFNLOAmplitude VBFNLO
+library HwMatchboxVBFNLO.so
+create Herwig::VBFNLOAmplitude VBFNLO
 
 mkdir Builtin
 cd Builtin
@@ -455,8 +455,8 @@ do TreePhasespace:SetCoupling 25 23 23 362.91922658249853887524
 do TreePhasespace:SetCoupling 22 24 -24 0.00755391226478475287
 do TreePhasespace:SetCoupling 23 24 -24 0.02637401475019835008
 
-# create Herwig::VBFNLOPhasespace VBFNLOPhasespace
-# set VBFNLOPhasespace:CouplingData PhasespaceCouplings
+create Herwig::VBFNLOPhasespace VBFNLOPhasespace
+set VBFNLOPhasespace:CouplingData PhasespaceCouplings
 
 set /Herwig/MatrixElements/Matchbox/Factory:Phasespace TreePhasespace
 

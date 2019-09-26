@@ -205,6 +205,13 @@ protected:
    */
   bool realign();
 
+  /**
+   * The choice of z boundaries; 0 = restricted, 1 = open, 2 = mixed/other
+   */
+  virtual int showerPhaseSpaceOption() const {
+    return theZBoundaries;
+  }
+
 protected:
 
   /**
@@ -496,7 +503,10 @@ private:
    */
   Ptr<MergerBase>::ptr theMergingHelper;
   
-  
+  /**
+   * The choice of z boundaries; 0 = restricted, 1 = open, 2 = mixed/other
+   */
+  int theZBoundaries;
 
 private:
 
@@ -510,7 +520,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  DipoleShowerHandler & operator=(const DipoleShowerHandler &);
+  DipoleShowerHandler & operator=(const DipoleShowerHandler &) = delete;
 
 };
 

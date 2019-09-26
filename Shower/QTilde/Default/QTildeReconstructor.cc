@@ -220,7 +220,7 @@ reconstructTimeLikeJet(const tShowerParticlePtr particleJetParent) const {
     if (jetGrandParent) {
       if (jetGrandParent->showerKinematics()) {
 	if(particleJetParent->id()==_progenitor->id()&&
-	   !_progenitor->data().stable()) {
+	   !_progenitor->data().stable()&&abs(_progenitor->data().id())!=ParticleID::tauminus) {
 	  jetGrandParent->showerKinematics()->reconstructLast(particleJetParent,
 							      _progenitor->mass());
 	}
@@ -231,9 +231,12 @@ reconstructTimeLikeJet(const tShowerParticlePtr particleJetParent) const {
     }
     // otherwise
     else {
-      Energy dm = particleJetParent->data().constituentMass();
+      auto dm=  ShowerHandler::currentHandler()->retConstituentMasses()?
+                particleJetParent->data().constituentMass():
+                particleJetParent->data().mass();
+      
       if (abs(dm-particleJetParent->momentum().m())>0.001*MeV
-	  &&particleJetParent->dataPtr()->stable()
+	  &&(particleJetParent->dataPtr()->stable() || abs(particleJetParent->id())==ParticleID::tauminus)
 	  &&particleJetParent->id()!=ParticleID::gamma
 	  &&_noRescale.find(particleJetParent->dataPtr())==_noRescale.end()) {
 	Lorentz5Momentum dum =  particleJetParent->momentum();

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([Herwig],[7.1.2],[herwig@projects.hepforge.org],[Herwig])
+AC_INIT([Herwig],[7.1.5],[herwig@projects.hepforge.org],[Herwig])
 AC_CONFIG_SRCDIR([Utilities/HerwigStrategy.cc])
 AC_CONFIG_AUX_DIR([Config])
 AC_CONFIG_MACRO_DIR([m4])
@@ -49,6 +49,7 @@ AC_COMPILE_IFELSE(
 	]
 )
 AC_LANG_POP([Fortran])
+AC_FC_WRAPPERS
 
 
 LT_PREREQ([2.2.6])
@@ -234,7 +235,7 @@ AC_CONFIG_FILES([UnderlyingEvent/Makefile
 
 AC_CONFIG_LINKS([Doc/BSMlibs.in:Doc/BSMlibs.in])
 AC_CONFIG_FILES([Doc/fixinterfaces.pl],[chmod +x Doc/fixinterfaces.pl])
-
+AC_CONFIG_HEADERS([PDF/SaSPhotonPDF.cc])
 HERWIG_OVERVIEW
 
 AC_CONFIG_COMMANDS([summary],[cat config.herwig])

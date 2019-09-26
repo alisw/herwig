@@ -136,7 +136,7 @@ void RSModelFFWGRVertex::setCoupling(Energy2 q2,tcPDPtr aa,tcPDPtr bb,
   // photon
   if(ibos==22) {
     // alpha
-    coup = UnitRemoval::E * kappa_ * couplast_;
+    coup = Complex(UnitRemoval::E * kappa_ * couplast_);
     // _charge of particle
     assert((iferm>=1 && iferm<=6)||(iferm>=11 &&iferm<=16));
     coup *= charge_[iferm];
@@ -145,14 +145,14 @@ void RSModelFFWGRVertex::setCoupling(Energy2 q2,tcPDPtr aa,tcPDPtr bb,
   }
   // Z boson
   else if(ibos==23) {
-    coup = UnitRemoval::E * kappa_ * couplast_;
+    coup = Complex(UnitRemoval::E * kappa_ * couplast_);
     // _charge of particle
     assert((iferm>=1 && iferm<=6)||(iferm>=11 &&iferm<=16));
     left (gl_[iferm]);
     right(gr_[iferm]);
   }
   else if(ibos==24) {
-    coup = UnitRemoval::E * kappa_ * couplast_ * 
+    coup = Complex(UnitRemoval::E * kappa_ * couplast_) * 
       sqrt(0.5) / sqrt(sin2ThetaW());
     // the left and right couplings
     int iferm=abs(aa->id());

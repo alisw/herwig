@@ -102,7 +102,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/Config/config.h
+CONFIG_HEADER = $(top_builddir)/Config/config.h SaSPhotonPDF.cc
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -167,6 +167,13 @@ HwReggeonPDF_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(AM_CXXFLAGS) $(CXXFLAGS) $(HwReggeonPDF_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
+HwSaSPhotonPDF_la_LIBADD =
+am_HwSaSPhotonPDF_la_OBJECTS = SaSGamma.lo SaSPhotonPDF.lo
+HwSaSPhotonPDF_la_OBJECTS = $(am_HwSaSPhotonPDF_la_OBJECTS)
+HwSaSPhotonPDF_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(HwSaSPhotonPDF_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
 HwSatPDF_la_LIBADD =
 am_HwSatPDF_la_OBJECTS = SatPDF.lo
 HwSatPDF_la_OBJECTS = $(am_HwSatPDF_la_OBJECTS)
@@ -213,6 +220,21 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
+F77COMPILE = $(F77) $(AM_FFLAGS) $(FFLAGS)
+LTF77COMPILE = $(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(F77) $(AM_FFLAGS) $(FFLAGS)
+AM_V_F77 = $(am__v_F77_@AM_V@)
+am__v_F77_ = $(am__v_F77_@AM_DEFAULT_V@)
+am__v_F77_0 = @echo "  F77     " $@;
+am__v_F77_1 = 
+F77LD = $(F77)
+F77LINK = $(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(F77LD) $(AM_FFLAGS) $(FFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+AM_V_F77LD = $(am__v_F77LD_@AM_V@)
+am__v_F77LD_ = $(am__v_F77LD_@AM_DEFAULT_V@)
+am__v_F77LD_0 = @echo "  F77LD   " $@;
+am__v_F77LD_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -233,18 +255,21 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(HwIncomingPhotonEvolver_la_SOURCES) \
 	$(HwPomeronFlux_la_SOURCES) $(HwPomeronPDF_la_SOURCES) \
-	$(HwReggeonPDF_la_SOURCES) $(HwSatPDF_la_SOURCES) \
-	$(libHwMPIPDF_la_SOURCES) $(libHwRemDecayer_la_SOURCES)
+	$(HwReggeonPDF_la_SOURCES) $(HwSaSPhotonPDF_la_SOURCES) \
+	$(HwSatPDF_la_SOURCES) $(libHwMPIPDF_la_SOURCES) \
+	$(libHwRemDecayer_la_SOURCES)
 DIST_SOURCES = $(HwIncomingPhotonEvolver_la_SOURCES) \
 	$(HwPomeronFlux_la_SOURCES) $(HwPomeronPDF_la_SOURCES) \
-	$(HwReggeonPDF_la_SOURCES) $(HwSatPDF_la_SOURCES) \
-	$(libHwMPIPDF_la_SOURCES) $(libHwRemDecayer_la_SOURCES)
+	$(HwReggeonPDF_la_SOURCES) $(HwSaSPhotonPDF_la_SOURCES) \
+	$(HwSatPDF_la_SOURCES) $(libHwMPIPDF_la_SOURCES) \
+	$(libHwRemDecayer_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
+am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) \
+	$(LISP)SaSPhotonPDF.cc.in
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
 # *not* preserved.
@@ -263,7 +288,8 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 ETAGS = etags
 CTAGS = ctags
-am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/Config/depcomp
+am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/SaSPhotonPDF.cc.in \
+	$(top_srcdir)/Config/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -312,6 +338,7 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DISTCHECK_CONFIGURE_FLAGS = @DISTCHECK_CONFIGURE_FLAGS@
 DLLTOOL = @DLLTOOL@
 DO_GOSAM = @DO_GOSAM@
 DO_MADGRAPH = @DO_MADGRAPH@
@@ -478,6 +505,7 @@ psdir = @psdir@
 pyexecdir = @pyexecdir@
 pythiaconfig = @pythiaconfig@
 pythondir = @pythondir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -488,19 +516,19 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIST = diffraction
 pkglib_LTLIBRARIES = HwPomeronPDF.la HwReggeonPDF.la HwPomeronFlux.la \
-	HwSatPDF.la HwIncomingPhotonEvolver.la
+	HwSatPDF.la HwIncomingPhotonEvolver.la HwSaSPhotonPDF.la
 HwPomeronPDF_la_SOURCES = \
 PomeronPDF.cc PomeronPDF.h
 
-HwPomeronPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 3:0:0
+HwPomeronPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 4:0:0
 HwReggeonPDF_la_SOURCES = \
 ReggeonPDF.cc ReggeonPDF.h
 
-HwReggeonPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 3:0:0
+HwReggeonPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 4:0:0
 HwPomeronFlux_la_SOURCES = \
 PomeronFlux.h PomeronFlux.cc
 
-HwPomeronFlux_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 4:0:0
+HwPomeronFlux_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 5:0:0
 noinst_LTLIBRARIES = libHwRemDecayer.la libHwMPIPDF.la
 libHwRemDecayer_la_SOURCES = \
 HwRemDecayer.h HwRemDecayer.cc HwRemDecayer.fh
@@ -512,15 +540,20 @@ MinBiasPDF.h MinBiasPDF.cc MinBiasPDF.fh
 HwSatPDF_la_SOURCES = \
 SatPDF.h SatPDF.cc
 
-HwSatPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 6:0:0
+HwSatPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 7:0:0
 HwIncomingPhotonEvolver_la_SOURCES = \
 IncomingPhotonEvolver.h IncomingPhotonEvolver.cc
 
-HwIncomingPhotonEvolver_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 6:0:0
-all: all-am
+HwIncomingPhotonEvolver_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 7:0:0
+HwSaSPhotonPDF_la_SOURCES = \
+SaSGamma.f SaSPhotonPDF.cc SaSPhotonPDF.h
+
+HwSaSPhotonPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 2:0:0
+all: SaSPhotonPDF.cc
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .cc .lo .o .obj
+.SUFFIXES: .cc .f .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -550,6 +583,17 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+
+SaSPhotonPDF.cc: stamp-h2
+	@test -f $@ || rm -f stamp-h2
+	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) stamp-h2
+
+stamp-h2: $(srcdir)/SaSPhotonPDF.cc.in $(top_builddir)/config.status
+	@rm -f stamp-h2
+	cd $(top_builddir) && $(SHELL) ./config.status PDF/SaSPhotonPDF.cc
+
+distclean-hdr:
+	-rm -f SaSPhotonPDF.cc stamp-h2
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -609,6 +653,9 @@ HwPomeronPDF.la: $(HwPomeronPDF_la_OBJECTS) $(HwPomeronPDF_la_DEPENDENCIES) $(EX
 HwReggeonPDF.la: $(HwReggeonPDF_la_OBJECTS) $(HwReggeonPDF_la_DEPENDENCIES) $(EXTRA_HwReggeonPDF_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(HwReggeonPDF_la_LINK) -rpath $(pkglibdir) $(HwReggeonPDF_la_OBJECTS) $(HwReggeonPDF_la_LIBADD) $(LIBS)
 
+HwSaSPhotonPDF.la: $(HwSaSPhotonPDF_la_OBJECTS) $(HwSaSPhotonPDF_la_DEPENDENCIES) $(EXTRA_HwSaSPhotonPDF_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(HwSaSPhotonPDF_la_LINK) -rpath $(pkglibdir) $(HwSaSPhotonPDF_la_OBJECTS) $(HwSaSPhotonPDF_la_LIBADD) $(LIBS)
+
 HwSatPDF.la: $(HwSatPDF_la_OBJECTS) $(HwSatPDF_la_DEPENDENCIES) $(EXTRA_HwSatPDF_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(HwSatPDF_la_LINK) -rpath $(pkglibdir) $(HwSatPDF_la_OBJECTS) $(HwSatPDF_la_LIBADD) $(LIBS)
 
@@ -631,6 +678,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PomeronFlux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PomeronPDF.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReggeonPDF.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SaSPhotonPDF.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SatPDF.Plo@am__quote@
 
 .cc.o:
@@ -656,6 +704,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+.f.o:
+	$(AM_V_F77)$(F77COMPILE) -c -o $@ $<
+
+.f.obj:
+	$(AM_V_F77)$(F77COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.f.lo:
+	$(AM_V_F77)$(LTF77COMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -747,7 +804,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES)
+all-am: Makefile $(LTLIBRARIES) SaSPhotonPDF.cc
 installdirs:
 	for dir in "$(DESTDIR)$(pkglibdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
@@ -791,7 +848,7 @@ distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-tags
+	distclean-hdr distclean-tags
 
 dvi: dvi-am
 
@@ -853,23 +910,23 @@ ps-am:
 
 uninstall-am: uninstall-local uninstall-pkglibLTLIBRARIES
 
-.MAKE: install-am install-strip
+.MAKE: all install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am check check-am clean clean-generic \
 	clean-libtool clean-noinstLTLIBRARIES clean-pkglibLTLIBRARIES \
 	cscopelist-am ctags ctags-am distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-data-local install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-pkglibLTLIBRARIES \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-local \
-	uninstall-pkglibLTLIBRARIES
+	distclean-generic distclean-hdr distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am \
+	install-data-local install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-pkglibLTLIBRARIES install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags tags-am uninstall uninstall-am \
+	uninstall-local uninstall-pkglibLTLIBRARIES
 
 .PRECIOUS: Makefile
 

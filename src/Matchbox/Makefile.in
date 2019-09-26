@@ -103,7 +103,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 DIST_COMMON = $(srcdir)/Makefile.am $(dist_Matchbox_DATA) \
 	$(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/Config/config.h
+CONFIG_HEADER = $(top_builddir)/Config/config.h \
+	$(top_builddir)/PDF/SaSPhotonPDF.cc
 CONFIG_CLEAN_FILES = LO-DefaultShower.in LO-DipoleShower.in \
 	MCatLO-DefaultShower.in MCatLO-DipoleShower.in LO-NoShower.in \
 	MCatNLO-DefaultShower.in MCatNLO-DipoleShower.in \
@@ -215,6 +216,7 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DISTCHECK_CONFIGURE_FLAGS = @DISTCHECK_CONFIGURE_FLAGS@
 DLLTOOL = @DLLTOOL@
 DO_GOSAM = @DO_GOSAM@
 DO_MADGRAPH = @DO_MADGRAPH@
@@ -381,6 +383,7 @@ psdir = @psdir@
 pyexecdir = @pyexecdir@
 pythiaconfig = @pythiaconfig@
 pythondir = @pythondir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@

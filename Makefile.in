@@ -104,7 +104,8 @@ DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/Config/config.h
+CONFIG_HEADER = $(top_builddir)/Config/config.h \
+	$(top_builddir)/PDF/SaSPhotonPDF.cc
 CONFIG_CLEAN_FILES = Models/Feynrules/python/Makefile-FR
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
@@ -263,6 +264,7 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DISTCHECK_CONFIGURE_FLAGS = --enable-debug --with-thepeg=$(THEPEGPATH) --with-gsl=$(GSLPATH)
 DLLTOOL = @DLLTOOL@
 DO_GOSAM = @DO_GOSAM@
 DO_MADGRAPH = @DO_MADGRAPH@
@@ -429,6 +431,7 @@ psdir = @psdir@
 pyexecdir = @pyexecdir@
 pythiaconfig = @pythiaconfig@
 pythondir = @pythondir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@

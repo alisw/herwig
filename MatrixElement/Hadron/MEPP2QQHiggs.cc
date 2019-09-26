@@ -225,7 +225,7 @@ bool MEPP2QQHiggs::generateKinematics(const double * r) {
     try {
       p1 = SimplePhaseSpace::getMagnitude(sHat(), m13, mq);
       p2 = SimplePhaseSpace::getMagnitude(m132,mq,mh);
-    } catch ( ImpossibleKinematics ) {
+    } catch ( ImpossibleKinematics & e ) {
       return false;
     }
     Energy ptmin = lastCuts().minKT(mePartonData()[3]);
@@ -266,7 +266,7 @@ bool MEPP2QQHiggs::generateKinematics(const double * r) {
     try {
       p1 = SimplePhaseSpace::getMagnitude(sHat(), m23, mq);
       p2 = SimplePhaseSpace::getMagnitude(m232,mq,mh);
-    } catch ( ImpossibleKinematics ) {
+    } catch ( ImpossibleKinematics & e ) {
       return false;
     }
     Energy ptmin = lastCuts().minKT(mePartonData()[2]);
@@ -314,7 +314,7 @@ CrossSection MEPP2QQHiggs::dSigHatDR() const {
     bwfact = mePartonData()[4]->generateWidth(moff)*moff/pi/
       (sqr(sqr(moff)-sqr(mh_))+sqr(mh_*wh_));
   }
-  else {
+  else if(shapeOpt_==2) {
     bwfact = hmass_->BreitWignerWeight(moff);
   }
   double jac1 = shapeOpt_==0 ? 

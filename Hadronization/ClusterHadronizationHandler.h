@@ -52,20 +52,6 @@ class ClusterHadronizationHandler: public HadronizationHandler {
 
 public:
 
-  /** @name Standard constructors and destructors. */
-  //@{
-  /**
-   * The default constructor.
-   */
-  ClusterHadronizationHandler() 
-    : _minVirtuality2( 0.1*GeV2 ), _maxDisplacement( 1.0e-10*mm ), 
-      _reduceToTwoComponents(true)
-  {}
-
-  //@}
-
-public:
-
   /**
    * The main method which manages the all cluster hadronization.
    *
@@ -101,7 +87,12 @@ public:
    *  pointer to "this", the current HadronizationHandler.
    */
   static const ClusterHadronizationHandler * currentHandler() {
-    assert(currentHandler_);
+    if(!currentHandler_){
+      cerr<< " \nCreating new ClusterHadronizationHandler without input from infiles.";
+      cerr<< " \nWhen using for example the string model ";
+      cerr<< " hadronic decays are still treated by the Cluster model\n";
+      currentHandler_=new ClusterHadronizationHandler();;
+    }
     return currentHandler_;
   }
 
@@ -150,7 +141,7 @@ private:
   /**
    * Private and non-existent assignment operator.
    */
-  ClusterHadronizationHandler & operator=(const ClusterHadronizationHandler &);
+  ClusterHadronizationHandler & operator=(const ClusterHadronizationHandler &) = delete;
 
   /**
    * This is a pointer to a Herwig::PartonSplitter object.
@@ -186,13 +177,13 @@ private:
    * The minimum virtuality^2 of partons to use in calculating 
    * distances.
    */
-  Energy2 _minVirtuality2;
+  Energy2 _minVirtuality2 = 0.1_GeV2;
 
   /**
    * The maximum displacement that is allowed for a particle
    * (used to determine the position of a cluster with two components).
    */
-  Length _maxDisplacement;
+  Length _maxDisplacement = 1.0e-10_mm;
 
   /**
    * The pointer to the Underlying Event handler. 
@@ -202,12 +193,12 @@ private:
   /**
    *  How to handle baryon-number clusters
    */
-  bool _reduceToTwoComponents;
+  bool _reduceToTwoComponents = true;
 
   /**
    * Tag the constituents of the clusters as their parents
    */
-  void _setChildren(ClusterVector clusters) const;
+  void _setChildren(const ClusterVector & clusters) const;
   
   /**
    *  pointer to "this", the current HadronizationHandler.

@@ -5,6 +5,7 @@
 //
 
 #include "GeneralfftoVH.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -79,17 +80,21 @@ void GeneralfftoVH::getDiagrams() const {
 				     getParticleData(ParticleID::cbar)));
       parentpair.push_back(make_pair(getParticleData(ParticleID::b), 
 				     getParticleData(ParticleID::ubar)));
+      [[fallthrough]];
     case 4:
       parentpair.push_back(make_pair(getParticleData(ParticleID::s), 
 				     getParticleData(ParticleID::cbar)));
       parentpair.push_back(make_pair(getParticleData(ParticleID::d), 
 				     getParticleData(ParticleID::cbar)));
+      [[fallthrough]];
     case 3:
       parentpair.push_back(make_pair(getParticleData(ParticleID::s), 
 				     getParticleData(ParticleID::ubar)));
+      [[fallthrough]];
     case 2:
       parentpair.push_back(make_pair(getParticleData(ParticleID::d), 
 				     getParticleData(ParticleID::ubar)));
+      [[fallthrough]];
     default:
       ;
     }
@@ -158,8 +163,10 @@ void GeneralfftoVH::persistentInput(PersistentIStream & is, int) {
   is >> ienum(process_);
 }
 
-ClassDescription<GeneralfftoVH> GeneralfftoVH::initGeneralfftoVH;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<GeneralfftoVH,MEfftoVH>
+describeHerwigGeneralfftoVH("Herwig::GeneralfftoVH", "Herwig.so");
 
 void GeneralfftoVH::Init() {
 

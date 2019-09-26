@@ -105,7 +105,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 DIST_COMMON = $(srcdir)/Makefile.am $(dist_noinst_SCRIPTS) \
 	$(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/Config/config.h
+CONFIG_HEADER = $(top_builddir)/Config/config.h \
+	$(top_builddir)/PDF/SaSPhotonPDF.cc
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -177,7 +178,7 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/Config
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/Config -I$(top_builddir)/PDF
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -253,6 +254,7 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DISTCHECK_CONFIGURE_FLAGS = @DISTCHECK_CONFIGURE_FLAGS@
 DLLTOOL = @DLLTOOL@
 DO_GOSAM = @DO_GOSAM@
 DO_MADGRAPH = @DO_MADGRAPH@
@@ -419,6 +421,7 @@ psdir = @psdir@
 pyexecdir = @pyexecdir@
 pythiaconfig = @pythiaconfig@
 pythondir = @pythondir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -430,7 +433,7 @@ top_srcdir = @top_srcdir@
 pkglib_LTLIBRARIES = Herwig.la
 Herwig_la_SOURCES = 
 Herwig_la_LIBTOOLFLAGS = --tag=CXX
-Herwig_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 23:0:0 \
+Herwig_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 26:0:0 \
 	$(THEPEGLDFLAGS) $(BOOST_SYSTEM_LDFLAGS) \
 	$(BOOST_FILESYSTEM_LDFLAGS) $(FCLIBS)
 Herwig_la_LIBADD = \

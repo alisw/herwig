@@ -129,12 +129,6 @@ protected:
 private:
   
   /**
-   * Symmetry factor for final state gluon splittings (should be 1/2).
-   */ 
-  
-  double theSymmetryFactor;
-
-  /**
    * The static object used to initialize the description of this class.
    * Indicates that this is a concrete class with persistent data.
    */
@@ -144,8 +138,12 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  FIMDecaygx2ggxDipoleKernel & operator=(const FIMDecaygx2ggxDipoleKernel &);
+  FIMDecaygx2ggxDipoleKernel & operator=(const FIMDecaygx2ggxDipoleKernel &) = delete;
 
+  /**
+   * Asymmetry option for final state gluon splittings.
+   */
+  int theAsymmetryOption=0;
 };
 
 }

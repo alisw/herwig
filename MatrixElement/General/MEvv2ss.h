@@ -151,16 +151,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEvv2ss> initMEvv2ss;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEvv2ss & operator=(const MEvv2ss &);
+  MEvv2ss & operator=(const MEvv2ss &) = delete;
 
 private:
 
@@ -199,33 +193,6 @@ private:
   
   
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEvv2ss. */
-template <>
-struct BaseClassTrait<Herwig::MEvv2ss,1> {
-  /** Typedef of the first base class of MEvv2ss. */
-  typedef Herwig::GeneralHardME NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEvv2ss class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEvv2ss>
-  : public ClassTraitsBase<Herwig::MEvv2ss> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEvv2ss"; }
-};
-
-/** @endcond */
 
 }
 

@@ -137,13 +137,13 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  FFgx2ggxDipoleKernel & operator=(const FFgx2ggxDipoleKernel &);
+  FFgx2ggxDipoleKernel & operator=(const FFgx2ggxDipoleKernel &) = delete;
 
   /**
-   * Symmetry factor for final state gluon splittings (should be 1/2).
-   */ 
-
-   double theSymmetryFactor;
+   * Asymmetry option for final state gluon splittings.
+   */
+  
+  int theAsymmetryOption=1;
 
 };
 

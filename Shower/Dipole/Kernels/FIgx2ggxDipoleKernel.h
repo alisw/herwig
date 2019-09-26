@@ -127,10 +127,10 @@ protected:
 
 private:
   /**
-   * Symmetry factor for final state gluon splittings (should be 1/2).
-   */ 
-
- double theSymmetryFactor;
+   * Asymmetry option for final state gluon splittings.
+   */
+  
+  int theAsymmetryOption=1;
 
   /**
    * The static object used to initialize the description of this class.
@@ -142,7 +142,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  FIgx2ggxDipoleKernel & operator=(const FIgx2ggxDipoleKernel &);
+  FIgx2ggxDipoleKernel & operator=(const FIgx2ggxDipoleKernel &) = delete;
 
 };
 
