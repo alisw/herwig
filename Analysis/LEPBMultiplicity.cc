@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // LEPBMultiplicity.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "LEPBMultiplicity.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Repository/EventGenerator.h"
 #include "ThePEG/EventRecord/Event.h"
 #include "ThePEG/PDT/EnumParticles.h"
@@ -108,8 +109,10 @@ void LEPBMultiplicity::analyze(tEventPtr event, long , int , int ) {
   }
 }
 
-NoPIOClassDescription<LEPBMultiplicity> LEPBMultiplicity::initLEPBMultiplicity;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeNoPIOClass<LEPBMultiplicity,AnalysisHandler>
+describeHerwigLEPBMultiplicity("Herwig::LEPBMultiplicity", "HwAnalysis.so");
 
 void LEPBMultiplicity::Init() {
 

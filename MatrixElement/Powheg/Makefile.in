@@ -255,14 +255,8 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
-BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
-BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
 BOOST_LDPATH = @BOOST_LDPATH@
 BOOST_ROOT = @BOOST_ROOT@
-BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
-BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
-BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS = @BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS@
 BOOST_UNIT_TEST_FRAMEWORK_LDPATH = @BOOST_UNIT_TEST_FRAMEWORK_LDPATH@
 BOOST_UNIT_TEST_FRAMEWORK_LIBS = @BOOST_UNIT_TEST_FRAMEWORK_LIBS@
@@ -463,7 +457,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 pkglib_LTLIBRARIES = HwPowhegMEHadron.la HwPowhegMELepton.la
-HwPowhegMEHadron_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 9:0:0
+HwPowhegMEHadron_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 9:0:1
 HwPowhegMEHadron_la_SOURCES = \
 MEqq2gZ2ffPowheg.cc MEqq2gZ2ffPowheg.h \
 MEqq2W2ffPowheg.cc  MEqq2W2ffPowheg.h \
@@ -475,7 +469,7 @@ VVKinematics.cc VVKinematics.h \
 MEPP2GammaGammaPowheg.cc  MEPP2GammaGammaPowheg.h \
 MEPP2HiggsVBFPowheg.cc MEPP2HiggsVBFPowheg.h
 
-HwPowhegMELepton_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 3:0:0
+HwPowhegMELepton_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 3:0:1
 HwPowhegMELepton_la_SOURCES = \
 MEee2gZ2qqPowheg.cc MEee2gZ2qqPowheg.h \
 MEee2gZ2llPowheg.cc MEee2gZ2llPowheg.h 

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SubtractionDipole.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -435,6 +435,7 @@ Selector<MEBase::DiagramIndex> SubtractionDipole::diagrams(const DiagramVector &
     underlyingBornME();
   if ( me->phasespace() ) {
     me->phasespace()->setXComb(lastXCombPtr());
+    me->phasespace()->clearDiagramWeights();
     me->phasespace()->fillDiagramWeights();
   }
   return 
@@ -1273,7 +1274,7 @@ void SubtractionDipole::persistentOutput(PersistentOStream & os) const {
      << ounit(theLastSplittingPt,GeV) << theLastSubtractionZ
      << theLastSplittingZ << theShowerApproximation 
      << theRealShowerSubtraction << theVirtualShowerSubtraction 
-     << theLoopSimSubtraction << theRealEmissionScales << theFactory
+     << theLoopSimSubtraction << theRealEmissionScales
      << ounit(theShowerHardScale,GeV) << ounit(theShowerScale,GeV) 
      << theShowerParameters << theIsInShowerPhasespace << theIsAboveCutoff;
 }
@@ -1292,7 +1293,7 @@ void SubtractionDipole::persistentInput(PersistentIStream & is, int) {
      >> iunit(theLastSplittingPt,GeV) >> theLastSubtractionZ
      >> theLastSplittingZ >> theShowerApproximation 
      >> theRealShowerSubtraction >> theVirtualShowerSubtraction 
-     >> theLoopSimSubtraction >> theRealEmissionScales >> theFactory
+     >> theLoopSimSubtraction >> theRealEmissionScales
      >> iunit(theShowerHardScale,GeV) >> iunit(theShowerScale,GeV) 
      >> theShowerParameters >> theIsInShowerPhasespace >> theIsAboveCutoff;
   lastMatchboxXComb(theLastXComb);
@@ -1305,13 +1306,8 @@ void SubtractionDipole::persistentInput(PersistentIStream & is, int) {
 }
 
 Ptr<MatchboxFactory>::tptr SubtractionDipole::factory() const {
-  return theFactory;
+  return MatchboxFactory::currentFactory();
 }
-
-void SubtractionDipole::factory(Ptr<MatchboxFactory>::tptr f) {
-  theFactory = f;
-}
-
 
 void SubtractionDipole::Init() {
 

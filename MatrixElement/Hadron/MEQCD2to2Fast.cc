@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEQCD2to2Fast.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "MEQCD2to2Fast.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Utilities/SimplePhaseSpace.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/Switch.h"
@@ -56,8 +57,10 @@ unsigned int MEQCD2to2Fast::orderInAlphaEW() const {
   return 0;
 }
 
-ClassDescription<MEQCD2to2Fast> MEQCD2to2Fast::initMEQCD2to2Fast;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEQCD2to2Fast,HwMEBase>
+describeHerwigMEQCD2to2Fast("Herwig::MEQCD2to2Fast", "HwMEHadronFast.so");
 
 void MEQCD2to2Fast::Init() {
 

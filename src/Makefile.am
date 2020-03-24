@@ -10,11 +10,9 @@ herwigopts.c herwigopts.h
 
 BUILT_SOURCES = herwigopts.c herwigopts.h
 
-Herwig_LDFLAGS = $(AM_LDFLAGS) -export-dynamic $(THEPEGLDFLAGS) \
-$(BOOST_SYSTEM_LDFLAGS) $(BOOST_FILESYSTEM_LDFLAGS)
+Herwig_LDFLAGS = $(AM_LDFLAGS) -export-dynamic $(THEPEGLDFLAGS)
 Herwig_LDADD = $(THEPEGLIB) -ldl \
-$(top_builddir)/API/libHerwigAPI.la \
-$(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS)
+$(top_builddir)/API/libHerwigAPI.la
 
 bin_SCRIPTS = herwig-config
 
@@ -71,7 +69,11 @@ TVT-Powheg.in \
 TVT-TTBA.in \
 LHC-LH.in \
 LHC-LHTP.in \
-LHE.in
+LHE.in \
+LHE-POWHEG.in \
+LHE-MCatNLO.in \
+LHE-FxFx.in \
+LHE-MGMerging.in
 
 dist_pkgdata_DATA = $(INPUTFILES) $(HELPERFILES)
 pkgdata_DATA = Makefile-UserModules

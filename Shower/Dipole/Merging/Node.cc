@@ -16,7 +16,7 @@ Node::Node(MatchboxMEBasePtr nodeME, int cutstage, MergerPtr mh)
  thedipol(), 
  theparent(),
  theCutStage(cutstage), 
- isOrdered(true), 
+ //isOrdered(true), 
  theSubtractedReal(false), 
  theVirtualContribution(false), 
  theMergingHelper(mh)
@@ -37,7 +37,7 @@ thedipol(dipol),
 theparent(head), 
 theDeepHead(deephead), 
 theCutStage(cutstage), 
-isOrdered(true), 
+//isOrdered(true), 
 theSubtractedReal(false), 
 theVirtualContribution(false),
  theMergingHelper() //The subnodes have no merging helper
@@ -356,10 +356,8 @@ bool Node::inShowerPS(Energy hardpT)const {
       dipole()->tildeKinematics()->zBounds(pT(), hardpT);
       return (zbounds.first<z_&&z_<zbounds.second);
   }
-  
-  
   assert(false);
-  
+  return false;
 }
 
 

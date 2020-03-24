@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ResonantProcessConstructor.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -276,7 +276,7 @@ makeResonantDiagram(IDPair in, PDPtr offshell, long outa, long outb,
     }
   }
   // add to the list
-  diagrams_.push_back(newdiag);
+  if(checkOrder(newdiag)) diagrams_.push_back(newdiag);
 }
 	
 set<tPDPtr> 

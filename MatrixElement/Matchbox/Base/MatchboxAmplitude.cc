@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxAmplitude.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -47,7 +47,7 @@ MatchboxAmplitude::MatchboxAmplitude()
 MatchboxAmplitude::~MatchboxAmplitude() {}
 
 void MatchboxAmplitude::persistentOutput(PersistentOStream & os) const {
-  os << theLastXComb << theColourBasis << theFactory 
+  os << theLastXComb << theColourBasis 
      << theCleanupAfter << treeLevelHelicityPoints << oneLoopHelicityPoints
      << theTrivialColourLegs << theReshuffleMasses.size();
   if ( !theReshuffleMasses.empty() ) {
@@ -58,7 +58,7 @@ void MatchboxAmplitude::persistentOutput(PersistentOStream & os) const {
 
 void MatchboxAmplitude::persistentInput(PersistentIStream & is, int) {
   size_t reshuffleSize;
-  is >> theLastXComb >> theColourBasis >> theFactory 
+  is >> theLastXComb >> theColourBasis 
      >> theCleanupAfter >> treeLevelHelicityPoints >> oneLoopHelicityPoints
      >> theTrivialColourLegs >> reshuffleSize;
   theReshuffleMasses.clear();
@@ -72,17 +72,12 @@ void MatchboxAmplitude::persistentInput(PersistentIStream & is, int) {
 }
 
 Ptr<MatchboxFactory>::tptr MatchboxAmplitude::factory() const {
-  return theFactory;
-}
-
-void MatchboxAmplitude::factory(Ptr<MatchboxFactory>::tptr f) {
-  theFactory = f;
+  return MatchboxFactory::currentFactory();
 }
 
 void MatchboxAmplitude::doinit() {
   Amplitude::doinit();
   if ( colourBasis() ) {
-    colourBasis()->factory(factory());
     colourBasis()->init();
   }
 }
@@ -255,7 +250,8 @@ void MatchboxAmplitude::setXComb(tStdXCombPtr xc) {
   theLastXComb = xc;
   lastMatchboxXComb(xc);
   fillCrossingMap();
-  if ( treeAmplitudes() || oneLoopAmplitudes() )
+  if ( ( treeAmplitudes() || oneLoopAmplitudes() ) &&
+       hasAmplitudeMomenta() )
     for ( size_t k = 0 ; k < meMomenta().size(); ++k )
       amplitudeMomenta()[k] = amplitudeMomentum(k);
 }
@@ -286,7 +282,9 @@ void MatchboxAmplitude::fillCrossingMap(size_t shift) {
   set<pair<tcPDPtr,int> > amplitudeLegs;
   crossingMap().resize(mePartonData().size());
   amplitudePartonData().resize(mePartonData().size());
-  amplitudeMomenta().resize(mePartonData().size());
+
+  if ( hasAmplitudeMomenta() )
+    amplitudeMomenta().resize(mePartonData().size());
 
   int ampCount = 0;
 

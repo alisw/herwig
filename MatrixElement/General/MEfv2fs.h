@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEfv2fs.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -20,8 +20,11 @@
 #include "Herwig/MatrixElement/ProductionMatrixElement.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFVVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFSVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractRFVVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractRFSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractVSSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractVVSVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractFFVSVertex.h"
 
 namespace Herwig {
 using namespace ThePEG;
@@ -36,8 +39,6 @@ using ThePEG::Helicity::ScalarWaveFunction;
  * fermion-vector to fermion scalar. It inherits from GeneralHardME 
  * and implements the required virtual functions.
  *
- * @see @see \ref MEfv2fsInterfaces "The Interfaces"
- * defined for MEfv2fs.
  * @see GeneralHardME
  */
 class MEfv2fs: public GeneralHardME {
@@ -50,13 +51,6 @@ class MEfv2fs: public GeneralHardME {
 
   /** Vector of VectorWaveFunctions. */
   typedef vector<VectorWaveFunction> VecWFVector;
-
-public:
-
-  /**
-   * The default constructor.
-   */
-  MEfv2fs() : scalar_(0), fermion_(0), vector_(0) {}
 
 public:
 
@@ -203,7 +197,16 @@ private:
    * Store a pair of  VVSVertex and FFVVertex pointers  
    */
   vector<pair<AbstractFFVVertexPtr,AbstractVVSVertexPtr> > vector_;
-  
+
+  /**
+   * Store a pair of  FFSVertex and FFVVertex pointers  
+   */
+  vector<pair<AbstractRFSVertexPtr, AbstractRFVVertexPtr> > RSfermion_;
+
+  /**
+   *  Store any 4-point vertices
+   */
+  vector<AbstractFFVSVertexPtr> four_;
 };
 
 }

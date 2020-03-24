@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // FRVDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "FRVDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -33,18 +34,24 @@ IBPtr FRVDecayer::fullclone() const {
   return new_ptr(*this);
 }
 
-void FRVDecayer::doinit() {
-  perturbativeVertex_ = dynamic_ptr_cast<RFVVertexPtr>        (getVertex());
-  abstractVertex_     = dynamic_ptr_cast<AbstractRFVVertexPtr>(getVertex());
-  GeneralTwoBodyDecayer::doinit();
+void FRVDecayer::setDecayInfo(PDPtr incoming, PDPair outgoing,
+			      vector<VertexBasePtr> vertex,
+			      map<ShowerInteraction,VertexBasePtr> &,
+			      const vector<map<ShowerInteraction,VertexBasePtr> > &,
+			      map<ShowerInteraction,VertexBasePtr>) {
+  decayInfo(incoming,outgoing);
+  for(auto vert : vertex) {
+    vertex_            .push_back(dynamic_ptr_cast<AbstractRFVVertexPtr>(vert));
+    perturbativeVertex_.push_back(dynamic_ptr_cast<RFVVertexPtr>        (vert));
+  }
 }
 
 void FRVDecayer::persistentOutput(PersistentOStream & os) const {
-  os << abstractVertex_ << perturbativeVertex_;
+  os << vertex_ << perturbativeVertex_;
 }
 
 void FRVDecayer::persistentInput(PersistentIStream & is, int) {
-  is >> abstractVertex_ >> perturbativeVertex_;
+  is >> vertex_ >> perturbativeVertex_;
 }
 
 double FRVDecayer::me2(const int , const Particle & inpart,
@@ -71,6 +78,8 @@ double FRVDecayer::me2(const int , const Particle & inpart,
       if(wavebar_[0].wave().Type() != SpinorType::v)
 	for(unsigned int ix = 0; ix < 2; ++ix) wavebar_[ix].conjugate();
     }
+    // fix rho if no correlations
+    fixRho(rho_);
   }
   // setup spin info when needed
   if(meopt==Terminate) {
@@ -103,15 +112,17 @@ double FRVDecayer::me2(const int , const Particle & inpart,
     for(unsigned int if2 = 0; if2 < 4; ++if2) {
       for(unsigned int vhel = 0; vhel < 3; ++vhel) {
 	if(massless && vhel == 1) ++vhel;
-	if(ferm)
-	  (*ME())(if1, if2,vhel) = 
-	    abstractVertex_->evaluate(scale,wave_[if1],
-				      RSwavebar_[if2],vector_[vhel]);
-	else
-	  (*ME())(if1, if2, vhel) = 
-	    abstractVertex_->evaluate(scale,RSwave_[if2],
-				      wavebar_[if1],vector_[vhel]);
-	
+	(*ME())(if1, if2,vhel) = 0.;
+	for(auto vert : vertex_) {
+	  if(ferm)
+	    (*ME())(if1, if2,vhel) += 
+	      vert->evaluate(scale,wave_[if1],
+			     RSwavebar_[if2],vector_[vhel]);
+	  else
+	    (*ME())(if1, if2, vhel) += 
+	      vert->evaluate(scale,RSwave_[if2],
+			     wavebar_[if1],vector_[vhel]);
+	}
       }
     }
   }
@@ -155,7 +166,8 @@ double FRVDecayer::me2(const int , const Particle & inpart,
 Energy FRVDecayer::partialWidth(PMPair inpart, PMPair outa, 
 				PMPair outb) const {
   if( inpart.second < outa.second + outb.second  ) return ZERO;
-  if(perturbativeVertex_) {
+  if(perturbativeVertex_.size()==1 &&
+     perturbativeVertex_[0]) {
     Energy m1(inpart.second),m2(outa.second),m3(outb.second);
     Energy2 m12(m1*m1),m22(m2*m2),m32(m3*m3);
     Energy Qp(sqrt(sqr(m1+m2)-sqr(m3))),Qm(sqrt(sqr(m1-m2)-sqr(m3)));
@@ -163,16 +175,16 @@ Energy FRVDecayer::partialWidth(PMPair inpart, PMPair outa,
     Energy pcm(Kinematics::pstarTwoBodyDecay(m1,m2,m3));
     // couplings
     tcPDPtr in = inpart.first->CC() ? tcPDPtr(inpart.first->CC()) : inpart.first;
-    perturbativeVertex_->setCoupling(sqr(inpart.second), outa.first, 
+    perturbativeVertex_[0]->setCoupling(sqr(inpart.second), outa.first, 
 				     in,  outb.first);
-    vector<Complex> left  = perturbativeVertex_-> left();
-    vector<Complex> right = perturbativeVertex_->right();
-    Complex A1 = 0.5*(left [0]+right[0])*perturbativeVertex_-> norm();
-    Complex B1 = 0.5*(right[0]- left[0])*perturbativeVertex_-> norm();
-    complex<InvEnergy> A2 = 0.5*(left [1]+right[1])*perturbativeVertex_-> norm()*UnitRemoval::InvE;
-    complex<InvEnergy> B2 = 0.5*(right[1]- left[1])*perturbativeVertex_-> norm()*UnitRemoval::InvE;
-    complex<InvEnergy2> A3 = 0.5*(left [2]+right[2])*perturbativeVertex_-> norm()*UnitRemoval::InvE2;
-    complex<InvEnergy2> B3 = 0.5*(right[2]- left[2])*perturbativeVertex_-> norm()*UnitRemoval::InvE2;
+    vector<Complex> left  = perturbativeVertex_[0]-> left();
+    vector<Complex> right = perturbativeVertex_[0]->right();
+    Complex A1 = 0.5*(left [0]+right[0])*perturbativeVertex_[0]-> norm();
+    Complex B1 = 0.5*(right[0]- left[0])*perturbativeVertex_[0]-> norm();
+    complex<InvEnergy> A2 = 0.5*(left [1]+right[1])*perturbativeVertex_[0]-> norm()*UnitRemoval::InvE;
+    complex<InvEnergy> B2 = 0.5*(right[1]- left[1])*perturbativeVertex_[0]-> norm()*UnitRemoval::InvE;
+    complex<InvEnergy2> A3 = 0.5*(left [2]+right[2])*perturbativeVertex_[0]-> norm()*UnitRemoval::InvE2;
+    complex<InvEnergy2> B3 = 0.5*(right[2]- left[2])*perturbativeVertex_[0]-> norm()*UnitRemoval::InvE2;
     complex<Energy> h1(-2.*Qp*A1),h2(2.*Qm*B1);
     complex<Energy> h3(-2./r3*Qp*(A1-Qm*Qm/m2*A2));
     complex<Energy> h4( 2./r3*Qm*(B1-Qp*Qp/m2*B2));
@@ -195,8 +207,10 @@ Energy FRVDecayer::partialWidth(PMPair inpart, PMPair outa,
   }
 }
 
-ClassDescription<FRVDecayer> FRVDecayer::initFRVDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<FRVDecayer,GeneralTwoBodyDecayer>
+describeHerwigFRVDecayer("Herwig::FRVDecayer", "Herwig.so");
 
 void FRVDecayer::Init() {
 

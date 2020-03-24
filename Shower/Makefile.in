@@ -109,16 +109,8 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libHwShower_la_DEPENDENCIES = $(top_builddir)/PDF/libHwMPIPDF.la \
 	$(top_builddir)/PDF/libHwRemDecayer.la
-am__dirstamp = $(am__leading_dot)dirstamp
 am_libHwShower_la_OBJECTS = ShowerHandler.lo ShowerVariation.lo \
-	ShowerEventRecord.lo UEBase.lo Core/ShowerConfig.lo \
-	Core/Base/ShowerParticle.lo Core/Base/ShowerKinematics.lo \
-	Core/Base/ShowerBasis.lo Core/Base/ShowerTree.lo \
-	Core/Base/HardTree.lo Core/Base/SudakovFormFactor.lo \
-	Core/Base/HardBranching.lo Core/Couplings/ShowerAlpha.lo \
-	Core/SplittingFunctions/SplittingGenerator.lo \
-	Core/SplittingFunctions/SplittingFunction.lo \
-	Core/Base/ShowerVertex.lo
+	ShowerEventRecord.lo UEBase.lo ShowerAlpha.lo
 libHwShower_la_OBJECTS = $(am_libHwShower_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -262,14 +254,8 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
-BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
-BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
 BOOST_LDPATH = @BOOST_LDPATH@
 BOOST_ROOT = @BOOST_ROOT@
-BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
-BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
-BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS = @BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS@
 BOOST_UNIT_TEST_FRAMEWORK_LDPATH = @BOOST_UNIT_TEST_FRAMEWORK_LDPATH@
 BOOST_UNIT_TEST_FRAMEWORK_LIBS = @BOOST_UNIT_TEST_FRAMEWORK_LIBS@
@@ -482,22 +468,8 @@ ShowerEventRecord.h ShowerEventRecord.cc \
 PerturbativeProcess.h PerturbativeProcess.fh \
 RealEmissionProcess.h RealEmissionProcess.fh \
 UEBase.h UEBase.cc UEBase.fh \
-Core/ShowerInteraction.h Core/ShowerConfig.h Core/ShowerConfig.cc \
-Core/Base/Branching.h \
-Core/Base/ShowerParticle.cc  Core/Base/ShowerParticle.fh  Core/Base/ShowerParticle.h \
-Core/Base/ShowerKinematics.fh  Core/Base/ShowerKinematics.h Core/Base/ShowerKinematics.cc \
-Core/Base/ShowerBasis.fh  Core/Base/ShowerBasis.h Core/Base/ShowerBasis.cc \
-Core/Base/ShowerTree.h Core/Base/ShowerTree.fh Core/Base/ShowerTree.cc \
-Core/Base/ShowerProgenitor.fh Core/Base/ShowerProgenitor.h \
-Core/Base/HardTree.h Core/Base/HardTree.fh Core/Base/HardTree.cc\
-Core/Base/SudakovFormFactor.cc Core/Base/SudakovFormFactor.h Core/Base/SudakovFormFactor.fh \
-Core/Base/HardBranching.h Core/Base/HardBranching.fh Core/Base/HardBranching.cc\
-Core/Couplings/ShowerAlpha.h Core/Couplings/ShowerAlpha.cc Core/Couplings/ShowerAlpha.fh\
-Core/SplittingFunctions/SplittingGenerator.cc Core/SplittingFunctions/SplittingGenerator.h\
-Core/SplittingFunctions/SplittingGenerator.fh \
-Core/SplittingFunctions/SplittingFunction.h Core/SplittingFunctions/SplittingFunction.fh \
-Core/SplittingFunctions/SplittingFunction.cc  \
-Core/Base/ShowerVertex.cc Core/Base/ShowerVertex.fh Core/Base/ShowerVertex.h
+ShowerInteraction.h \
+ShowerAlpha.h ShowerAlpha.cc ShowerAlpha.fh
 
 all: all-recursive
 
@@ -543,90 +515,21 @@ clean-noinstLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
-Core/$(am__dirstamp):
-	@$(MKDIR_P) Core
-	@: > Core/$(am__dirstamp)
-Core/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) Core/$(DEPDIR)
-	@: > Core/$(DEPDIR)/$(am__dirstamp)
-Core/ShowerConfig.lo: Core/$(am__dirstamp) \
-	Core/$(DEPDIR)/$(am__dirstamp)
-Core/Base/$(am__dirstamp):
-	@$(MKDIR_P) Core/Base
-	@: > Core/Base/$(am__dirstamp)
-Core/Base/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) Core/Base/$(DEPDIR)
-	@: > Core/Base/$(DEPDIR)/$(am__dirstamp)
-Core/Base/ShowerParticle.lo: Core/Base/$(am__dirstamp) \
-	Core/Base/$(DEPDIR)/$(am__dirstamp)
-Core/Base/ShowerKinematics.lo: Core/Base/$(am__dirstamp) \
-	Core/Base/$(DEPDIR)/$(am__dirstamp)
-Core/Base/ShowerBasis.lo: Core/Base/$(am__dirstamp) \
-	Core/Base/$(DEPDIR)/$(am__dirstamp)
-Core/Base/ShowerTree.lo: Core/Base/$(am__dirstamp) \
-	Core/Base/$(DEPDIR)/$(am__dirstamp)
-Core/Base/HardTree.lo: Core/Base/$(am__dirstamp) \
-	Core/Base/$(DEPDIR)/$(am__dirstamp)
-Core/Base/SudakovFormFactor.lo: Core/Base/$(am__dirstamp) \
-	Core/Base/$(DEPDIR)/$(am__dirstamp)
-Core/Base/HardBranching.lo: Core/Base/$(am__dirstamp) \
-	Core/Base/$(DEPDIR)/$(am__dirstamp)
-Core/Couplings/$(am__dirstamp):
-	@$(MKDIR_P) Core/Couplings
-	@: > Core/Couplings/$(am__dirstamp)
-Core/Couplings/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) Core/Couplings/$(DEPDIR)
-	@: > Core/Couplings/$(DEPDIR)/$(am__dirstamp)
-Core/Couplings/ShowerAlpha.lo: Core/Couplings/$(am__dirstamp) \
-	Core/Couplings/$(DEPDIR)/$(am__dirstamp)
-Core/SplittingFunctions/$(am__dirstamp):
-	@$(MKDIR_P) Core/SplittingFunctions
-	@: > Core/SplittingFunctions/$(am__dirstamp)
-Core/SplittingFunctions/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) Core/SplittingFunctions/$(DEPDIR)
-	@: > Core/SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
-Core/SplittingFunctions/SplittingGenerator.lo:  \
-	Core/SplittingFunctions/$(am__dirstamp) \
-	Core/SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
-Core/SplittingFunctions/SplittingFunction.lo:  \
-	Core/SplittingFunctions/$(am__dirstamp) \
-	Core/SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
-Core/Base/ShowerVertex.lo: Core/Base/$(am__dirstamp) \
-	Core/Base/$(DEPDIR)/$(am__dirstamp)
 
 libHwShower.la: $(libHwShower_la_OBJECTS) $(libHwShower_la_DEPENDENCIES) $(EXTRA_libHwShower_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(CXXLINK)  $(libHwShower_la_OBJECTS) $(libHwShower_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f Core/*.$(OBJEXT)
-	-rm -f Core/*.lo
-	-rm -f Core/Base/*.$(OBJEXT)
-	-rm -f Core/Base/*.lo
-	-rm -f Core/Couplings/*.$(OBJEXT)
-	-rm -f Core/Couplings/*.lo
-	-rm -f Core/SplittingFunctions/*.$(OBJEXT)
-	-rm -f Core/SplittingFunctions/*.lo
 
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShowerAlpha.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShowerEventRecord.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShowerHandler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShowerVariation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UEBase.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Core/$(DEPDIR)/ShowerConfig.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Core/Base/$(DEPDIR)/HardBranching.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Core/Base/$(DEPDIR)/HardTree.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Core/Base/$(DEPDIR)/ShowerBasis.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Core/Base/$(DEPDIR)/ShowerKinematics.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Core/Base/$(DEPDIR)/ShowerParticle.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Core/Base/$(DEPDIR)/ShowerTree.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Core/Base/$(DEPDIR)/ShowerVertex.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Core/Base/$(DEPDIR)/SudakovFormFactor.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Core/Couplings/$(DEPDIR)/ShowerAlpha.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Core/SplittingFunctions/$(DEPDIR)/SplittingFunction.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Core/SplittingFunctions/$(DEPDIR)/SplittingGenerator.Plo@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -657,10 +560,6 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-	-rm -rf Core/.libs Core/_libs
-	-rm -rf Core/Base/.libs Core/Base/_libs
-	-rm -rf Core/Couplings/.libs Core/Couplings/_libs
-	-rm -rf Core/SplittingFunctions/.libs Core/SplittingFunctions/_libs
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -847,14 +746,6 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f Core/$(DEPDIR)/$(am__dirstamp)
-	-rm -f Core/$(am__dirstamp)
-	-rm -f Core/Base/$(DEPDIR)/$(am__dirstamp)
-	-rm -f Core/Base/$(am__dirstamp)
-	-rm -f Core/Couplings/$(DEPDIR)/$(am__dirstamp)
-	-rm -f Core/Couplings/$(am__dirstamp)
-	-rm -f Core/SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
-	-rm -f Core/SplittingFunctions/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -865,7 +756,7 @@ clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -rf ./$(DEPDIR) Core/$(DEPDIR) Core/Base/$(DEPDIR) Core/Couplings/$(DEPDIR) Core/SplittingFunctions/$(DEPDIR)
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -911,7 +802,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -rf ./$(DEPDIR) Core/$(DEPDIR) Core/Base/$(DEPDIR) Core/Couplings/$(DEPDIR) Core/SplittingFunctions/$(DEPDIR)
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

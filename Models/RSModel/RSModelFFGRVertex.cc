@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // RSModelFFGRVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "RSModelFFGRVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -27,8 +28,10 @@ void RSModelFFGRVertex::persistentInput(PersistentIStream & is, int) {
   is >> iunit(kappa_,InvGeV);
 }
 
-ClassDescription<RSModelFFGRVertex> RSModelFFGRVertex::initRSModelFFGRVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<RSModelFFGRVertex,FFTVertex>
+describeHerwigRSModelFFGRVertex("Herwig::RSModelFFGRVertex", "HwRSModel.so");
 
 void RSModelFFGRVertex::Init() {
   static ClassDocumentation<RSModelFFGRVertex> documentation
@@ -44,6 +47,7 @@ void RSModelFFGRVertex::setCoupling(Energy2,tcPDPtr,tcPDPtr, tcPDPtr) {
 RSModelFFGRVertex::RSModelFFGRVertex() : kappa_(ZERO) {
   orderInGem(1);
   orderInGs (0);
+  colourStructure(ColourStructure::DELTA);
 }
 
 void RSModelFFGRVertex::doinit() {

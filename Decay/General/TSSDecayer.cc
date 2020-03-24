@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // TSSDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "TSSDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -32,22 +33,32 @@ IBPtr TSSDecayer::fullclone() const {
   return new_ptr(*this);
 }
 
-void TSSDecayer::doinit() {
-  GeneralTwoBodyDecayer::doinit();
-  _perturbativeVertex = dynamic_ptr_cast<SSTVertexPtr>        (getVertex());
-  _abstractVertex     = dynamic_ptr_cast<AbstractSSTVertexPtr>(getVertex());
+
+void TSSDecayer::setDecayInfo(PDPtr incoming, PDPair outgoing,
+			      vector<VertexBasePtr> vertex,
+			      map<ShowerInteraction,VertexBasePtr> & ,
+			      const vector<map<ShowerInteraction,VertexBasePtr> > & ,
+			      map<ShowerInteraction,VertexBasePtr> ) {
+  decayInfo(incoming,outgoing);
+  for(auto vert : vertex) {
+    vertex_            .push_back(dynamic_ptr_cast<AbstractSSTVertexPtr>(vert));
+    perturbativeVertex_.push_back(dynamic_ptr_cast<SSTVertexPtr>        (vert));
+  }
 }
 
+
 void TSSDecayer::persistentOutput(PersistentOStream & os) const {
-  os << _abstractVertex << _perturbativeVertex;
+  os << vertex_ << perturbativeVertex_;
 }
 
 void TSSDecayer::persistentInput(PersistentIStream & is, int) {
-  is >> _abstractVertex >> _perturbativeVertex;
+  is >> vertex_ >> perturbativeVertex_;
 }
 
-ClassDescription<TSSDecayer> TSSDecayer::initTSSDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<TSSDecayer,GeneralTwoBodyDecayer>
+describeHerwigTSSDecayer("Herwig::TSSDecayer", "Herwig.so");
 
 void TSSDecayer::Init() {
 
@@ -64,12 +75,14 @@ double TSSDecayer::me2(const int , const Particle & inpart,
     ME(new_ptr(GeneralDecayMatrixElement(PDT::Spin2,PDT::Spin0,PDT::Spin0)));
   if(meopt==Initialize) {
     TensorWaveFunction::
-      calculateWaveFunctions(_tensors,_rho,const_ptr_cast<tPPtr>(&inpart),
+      calculateWaveFunctions(tensors_,rho_,const_ptr_cast<tPPtr>(&inpart),
 			     incoming,false);
+    // fix rho if no correlations
+    fixRho(rho_);
   }
   if(meopt==Terminate) {
     TensorWaveFunction::
-      constructSpinInfo(_tensors,const_ptr_cast<tPPtr>(&inpart),
+      constructSpinInfo(tensors_,const_ptr_cast<tPPtr>(&inpart),
 			incoming,true,false);
     for(unsigned int ix=0;ix<2;++ix)
       ScalarWaveFunction::
@@ -80,9 +93,11 @@ double TSSDecayer::me2(const int , const Particle & inpart,
   ScalarWaveFunction sca2(decay[1]->momentum(),decay[1]->dataPtr(),outgoing);
   Energy2 scale(sqr(inpart.mass()));
   for(unsigned int thel=0;thel<5;++thel) {
-    (*ME())(thel,0,0) =_abstractVertex->evaluate(scale,sca1,sca2,_tensors[thel]); 
+    (*ME())(thel,0,0) =0.;
+    for(auto vert : vertex_)
+      (*ME())(thel,0,0) += vert->evaluate(scale,sca1,sca2,tensors_[thel]); 
   }
-  double output = (ME()->contract(_rho)).real()/scale*UnitRemoval::E2;
+  double output = (ME()->contract(rho_)).real()/scale*UnitRemoval::E2;
   // colour and identical particle factors
   output *= colourFactor(inpart.dataPtr(),decay[0]->dataPtr(),
 			 decay[1]->dataPtr());
@@ -94,16 +109,17 @@ double TSSDecayer::me2(const int , const Particle & inpart,
 Energy TSSDecayer::partialWidth(PMPair inpart, PMPair outa, 
 				PMPair outb) const {
   if( inpart.second < outa.second + outb.second  ) return ZERO;
-  if(_perturbativeVertex) {
+  if(perturbativeVertex_.size()==1 &&
+     perturbativeVertex_[0]) {
     Energy2 scale(sqr(inpart.second));
     tcPDPtr in = inpart.first->CC() ? tcPDPtr(inpart.first->CC()) : inpart.first;
-    _perturbativeVertex->setCoupling(scale, outa.first, outb.first, in);
+    perturbativeVertex_[0]->setCoupling(scale, outa.first, outb.first, in);
     double musq = sqr(outa.second/inpart.second);
     double b = sqrt(1. - 4.*musq);
     double me2 = scale*pow(b,4)/120*UnitRemoval::InvE2;
     Energy pcm = Kinematics::pstarTwoBodyDecay(inpart.second,outa.second,
 					outb.second);
-    Energy output = norm(_perturbativeVertex->norm())*me2*pcm/(8.*Constants::pi);
+    Energy output = norm(perturbativeVertex_[0]->norm())*me2*pcm/(8.*Constants::pi);
     // colour factor
     output *= colourFactor(inpart.first,outa.first,outb.first);
     // return the answer

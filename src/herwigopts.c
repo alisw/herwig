@@ -38,7 +38,6 @@ const char *gengetopt_args_info_full_help[] = {
   "      --full-help          Print help, including hidden options, and exit",
   "  -V, --version            Print version and exit",
   "\nEvent generation options:",
-  "",
   "  -N, --numevents=LONG     Number of events to generate.",
   "  -s, --seed=INT           The random number generator seed.",
   "  -t, --tag=TAG            A tag to append to the run name.  (default=`')",
@@ -47,16 +46,15 @@ const char *gengetopt_args_info_full_help[] = {
   "  -q, --quiet              Disable event counter.  (default=off)",
   "  -j, --jobs=INT           Number of jobs to run in parallel (max 10).",
   "  -x, --setupfile=FILE     An input file to modify run parameters.",
-  "\n  -x, --setupfile=FILE     An input file to modify run parameters.\n  -t, --tag=TAG            A tag to append to the run name  (default=`')",
   "\nBuild and integration options:",
+  "  -c, --cachedir=DIR       Matchbox cache directory.  (default=`Herwig-cache')",
   "  -z, --jobsize=NUMBER     The number of subprocesses to integrate per job\n                             (build only).",
   "  -y, --maxjobs=NUMBER     The maximum number of integration jobs to be created\n                             (build only).",
   "  -n, --jobid=NUMBER       Integrate the given integration job.",
-  "",
+  "  -x, --setupfile=FILE     An input file to modify run parameters.\n  -t, --tag=TAG            A tag to append to the run name  (default=`')",
   "\nRepository options:",
   "  -i, --append-read=PATH   Append a search path for the read command.",
   "  -I, --prepend-read=PATH  Prepend a search path for the read command.",
-  "",
   "\nPlugin library options:",
   "  -l, --append=PATH        Append a search path for dynamically loaded\n                             libraries.",
   "  -L, --prepend=PATH       Prepend a search path for dynamically loaded\n                             libraries.",
@@ -96,13 +94,11 @@ init_help_array(void)
   gengetopt_args_info_help[22] = gengetopt_args_info_full_help[22];
   gengetopt_args_info_help[23] = gengetopt_args_info_full_help[23];
   gengetopt_args_info_help[24] = gengetopt_args_info_full_help[24];
-  gengetopt_args_info_help[25] = gengetopt_args_info_full_help[25];
-  gengetopt_args_info_help[26] = gengetopt_args_info_full_help[26];
-  gengetopt_args_info_help[27] = 0; 
+  gengetopt_args_info_help[25] = 0; 
   
 }
 
-const char *gengetopt_args_info_help[28];
+const char *gengetopt_args_info_help[26];
 
 typedef enum {ARG_NO
   , ARG_FLAG
@@ -140,6 +136,7 @@ void clear_given (struct gengetopt_args_info *args_info)
   args_info->quiet_given = 0 ;
   args_info->jobs_given = 0 ;
   args_info->setupfile_given = 0 ;
+  args_info->cachedir_given = 0 ;
   args_info->jobsize_given = 0 ;
   args_info->maxjobs_given = 0 ;
   args_info->jobid_given = 0 ;
@@ -166,6 +163,8 @@ void clear_args (struct gengetopt_args_info *args_info)
   args_info->jobs_orig = NULL;
   args_info->setupfile_arg = NULL;
   args_info->setupfile_orig = NULL;
+  args_info->cachedir_arg = gengetopt_strdup ("Herwig-cache");
+  args_info->cachedir_orig = NULL;
   args_info->jobsize_orig = NULL;
   args_info->maxjobs_orig = NULL;
   args_info->jobid_arg = NULL;
@@ -193,32 +192,33 @@ void init_args_info(struct gengetopt_args_info *args_info)
   args_info->help_help = gengetopt_args_info_full_help[0] ;
   args_info->full_help_help = gengetopt_args_info_full_help[1] ;
   args_info->version_help = gengetopt_args_info_full_help[2] ;
-  args_info->numevents_help = gengetopt_args_info_full_help[5] ;
-  args_info->seed_help = gengetopt_args_info_full_help[6] ;
-  args_info->tag_help = gengetopt_args_info_full_help[7] ;
-  args_info->debug_help = gengetopt_args_info_full_help[8] ;
-  args_info->debug_fpe_help = gengetopt_args_info_full_help[9] ;
-  args_info->quiet_help = gengetopt_args_info_full_help[10] ;
-  args_info->jobs_help = gengetopt_args_info_full_help[11] ;
-  args_info->setupfile_help = gengetopt_args_info_full_help[12] ;
-  args_info->jobsize_help = gengetopt_args_info_full_help[15] ;
-  args_info->maxjobs_help = gengetopt_args_info_full_help[16] ;
-  args_info->jobid_help = gengetopt_args_info_full_help[17] ;
-  args_info->append_read_help = gengetopt_args_info_full_help[20] ;
+  args_info->numevents_help = gengetopt_args_info_full_help[4] ;
+  args_info->seed_help = gengetopt_args_info_full_help[5] ;
+  args_info->tag_help = gengetopt_args_info_full_help[6] ;
+  args_info->debug_help = gengetopt_args_info_full_help[7] ;
+  args_info->debug_fpe_help = gengetopt_args_info_full_help[8] ;
+  args_info->quiet_help = gengetopt_args_info_full_help[9] ;
+  args_info->jobs_help = gengetopt_args_info_full_help[10] ;
+  args_info->setupfile_help = gengetopt_args_info_full_help[11] ;
+  args_info->cachedir_help = gengetopt_args_info_full_help[13] ;
+  args_info->jobsize_help = gengetopt_args_info_full_help[14] ;
+  args_info->maxjobs_help = gengetopt_args_info_full_help[15] ;
+  args_info->jobid_help = gengetopt_args_info_full_help[16] ;
+  args_info->append_read_help = gengetopt_args_info_full_help[19] ;
   args_info->append_read_min = 0;
   args_info->append_read_max = 0;
-  args_info->prepend_read_help = gengetopt_args_info_full_help[21] ;
+  args_info->prepend_read_help = gengetopt_args_info_full_help[20] ;
   args_info->prepend_read_min = 0;
   args_info->prepend_read_max = 0;
-  args_info->append_help = gengetopt_args_info_full_help[24] ;
+  args_info->append_help = gengetopt_args_info_full_help[22] ;
   args_info->append_min = 0;
   args_info->append_max = 0;
-  args_info->prepend_help = gengetopt_args_info_full_help[25] ;
+  args_info->prepend_help = gengetopt_args_info_full_help[23] ;
   args_info->prepend_min = 0;
   args_info->prepend_max = 0;
-  args_info->repo_help = gengetopt_args_info_full_help[28] ;
-  args_info->noexitonerror_help = gengetopt_args_info_full_help[29] ;
-  args_info->resume_help = gengetopt_args_info_full_help[30] ;
+  args_info->repo_help = gengetopt_args_info_full_help[26] ;
+  args_info->noexitonerror_help = gengetopt_args_info_full_help[27] ;
+  args_info->resume_help = gengetopt_args_info_full_help[28] ;
   
 }
 
@@ -368,6 +368,8 @@ cmdline_parser_release (struct gengetopt_args_info *args_info)
   free_string_field (&(args_info->jobs_orig));
   free_string_field (&(args_info->setupfile_arg));
   free_string_field (&(args_info->setupfile_orig));
+  free_string_field (&(args_info->cachedir_arg));
+  free_string_field (&(args_info->cachedir_orig));
   free_string_field (&(args_info->jobsize_orig));
   free_string_field (&(args_info->maxjobs_orig));
   free_string_field (&(args_info->jobid_arg));
@@ -443,6 +445,8 @@ cmdline_parser_dump(FILE *outfile, struct gengetopt_args_info *args_info)
     write_into_file(outfile, "jobs", args_info->jobs_orig, 0);
   if (args_info->setupfile_given)
     write_into_file(outfile, "setupfile", args_info->setupfile_orig, 0);
+  if (args_info->cachedir_given)
+    write_into_file(outfile, "cachedir", args_info->cachedir_orig, 0);
   if (args_info->jobsize_given)
     write_into_file(outfile, "jobsize", args_info->jobsize_orig, 0);
   if (args_info->maxjobs_given)
@@ -1042,6 +1046,7 @@ cmdline_parser_internal (
         { "quiet",	0, NULL, 'q' },
         { "jobs",	1, NULL, 'j' },
         { "setupfile",	1, NULL, 'x' },
+        { "cachedir",	1, NULL, 'c' },
         { "jobsize",	1, NULL, 'z' },
         { "maxjobs",	1, NULL, 'y' },
         { "jobid",	1, NULL, 'n' },
@@ -1055,7 +1060,7 @@ cmdline_parser_internal (
         { 0,  0, 0, 0 }
       };
 
-      c = getopt_long (argc, argv, "hVN:s:t:d:Dqj:x:z:y:n:i:I:l:L:", long_options, &option_index);
+      c = getopt_long (argc, argv, "hVN:s:t:d:Dqj:x:c:z:y:n:i:I:l:L:", long_options, &option_index);
 
       if (c == -1) break;	/* Exit from `while (1)' loop.  */
 
@@ -1168,6 +1173,18 @@ cmdline_parser_internal (
               &(local_args_info.setupfile_given), optarg, 0, 0, ARG_STRING,
               check_ambiguity, override, 0, 0,
               "setupfile", 'x',
+              additional_error))
+            goto failure;
+        
+          break;
+        case 'c':	/* Matchbox cache directory..  */
+        
+        
+          if (update_arg( (void *)&(args_info->cachedir_arg), 
+               &(args_info->cachedir_orig), &(args_info->cachedir_given),
+              &(local_args_info.cachedir_given), optarg, 0, "Herwig-cache", ARG_STRING,
+              check_ambiguity, override, 0, 0,
+              "cachedir", 'c',
               additional_error))
             goto failure;
         

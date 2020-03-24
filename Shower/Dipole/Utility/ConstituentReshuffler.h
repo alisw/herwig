@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ConstituentReshuffler.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -125,6 +125,15 @@ public:
 		    PList& eventHard,
 		    PerturbativeProcessPtr decayProc = PerturbativeProcessPtr() ) ;
 
+
+  /** 
+   * Update the spinInfo of a particle following reshuffling 
+   * to take account of the change in momentum.
+   * Used only for unstable particles that need to be dealt with.
+   **/
+  void updateSpinInfo( PPtr& oldPart,
+                       PPtr& newPart ) ;
+  
 protected:
 
   /**

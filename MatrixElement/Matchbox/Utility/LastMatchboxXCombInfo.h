@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxXComb.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -505,9 +505,11 @@ protected:
    * Set the XComb pointer cast to MatchboxXComb
    */
   void lastMatchboxXComb(tStdXCombPtr xc) {
-    theLastMatchboxXComb = xc ? &dynamic_cast<MatchboxXCombData&>(*xc) : 0;
+    theLastMatchboxXComb = xc ?
+      dynamic_cast<MatchboxXCombData*>(PtrTraits<tStdXCombPtr>::barePointer(xc)) : 0;
     theLastHeadMatchboxXComb = 
-      xc && xc->head() ? &dynamic_cast<MatchboxXCombData&>(*xc->head()) : 0;
+      xc && xc->head() ? 
+      dynamic_cast<MatchboxXCombData*>(PtrTraits<tStdXCombPtr>::barePointer(xc->head())) : 0;
   }
 
   /**

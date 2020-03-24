@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // IFDipole.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "IFDipole.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/PDT/EnumParticles.h"
 #include "ThePEG/EventRecord/Particle.h"
 #include "ThePEG/Interface/Parameter.h"
@@ -35,8 +36,10 @@ void IFDipole::persistentInput(PersistentIStream & is, int) {
      >> _mode  >> _maxtry >> _energyopt  >> _betaopt;
 }
 
-ClassDescription<IFDipole> IFDipole::initIFDipole;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<IFDipole,Interfaced>
+describeHerwigIFDipole("Herwig::IFDipole", "Herwig.so");
 
 void IFDipole::Init() {
   static ClassDocumentation<IFDipole> documentation

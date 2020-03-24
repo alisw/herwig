@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // VectorMesonVectorPScalarDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "VectorMesonVectorPScalarDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/PDT/DecayMode.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/ParVector.h"
@@ -300,9 +301,10 @@ void VectorMesonVectorPScalarDecayer::persistentInput(PersistentIStream & is, in
   is >> _incoming >> _outgoingV >> _outgoingP >> _maxweight >> iunit(_coupling,1/MeV);
 }
 
-ClassDescription<VectorMesonVectorPScalarDecayer> 
-VectorMesonVectorPScalarDecayer::initVectorMesonVectorPScalarDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<VectorMesonVectorPScalarDecayer,DecayIntegrator>
+describeHerwigVectorMesonVectorPScalarDecayer("Herwig::VectorMesonVectorPScalarDecayer", "HwVMDecay.so");
 
 void VectorMesonVectorPScalarDecayer::Init() {
 

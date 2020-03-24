@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // FFLightKinematics.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -120,7 +120,6 @@ bool FFLightKinematics::generateSplitting(double kappa, double xi, double rphi,
     theMCCheck->book(1.,1.,info.scale(),info.hardPt(),pt,z,jacobian());
 
   return true;
-
 }
 
 void FFLightKinematics::generateKinematics(const Lorentz5Momentum& pEmitter,
@@ -130,26 +129,27 @@ void FFLightKinematics::generateKinematics(const Lorentz5Momentum& pEmitter,
   double z = dInfo.lastZ();
   Energy pt = dInfo.lastPt();
   double y = sqr(pt / (pEmitter+pSpectator).m()) / (z*(1.-z));
-
+ 
   Lorentz5Momentum kt =
     getKt(pEmitter, pSpectator, pt, dInfo.lastPhi());
-
+  
   Lorentz5Momentum em = z*pEmitter + y*(1.-z)*pSpectator + kt;
-  em.setMass(0.*GeV);
+  Lorentz5Momentum emm = (1.-z)*pEmitter + z*y*pSpectator - kt;
+  Lorentz5Momentum spe = (1.-y)*pSpectator;
+  
+  em.setMass(ZERO);
   em.rescaleEnergy();
 
-  Lorentz5Momentum emm = (1.-z)*pEmitter + z*y*pSpectator - kt;
-  emm.setMass(0.*GeV);
+  emm.setMass(ZERO);
   emm.rescaleEnergy();
-
-  Lorentz5Momentum spe = (1.-y)*pSpectator;
-  spe.setMass(0.*GeV);
+  
+  spe.setMass(ZERO);
   spe.rescaleEnergy();
 
   emitterMomentum(em);
   emissionMomentum(emm);
   spectatorMomentum(spe);
-
+  
 }
 
 // If needed, insert default implementations of function defined

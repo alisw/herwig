@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // FRVDecayer.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -61,6 +61,15 @@ public:
    */
   virtual Energy partialWidth(PMPair inpart, PMPair outa, 
 			      PMPair outb) const;
+
+  /**
+   *  Set the information on the decay
+   */
+  virtual void setDecayInfo(PDPtr incoming, PDPair outgoing,
+			    vector<VertexBasePtr>,
+			    map<ShowerInteraction,VertexBasePtr> &,
+			    const vector<map<ShowerInteraction,VertexBasePtr> > &,
+			    map<ShowerInteraction,VertexBasePtr>);
   //@}
 
 public:
@@ -106,25 +115,7 @@ protected:
   virtual IBPtr fullclone() const;
   //@}
 
-protected:
-
-  /** @name Standard Interfaced functions. */
-  //@{
-  /**
-   * Initialize this object after the setup phase before saving an
-   * EventGenerator to disk.
-   * @throws InitException if object could not be initialized properly.
-   */
-  virtual void doinit();
-  //@}
-
 private:
-
-  /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<FRVDecayer> initFRVDecayer;
 
   /**
    * The assignment operator is private and must never be called.
@@ -137,12 +128,12 @@ private:
   /**
    *  Abstract pointer to AbstractFRVVertex
    */
-  AbstractRFVVertexPtr abstractVertex_;
+  vector<AbstractRFVVertexPtr> vertex_;
 
   /**
    * Pointer to the perturbative vertex
    */
-  RFVVertexPtr perturbativeVertex_;
+  vector<RFVVertexPtr> perturbativeVertex_;
 
   /**
    *  Spin density matrix
@@ -176,33 +167,5 @@ private:
 };
 
 }
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of FRVDecayer. */
-template <>
-struct BaseClassTrait<Herwig::FRVDecayer,1> {
-  /** Typedef of the first base class of FRVDecayer. */
-  typedef Herwig::GeneralTwoBodyDecayer NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the FRVDecayer class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::FRVDecayer>
-  : public ClassTraitsBase<Herwig::FRVDecayer> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::FRVDecayer"; }
-};
-
-/** @endcond */
-
-}
-
 
 #endif /* HERWIG_FRVDecayer_H */

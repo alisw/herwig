@@ -12,8 +12,10 @@ ALL_H_FILES = \
 SextetParticles.h \
 SextetModel.h SextetModel.fh \
 SextetGSSVertex.h  \
+SextetPSSVertex.h  \
 SextetGGSSVertex.h \
 SextetGVVVertex.h  \
+SextetPVVVertex.h  \
 SextetGGVVVertex.h \
 SextetFFSVertex.h \
 SextetFFVVertex.h
@@ -22,8 +24,10 @@ DIR_CC_FILES = $(addprefix $(srcdir)/,$(ALL_CC_FILES))
 ALL_CC_FILES = \
 SextetModel.cc      \
 SextetGSSVertex.cc  \
+SextetPSSVertex.cc  \
 SextetGGSSVertex.cc \
 SextetGVVVertex.cc  \
+SextetPVVVertex.cc  \
 SextetGGVVVertex.cc \
 SextetFFSVertex.cc  \
 SextetFFVVertex.cc  

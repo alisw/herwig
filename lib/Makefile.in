@@ -154,8 +154,7 @@ Herwig_la_DEPENDENCIES =  \
 	$(top_builddir)/MatrixElement/Matchbox/libHwMatchbox.la \
 	$(top_builddir)/Decay/libHwWeakCurrent.la \
 	$(top_builddir)/Looptools/libHwLooptools.la \
-	$(top_builddir)/Shower/libHwShower.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(top_builddir)/Shower/libHwShower.la $(am__DEPENDENCIES_1)
 am_Herwig_la_OBJECTS =
 Herwig_la_OBJECTS = $(am_Herwig_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -223,14 +222,8 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
-BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
-BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
 BOOST_LDPATH = @BOOST_LDPATH@
 BOOST_ROOT = @BOOST_ROOT@
-BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
-BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
-BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS = @BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS@
 BOOST_UNIT_TEST_FRAMEWORK_LDPATH = @BOOST_UNIT_TEST_FRAMEWORK_LDPATH@
 BOOST_UNIT_TEST_FRAMEWORK_LIBS = @BOOST_UNIT_TEST_FRAMEWORK_LIBS@
@@ -433,7 +426,7 @@ top_srcdir = @top_srcdir@
 pkglib_LTLIBRARIES = Herwig.la
 Herwig_la_SOURCES = 
 Herwig_la_LIBTOOLFLAGS = --tag=CXX
-Herwig_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 26:0:0 \
+Herwig_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 27:0:0 \
 	$(THEPEGLDFLAGS) $(BOOST_SYSTEM_LDFLAGS) \
 	$(BOOST_FILESYSTEM_LDFLAGS) $(FCLIBS)
 Herwig_la_LIBADD = \
@@ -452,7 +445,7 @@ $(top_builddir)/MatrixElement/Matchbox/libHwMatchbox.la \
 $(top_builddir)/Decay/libHwWeakCurrent.la \
 $(top_builddir)/Looptools/libHwLooptools.la \
 $(top_builddir)/Shower/libHwShower.la \
-$(THEPEGLIB) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) -ldl
+$(THEPEGLIB) -ldl
 
 dist_noinst_SCRIPTS = fix-osx-path
 POSTPROCESSING = done-all-links $(am__append_1)

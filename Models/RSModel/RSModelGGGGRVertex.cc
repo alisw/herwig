@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // RSModelGGGGRVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "RSModelGGGGRVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -23,6 +24,7 @@ RSModelGGGGRVertex::RSModelGGGGRVertex()
   : kappa_(ZERO), _couplast(0.), _q2last(ZERO) {
   orderInGem(1);
   orderInGs (1);
+  colourStructure(ColourStructure::SU3FF);
 }
 
 void RSModelGGGGRVertex::doinit() {
@@ -44,8 +46,10 @@ void RSModelGGGGRVertex::persistentInput(PersistentIStream & is, int) {
   is >> iunit(kappa_,InvGeV);
 }
 
-ClassDescription<RSModelGGGGRVertex> RSModelGGGGRVertex::initRSModelGGGGRVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<RSModelGGGGRVertex,VVVTVertex>
+describeHerwigRSModelGGGGRVertex("Herwig::RSModelGGGGRVertex", "HwRSModel.so");
 
 void RSModelGGGGRVertex::Init() {
  static ClassDocumentation<RSModelGGGGRVertex> documentation

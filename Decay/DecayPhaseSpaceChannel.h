@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // DecayPhaseSpaceChannel.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -49,7 +49,7 @@ using namespace ThePEG;
    * @author  Peter Richardson
    */
 
-class DecayPhaseSpaceChannel: public Interfaced {
+class DecayPhaseSpaceChannel: public Base {
 
   /**
    *  A friend output operator to allow the channel to be outputted for
@@ -140,6 +140,11 @@ public:
       if(_intdau2[ix]==oldp) _intdau2[ix]=newp;
     }
   }
+
+  /**
+   *  Check the kinematics
+   */
+  bool checkKinematics();
   //@}
 
 protected:
@@ -215,25 +220,8 @@ public:
    * Standard Init function used to initialize the interfaces.
    */
   static void Init();
-  
-protected:
-  
-  /** @name Clone Methods. */
-  //@{
-  /**
-   * Make a simple clone of this object.
-   * @return a pointer to the new object.
-   */
-  virtual IBPtr clone() const {return new_ptr(*this);}
 
-  /** Make a clone of this object, possibly modifying the cloned object
-   * to make it sane.
-   * @return a pointer to the new object.
-   */
-  virtual IBPtr fullclone() const {return new_ptr(*this);}
-  //@}
-
-protected:  
+public:  
 
   /** @name Standard Interfaced functions. */
   //@{
@@ -242,21 +230,16 @@ protected:
    * EventGenerator to disk.
    * @throws InitException if object could not be initialized properly.
    */
-  virtual void doinit();
+  virtual void init();
 
   /**
    * Initialize this object. Called in the run phase just before
    * a run begins.
    */
-  virtual void doinitrun();
+  virtual void initrun();
   //@}
 
 private:
-  
-  /**
-   * Describe a concrete class with persistent data.
-   */
-  static ClassDescription<DecayPhaseSpaceChannel> initDecayPhaseSpaceChannel;
   
   /**
    * Private and non-existent assignment operator.
@@ -362,36 +345,5 @@ ostream & operator<<(ostream &, const DecayPhaseSpaceChannel &);
 class DecayPhaseSpaceError: public Exception {};
 }
 
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/**
- * The following template specialization informs ThePEG about the
- * base class of DecayPhaseSpaceChannel.
- */
-template <>
-
-struct BaseClassTrait<Herwig::DecayPhaseSpaceChannel,1> {
-  /** Typedef of the base class of DecayPhaseSpaceChannel */
-  typedef Interfaced NthBase;
-};
-
-/**
- * The following template specialization informs ThePEG about the
- * name of this class and the shared object where it is defined.
- */
-template <>
-
-struct ClassTraits<Herwig::DecayPhaseSpaceChannel>
-  : public ClassTraitsBase<Herwig::DecayPhaseSpaceChannel> {
-    /**  Return the class name.*/
-  static string className() { return "Herwig::DecayPhaseSpaceChannel"; }
-};
-
-/** @endcond */
-
-}
 
 #endif /* HERWIG_DecayPhaseSpaceChannel_H */

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // GenericSVVVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "GenericSVVVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/Switch.h"
@@ -24,10 +25,8 @@ using namespace Herwig;
 using namespace ThePEG;  
 
 GenericSVVVertex::GenericSVVVertex()
-  :pids(ZERO),oas(0),oaew(0){
-  orderInGs(0);
-  orderInGem(0);
-}
+  :pids(ZERO),oas(0),oaew(0)
+{}
 
 void GenericSVVVertex::doinit() {
   //PDG codes for particles at vertices
@@ -65,8 +64,10 @@ void GenericSVVVertex::persistentInput(PersistentIStream & is, int) {
   is >> pids>>oas>>oaew;
 }
 
-ClassDescription<GenericSVVVertex> GenericSVVVertex::initGenericSVVVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<GenericSVVVertex,Helicity::GeneralVVSVertex>
+describeHerwigGenericSVVVertex("Herwig::GenericSVVVertex", "Herwig.so");
 
 void GenericSVVVertex::Init() {
   
@@ -91,7 +92,22 @@ void GenericSVVVertex::Init() {
      false, false, Interface::lowerlim);
 }
 
-void GenericSVVVertex::setCoupling(Energy2, tcPDPtr part2, tcPDPtr part3, tcPDPtr part1) {
+void GenericSVVVertex::setCoupling(Energy2,
+#ifndef NDEBUG
+				   tcPDPtr part2,
+#else
+				   tcPDPtr,
+#endif
+#ifndef NDEBUG
+				   tcPDPtr part3,
+#else
+				   tcPDPtr,
+#endif
+#ifndef NDEBUG
+				   tcPDPtr part1) {
+#else
+				   tcPDPtr) {
+#endif
   assert(part1 && part2 && part3);
   assert(part1->id() == pids[0] &&
 	 part2->id() == pids[1]  && part3->id() == pids[2] );

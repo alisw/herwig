@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // DipoleSplittingInfo.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -16,6 +16,7 @@
 #include "ThePEG/PDT/ParticleData.h"
 
 #include "Herwig/Shower/Dipole/Kinematics/DipoleSplittingKinematics.h"
+#include "Herwig/Shower/Dipole/Kernels/DipoleSplittingKernel.h"
 
 namespace Herwig {
 
@@ -45,7 +46,8 @@ public:
    */
   DipoleIndex(tcPDPtr newEmitter, tcPDPtr newSpectator,
 	      const PDF& newEmitterPDF = PDF(), const PDF& newSpectatorPDF = PDF(),
-	      const bool decayingEmitter = false, const bool decayingSpectator = false);
+	      const bool decayingEmitter = false, const bool decayingSpectator = false,
+	      const bool offShellEmitter = false, const bool offShellSpectator = false);
 
 public:
 
@@ -94,6 +96,12 @@ public:
   bool incomingDecayEmitter() const { return theIncomingDecayEmitter; }
 
   /**
+   * Return true, if the emitter can be off-shell
+   */
+  bool offShellEmitter() const { return theOffShellEmitter; }
+  //bool offShellEmitter() const { return theEmitterData->width() != ZERO; }
+
+  /**
    * Return the PDF object associated with the emitter
    */
   const PDF& emitterPDF() const { return theEmitterPDF; }
@@ -112,6 +120,12 @@ public:
    * Return true, if the spectator is incoming to a decay
    */
   bool incomingDecaySpectator() const { return theIncomingDecaySpectator; }
+
+  /**
+   * Return true, if the spectator can be off-shell
+   */
+  bool offShellSpectator() const { return theOffShellSpectator; }
+  //bool offShellSpectator() const { return theSpectatorData->width() != ZERO; }
 
   /**
    * Return the PDF object associated with the spectator
@@ -143,6 +157,11 @@ private:
   bool theIncomingDecayEmitter;
 
   /**
+   * Can the emitter be off-shell?
+   */
+  bool theOffShellEmitter;
+  
+  /**
    * The PDF object for the emitter.
    */
   PDF theEmitterPDF;
@@ -161,6 +180,11 @@ private:
    * Whether or not the spectator is incoming to a decay.
    */
   bool theIncomingDecaySpectator;
+  
+  /**
+   * Can the spectator be off-shell?
+   */
+  bool theOffShellSpectator;
 
   /**
    * The PDF object for the spectator.
@@ -274,6 +298,12 @@ public:
   Ptr<DipoleSplittingKinematics>::tptr splittingKinematics() const { return theSplittingKinematics; }
 
   /**
+   * Return a pointer to the DipoleSplittingKernel object
+   * which is used to perform the splitting.
+   **/
+  Ptr<DipoleSplittingKernel>::tptr splittingKernel() const { return theSplittingKernel;}
+
+  /**
    * Return the dipole scale
    */
   Energy scale() const { return theScale; }
@@ -363,6 +393,13 @@ public:
   }
 
   /**
+   * Set the DipoleSplittingKernel object
+   */
+  void splittingKernel( Ptr<DipoleSplittingKernel>::tptr newSplittingKernel){
+    theSplittingKernel = newSplittingKernel;
+  }
+
+  /**
    * Set the particle data object of the emitter
    * after the splitting.
    */
@@ -395,7 +432,7 @@ public:
    * Set the mass of the recoil system
    * in decay dipoles
    */
-  void recoilMass(Energy mass) { theRecoilMass = mass; }
+  void recoilMass(Energy mass) { theRecoilMass = mass; }  
 
   /**
    * Set the spectator mass
@@ -616,6 +653,12 @@ private:
    * which is to be used to perform the splitting.
    */
   Ptr<DipoleSplittingKinematics>::tptr theSplittingKinematics;
+  
+  /**
+   * A pointer to the DipoleSplittingKernel object
+   * which is used to perform the splitting.
+   **/
+  Ptr<DipoleSplittingKernel>::tptr theSplittingKernel;
 
   /**
    * The scale for this dipole.
@@ -633,7 +676,6 @@ private:
    */
   Energy theRecoilMass;
 
-
   /**
    * The mass of the emitter.
    * (To account for off-shell).
@@ -645,9 +687,6 @@ private:
    * (To account for off-shell).
    */
   Energy theSpectatorMass;
-
-
-  
 
   /**
    * The momentum fraction of the emitter.

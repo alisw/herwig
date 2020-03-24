@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxRambo.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -110,7 +110,9 @@ double MatchboxRambo::generateTwoToNKinematics(const double* r,
     referenceSample = ref->second;
   }
 
-  size_t offset = dynamic_cast<const Tree2toNDiagram&>(*lastXComb().diagrams().front()).nSpace() > 0 ? 2 : 1;
+  size_t offset = 2;
+  if ( lastXCombPtr() )
+    offset = dynamic_cast<const Tree2toNDiagram&>(*lastXComb().diagrams().front()).nSpace() > 0 ? 2 : 1;
 
   Energy w = sqrt(lastSHat());
   size_t count = 0;
@@ -154,7 +156,6 @@ double MatchboxRambo::generateTwoToNKinematics(const double* r,
   if ( !needToReshuffle ) {
     if ( !matchConstraints(momenta) )
       return 0.;
-    fillDiagramWeights();
     if ( theMakeReferenceSample )
       dumpReference(momenta, weight);
     return weight;
@@ -196,8 +197,6 @@ double MatchboxRambo::generateTwoToNKinematics(const double* r,
     return 0.;
 
   weight *= num/den;
-
-  fillDiagramWeights();
 
   if ( theMakeReferenceSample )
     dumpReference(momenta, weight);

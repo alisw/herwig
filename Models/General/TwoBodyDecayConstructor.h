@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // TwoBodyDecayConstructor.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -15,6 +15,7 @@
 #include "NBodyDecayConstructorBase.h"
 #include "ThePEG/Helicity/Vertex/VertexBase.h"
 #include "Herwig/Decay/General/GeneralTwoBodyDecayer.fh"
+#include "Herwig/Shower/ShowerAlpha.h"
 #include "TwoBodyDecay.h"
 
 namespace Herwig {
@@ -40,7 +41,10 @@ public:
   /**
    * The default constructor.
    */
-  TwoBodyDecayConstructor() : showerAlpha_("/Herwig/Shower/AlphaQCD") {}
+  TwoBodyDecayConstructor() : inter_(ShowerInteraction::Both) {
+    radiationVertices_[ShowerInteraction::QCD] = map<tPDPtr,VertexBasePtr>();
+    radiationVertices_[ShowerInteraction::QED] = map<tPDPtr,VertexBasePtr>();
+  }
 
   /**
    * Function used to determine allowed decaymodes
@@ -55,6 +59,22 @@ public:
 
   
 public:
+
+  /** @name Functions used by the persistent I/O system. */
+  //@{
+  /**
+   * Function used to write out object persistently.
+   * @param os the persistent output stream written to.
+   */
+  void persistentOutput(PersistentOStream & os) const;
+
+  /**
+   * Function used to read in object persistently.
+   * @param is the persistent input stream read from.
+   * @param version the version number of the object when written.
+   */
+  void persistentInput(PersistentIStream & is, int version);
+  //@}
 
   /**
    * The standard Init function used to initialize the interfaces.
@@ -84,12 +104,6 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static NoPIOClassDescription<TwoBodyDecayConstructor> initTwoBodyDecayConstructor;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
@@ -107,28 +121,31 @@ private:
    * @param iv Row number in _theExistingDecayers member
    * @return A vector a decay modes
    */
-  set<TwoBodyDecay> createModes(tPDPtr inpart, VertexBasePtr vert,
-				unsigned int ilist);
+  void createModes(tPDPtr inpart, VertexBasePtr vert,
+		   unsigned int ilist,
+		   multiset<TwoBodyDecay> & modes);
 
   /**
    * Function to create decayer for specific vertex
    * @param decay decay mode for this decay
    * member variable
    */
-  GeneralTwoBodyDecayerPtr createDecayer(TwoBodyDecay decay);
+  GeneralTwoBodyDecayerPtr createDecayer(TwoBodyDecay decay,
+					 vector<VertexBasePtr> );
 
   /**
    * Create decay mode(s) from given part and decay modes
    * @param decays The vector of decay modes
    * @param decayer The decayer responsible for this decay
    */
-  void createDecayMode(set<TwoBodyDecay> & decays);
+  void createDecayMode(multiset<TwoBodyDecay> & decays);
   //@}
 
   /**
-   * Get the vertex for QCD radiation
+   * Get the vertex for QED/QCD radiation
    */
-  VertexBasePtr radiationVertex(tPDPtr particle,tPDPair children = tPDPair ());
+  VertexBasePtr radiationVertex(tPDPtr particle,ShowerInteraction inter,
+				tPDPair children = tPDPair ());
 
 private:
 
@@ -136,41 +153,25 @@ private:
    *  Map of particles and the vertices which generate their QCD
    *  radiation
    */
-  map<tPDPtr,VertexBasePtr> radiationVertices_;
+  map<ShowerInteraction,map<tPDPtr,VertexBasePtr> > radiationVertices_;
 
   /**
-   *  Default choice for the strong coupling object for hard radiation
+   *  Default choice for the strong coupling object for hard QCD radiation
    */
-  string showerAlpha_;
+  ShowerAlphaPtr  alphaQCD_;
+
+  /**
+   *  Default choice for the strong coupling object for hard QED radiation
+   */
+  ShowerAlphaPtr  alphaQED_;
+
+  /**
+   *  Which type of corrections to the decays to include
+   */
+  ShowerInteraction inter_; 
+  
 };
   
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of TwoBodyDecayConstructor. */
-template <>
-struct BaseClassTrait<Herwig::TwoBodyDecayConstructor,1> {
-  /** Typedef of the first base class of TwoBodyDecayConstructor. */
-  typedef Herwig::NBodyDecayConstructorBase NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the TwoBodyDecayConstructor class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::TwoBodyDecayConstructor>
-  : public ClassTraitsBase<Herwig::TwoBodyDecayConstructor> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::TwoBodyDecayConstructor"; }
-};
-
-/** @endcond */
-
 }
 
 #endif /* HERWIG_TwoBodyDecayConstructor_H */

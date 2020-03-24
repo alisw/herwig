@@ -1,13 +1,13 @@
 // -*- C++ -*-
 //
 // MEee2VectorMeson.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
-#ifndef THEPEG_MEee2VectorMeson_H
-#define THEPEG_MEee2VectorMeson_H
+#ifndef HERWIG_MEee2VectorMeson_H
+#define HERWIG_MEee2VectorMeson_H
 //
 // This is the declaration of the MEee2VectorMeson class.
 //
@@ -42,7 +42,7 @@ public:
   /**
    * The default constructor.
    */
-  inline MEee2VectorMeson() :_coupling(0.0012), _lineshape(false) 
+  MEee2VectorMeson() : coupling_(0.0012), lineShape_(false) 
   {}
 
   /** @name Virtual functions required by the MEBase class. */
@@ -202,12 +202,6 @@ private:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEee2VectorMeson> initMEee2VectorMeson;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
@@ -218,60 +212,25 @@ private:
   /**
    *  The vector meson being produced
    */
-  PDPtr _vector;
+  PDPtr vector_;
 
   /**
    *  The coupling
    */
-  double _coupling;
+  double coupling_;
 
   /**
    *  Use the mass generator for the line shape
    */
-  bool _lineshape;
+  bool lineShape_;
 
   /**
    *  Pointer to the mass generator for the Higgs
    */
-  GenericMassGeneratorPtr _massgen;
+  GenericMassGeneratorPtr massGen_;
 
 };
 
 }
 
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEee2VectorMeson. */
-template <>
-struct BaseClassTrait<Herwig::MEee2VectorMeson,1> {
-  /** Typedef of the first base class of MEee2VectorMeson. */
-  typedef MEBase NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEee2VectorMeson class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEee2VectorMeson>
-  : public ClassTraitsBase<Herwig::MEee2VectorMeson> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEee2VectorMeson"; }
-  /**
-   * The name of a file containing the dynamic library where the class
-   * MEee2VectorMeson is implemented. It may also include several, space-separated,
-   * libraries if the class MEee2VectorMeson depends on other classes (base classes
-   * excepted). In this case the listed libraries will be dynamically
-   * linked in the order they are specified.
-   */
-  static string library() { return "HwMELepton.so"; }
-};
-
-/** @endcond */
-
-}
-
-#endif /* THEPEG_MEee2VectorMeson_H */
+#endif /* HERWIG_MEee2VectorMeson_H */

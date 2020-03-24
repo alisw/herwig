@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // GSLIntegrator.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -58,6 +58,11 @@ public:
     _abserr(abserr), _relerr(relerr), _nbins(nbins) {}
   //@}
 
+  /// helper type for the integration result
+  template <class T>
+  using ValT = decltype(std::declval<typename T::ValType>() 
+                      * std::declval<typename T::ArgType>());
+
   /**
    * The value of the integral
    * @param function The integrand class that defines operator()
@@ -65,8 +70,7 @@ public:
    * @param upper The upper limit of integration.
    */
   template <class T>
-  inline typename BinaryOpTraits<typename T::ValType,
-				 typename T::ArgType>::MulT
+  inline ValT<T>
   value(const T & function, 
 	const typename T::ArgType lower,
 	const typename T::ArgType upper) const;
@@ -79,13 +83,11 @@ public:
    * @param error Returns the estimated error of the integral
    */
   template <class T>
-  inline typename BinaryOpTraits<typename T::ValType,
-				 typename T::ArgType>::MulT
+  inline ValT<T>
   value(const T & function, 
 	const typename T::ArgType lower,
 	const typename T::ArgType upper,
-	typename BinaryOpTraits<typename T::ValType,
-	typename T::ArgType>::MulT & error) const;
+	ValT<T> & error) const;
 
 private:
 

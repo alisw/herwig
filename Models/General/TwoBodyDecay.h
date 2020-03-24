@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // TwoBodyDecay.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -72,7 +72,16 @@ inline bool operator<(const TwoBodyDecay & x, const TwoBodyDecay & y) {
     return x.children_.first->id() < y.children_.first->id();
   if(x.children_.second->id()!=y.children_.second->id())
     return x.children_.second->id() < y.children_.second->id();
-  return x.vertex_<y.vertex_;
+  return false;
+}
+inline bool operator==(const TwoBodyDecay & x, const TwoBodyDecay & y) {
+  if(x.parent_->id()!=y.parent_->id())
+    return false;
+  if(x.children_.first->id()!=y.children_.first->id())
+    return false;
+  if(x.children_.second->id()!=y.children_.second->id())
+    return false;
+  return true;
 }
 
 }

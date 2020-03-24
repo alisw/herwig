@@ -1,12 +1,13 @@
 // -*- C++ -*-
 //
 // DifractivePDF.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
 #include "ReggeonPDF.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include <ThePEG/PDT/ParticleData.h>
 #include <ThePEG/PDT/EnumParticles.h>
 #include <ThePEG/Persistency/PersistentOStream.h>
@@ -69,8 +70,10 @@ void ReggeonPDF::doinit() {
 		   << Exception::runerror;
 }
 
-ClassDescription<ReggeonPDF> ReggeonPDF::initReggeonPDF; 
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<ReggeonPDF,PDFBase>
+describeHerwigReggeonPDF("Herwig::ReggeonPDF", "HwReggeonPDF.so");
 
 void ReggeonPDF::Init(){
 

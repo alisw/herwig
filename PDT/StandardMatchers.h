@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // StandardMatchers.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -205,6 +205,27 @@ struct ChargedLeptonMatcher: public MatcherType {
 };
 /** Gives a MatcherBase class based on ChargedLeptonMatcher. */
 typedef Matcher<ChargedLeptonMatcher> MatchChargedLepton;
-}
 
+/**
+ * A Matcher class which matches any light (<1GeV) particles other than the photon
+ */
+struct LightParticleMatcher: public MatcherType {
+  /** Typedef the class matching the complex conjugate particles. */
+  typedef LightParticleMatcher CC;
+  /** The main static function to check if a given particle type \a pd
+      matches. */
+  static bool Check(const ParticleData & pd) {
+    return pd.id()!=22 && abs(pd.id()) > 6 && abs(pd.id())!=11 &&
+      abs(pd.id())!=13 && abs(pd.id())!=15 && abs(pd.mass())<=GeV;
+  }
+  /** A simplified but unique class name. */
+  static string className() { return "LightParticle"; }
+};
+
+/**
+ * Gives a MatcherBase class based on LightParticleatcher. 
+ */
+typedef Matcher<LightParticleMatcher> MatchLightParticle;
+
+}
 #endif /* Herwig_StandardMatchers_H */

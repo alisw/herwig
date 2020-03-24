@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SSWGSSVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "SSWGSSVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -21,8 +22,9 @@ using namespace Herwig;
 
 SSWGSSVertex::SSWGSSVertex() : _sw(0.), _cw(0.), _q2last(),_emcouplast(0.),
 			       _scouplast(0.), _ulast(0), _dlast(0),
-			       _gblast(0), _factlast(0.)  
-{}
+			       _gblast(0), _factlast(0.)  {
+  colourStructure(ColourStructure::SU3TFUND);
+}
 
 void SSWGSSVertex::doinit() {
   //W-
@@ -105,8 +107,10 @@ void SSWGSSVertex::persistentInput(PersistentIStream & is, int) {
 }
 
 
-ClassDescription<SSWGSSVertex> SSWGSSVertex::initSSWGSSVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<SSWGSSVertex,VVSSVertex>
+describeHerwigSSWGSSVertex("Herwig::SSWGSSVertex", "HwSusy.so");
 
 
 void SSWGSSVertex::Init() {
@@ -194,5 +198,5 @@ void SSWGSSVertex::setCoupling(Energy2 q2,   tcPDPtr part1,
     _emcouplast = electroMagneticCoupling(q2);
     _scouplast = strongCoupling(q2);
   }
-  norm(_emcouplast*_scouplast*_factlast);
+  norm(-_emcouplast*_scouplast*_factlast);
 }

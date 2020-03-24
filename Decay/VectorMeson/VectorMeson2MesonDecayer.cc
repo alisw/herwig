@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // VectorMeson2MesonDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "VectorMeson2MesonDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/PDT/DecayMode.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/ParVector.h"
@@ -257,9 +258,10 @@ void VectorMeson2MesonDecayer::persistentInput(PersistentIStream & is, int) {
   is >> _incoming >> _outgoing1 >> _outgoing2 >> _maxweight >> _coupling;
 }
   
-ClassDescription<VectorMeson2MesonDecayer> 
-VectorMeson2MesonDecayer::initVectorMeson2MesonDecayer;
-  // Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<VectorMeson2MesonDecayer,DecayIntegrator>
+describeHerwigVectorMeson2MesonDecayer("Herwig::VectorMeson2MesonDecayer", "HwVMDecay.so");
 
 void VectorMeson2MesonDecayer::Init() {
   

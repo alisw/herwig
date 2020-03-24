@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SMWWHVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -11,6 +11,7 @@
 // functions of the WWHVertex class.
 //
 #include "SMWWHVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -22,6 +23,7 @@ SMWWHVertex::SMWWHVertex()
   : _couplast(0.), _q2last(ZERO), _mw(ZERO), _zfact(0.) {
   orderInGem(1);
   orderInGs(0);
+  colourStructure(ColourStructure::SINGLET);
 }
 
 void SMWWHVertex::doinit() {
@@ -42,8 +44,10 @@ void SMWWHVertex::persistentInput(PersistentIStream & is, int) {
   is >> iunit(_mw,GeV) >> _zfact;
 }
     
-ClassDescription<SMWWHVertex>SMWWHVertex::initSMWWHVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<SMWWHVertex,VVSVertex>
+describeHerwigSMWWHVertex("Herwig::SMWWHVertex", "Herwig.so");
 
 void SMWWHVertex::Init() {
   static ClassDocumentation<SMWWHVertex> documentation

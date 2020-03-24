@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SMHiggsWidthGenerator.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -156,12 +156,6 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<SMHiggsWidthGenerator> initSMHiggsWidthGenerator;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
@@ -279,33 +273,6 @@ private:
    */
   map<int,int> locMap_;
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of SMHiggsWidthGenerator. */
-template <>
-struct BaseClassTrait<Herwig::SMHiggsWidthGenerator,1> {
-  /** Typedef of the first base class of SMHiggsWidthGenerator. */
-  typedef GenericWidthGenerator NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the SMHiggsWidthGenerator class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::SMHiggsWidthGenerator>
-  : public ClassTraitsBase<Herwig::SMHiggsWidthGenerator> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::SMHiggsWidthGenerator"; }
-};
-
-/** @endcond */
 
 }
 

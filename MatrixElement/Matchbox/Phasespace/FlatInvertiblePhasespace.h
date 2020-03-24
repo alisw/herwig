@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // FlatInvertiblePhasespace.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -130,6 +130,16 @@ private:
   double invertKinematics(const vector<Lorentz5Momentum>& P,
 			  Energy Ecm,
 			  double* r) const;
+
+  /** 
+   * Return the appropriate phase space weight, 
+   * Eq. 11 in 1308.2922
+   * with the factor (2 pi)^4/(2 pi)^(3n) included 
+   * and the SHat of the process divided out to have everything expressed in the units of the ThePEG conventions, i.e. 
+   * without the Q^2 factor
+   */ 
+
+  long double flatWeights(int n) const;
 
 public:
 

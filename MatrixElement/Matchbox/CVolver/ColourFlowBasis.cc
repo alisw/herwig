@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ColourFlowBasis.cc is a part of CVolver
-// Copyright (C) 2013-2017 Simon Platzer, The Herwig Collaboration
+// Copyright (C) 2013-2019 Simon Platzer, The Herwig Collaboration
 //
 // CVolver is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -119,7 +119,26 @@ double ColourFlowBasis::scalarProduct(size_t i, size_t j,
 
 double ColourFlowBasis::tMatrixElement(size_t m, size_t a, size_t b,
 				       const vector<PDT::Colour>& aBasis,
-				       const vector<PDT::Colour>& bBasis) const {
+				       const vector<PDT::Colour>& bBasis,
+#ifndef NDEBUG
+				       size_t k, size_t l,
+#else
+				       size_t , size_t ,
+#endif
+				       const map<size_t,size_t>& dict
+				       ) const {
+  // Check indices k and l
+  assert( k == m );
+  assert( l == bBasis.size() );
+  // Check that dict is the standardMap
+  assert( dict.size()+1 == bBasis.size() );
+  map<size_t,size_t>::const_iterator tmp;
+  for ( size_t ii = 0; ii < bBasis.size(); ii++ )
+    if ( ii != m ) {
+      tmp = dict.find(ii);
+      assert( tmp != dict.end() ); 
+      assert( tmp->second == ii );
+    }
 
   assert(theCrossings.find(bBasis) != theCrossings.end());
   const ColourFlowCrossing& bcrossing = theCrossings.find(bBasis)->second;
@@ -180,6 +199,19 @@ double ColourFlowBasis::tMatrixElement(size_t m, size_t a, size_t b,
   }
 
   return 0.0;
+
+}
+
+double ColourFlowBasis::sMatrixElement(size_t, size_t, size_t,
+				       const vector<PDT::Colour>&,
+				       const vector<PDT::Colour>&,
+				       size_t, size_t,
+				       const map<size_t,size_t>&) const {
+
+  throw Exception() << "ATTENTION this is missing on the CVolver API"
+		    << Exception::runerror;
+
+  return 0.;
 
 }
 

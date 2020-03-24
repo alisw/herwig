@@ -22,11 +22,19 @@ PDF-NNPDF30NLO.in \
 PPCollider.in \
 RivetFixedOrder.in \
 Rivet.in \
-SoftModel.in \
-SoftTune.in \
 YFS.in \
-BaryonicReconnection.in \
-Dipole_AutoTune_prel.in
+CMWinQtiledShower.in \
+Dipole_AutoTunes_gss.in \
+Tune-DotProduct.in  \
+Tune-DotProduct-Veto.in  \
+Tune-pT.in  \
+Tune-Q2.in \
+EvolutionScheme-DotProduct.in  \
+EvolutionScheme-DotProduct-Veto.in  \
+EvolutionScheme-pT.in  \
+EvolutionScheme-Q2.in \
+FixedTarget.in \
+FixedTarget-PP.in
 
 dist_snippets_DATA = $(INPUTFILES)
 

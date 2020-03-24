@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // HerwigStrategy.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2008-2017 The Herwig Collaboration
+// Copyright (C) 2008-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -11,6 +11,7 @@
 //
 
 #include "HerwigStrategy.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/PDT/ParticleData.h"
 #include "ThePEG/Repository/Repository.h"
@@ -34,7 +35,10 @@ IBPtr HerwigStrategy::fullclone() const {
   return new_ptr(*this);
 }
 
-NoPIOClassDescription<HerwigStrategy> HerwigStrategy::initHerwigStrategy;
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeNoPIOClass<HerwigStrategy,ThePEG::Strategy>
+describeHerwigHerwigStrategy("Herwig::HerwigStrategy", "Herwig.so");
 
 void HerwigStrategy::Init() {
   static ClassDocumentation<HerwigStrategy> interfaceDescription

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // HwRemDecayer.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -17,7 +17,7 @@
 #include "ThePEG/Repository/EventGenerator.h"
 #include "ThePEG/EventRecord/SubProcess.h"
 #include "ThePEG/PDF/BeamParticleData.h"
-#include "Herwig/Shower/Core/Couplings/ShowerAlpha.h"
+#include "Herwig/Shower/ShowerAlpha.h"
 #include "Herwig/PDT/StandardMatchers.h"
 #include "ThePEG/PDT/StandardMatchers.h"
 #include "HwRemDecayer.fh"
@@ -65,13 +65,14 @@ public:
   /**
    * The default constructor.
    */
-  HwRemDecayer() : allowTop_(false), multiPeriph_(false), quarkPair_(false),
+  HwRemDecayer() : allowTop_(false), multiPeriph_(true), quarkPair_(false),
                    ptmin_(-1.*GeV), beta_(ZERO),
 		   maxtrySoft_(10), 
 		   colourDisrupt_(1.0),
 		   ladderbFactor_(0.0),
 		   ladderPower_(-0.08),
 		   ladderNorm_(1.0),
+ 		   ladderMult_(1.0),
 		   gaussWidth_(0.1),
 		   valOfN_(0), 
 		   initTotRap_(0),
@@ -79,6 +80,7 @@ public:
 		   _forcedSplitScale(2.5*GeV),
 		   _range(1.1), _zbin(0.05),_ybin(0.),
 		   _nbinmax(100), DISRemnantOpt_(0),
+                   PtDistribution_(0),
 		   pomeronStructure_(0), mg_(ZERO) {}
 
   /** @name Virtual functions required by the Decayer class. */
@@ -220,16 +222,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<HwRemDecayer> initHwRemDecayer;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  HwRemDecayer & operator=(const HwRemDecayer &) = delete;
+  HwRemDecayer & operator=(const HwRemDecayer &);
 
 public:
   
@@ -444,9 +440,9 @@ private:
    */
   void doSoftInteractions(unsigned int N){
   	if(!multiPeriph_){
-  		doSoftInteractions_old(N);}
+  		doSoftInteractions_old(N);} //outdated model for soft interactions
   	else{
-  		doSoftInteractions_multiPeriph(N);
+                doSoftInteractions_multiPeriph(N); // Multiperipheral model
   	}
   }
   
@@ -456,9 +452,83 @@ private:
   void doSoftInteractions_old(unsigned int N);
   
   /**
-   * Create N soft gluon interactions - multiperhpheral kinematics
+   * Create N soft gluon interactions with multiperhpheral kinematics
    */
   void doSoftInteractions_multiPeriph(unsigned int N);
+
+  /**
+   * Phase space generation for the ladder partons
+   */
+  bool doPhaseSpaceGenerationGluons(vector<Lorentz5Momentum> &softGluons, Energy energy, unsigned int &its)
+    const;
+
+  /**
+   * This returns the rotation matrix needed to rotate p into the z axis
+   */
+  LorentzRotation rotate(const LorentzMomentum &p) const;
+
+   /**
+    * Methods to generate random distributions also all stolen form UA5Handler
+    **/
+
+  template <typename T>
+  inline T gaussDistribution(T mean, T stdev) const{
+    double x = rnd();
+    x = sqrt(-2.*log(x));
+    double y;
+    randAzm(x,x,y);
+    return mean + stdev*x;
+  }
+
+
+  /**
+   * This returns a random number with a flat distribution
+   * [-A,A] plus gaussian tail with stdev B 
+   * TODO: Should move this to Utilities
+   * @param A The width of the flat part
+   * @param B The standard deviation of the gaussian tail
+   * @return the randomly generated value
+   */
+  inline double randUng(double A, double B) const{
+    double prun;
+    if(A == 0.) prun = 0.;
+    else prun = 1./(1.+B*1.2533/A);
+    if(rnd() < prun) return 2.*(rnd()-0.5)*A;
+    else {
+      double temp = gaussDistribution(0.,B);
+      if(temp < 0) return temp - abs(A);
+      else return temp + abs(A);
+    }
+  }
+  template <typename T>
+  inline void randAzm(T pt, T &px, T &py) const{
+    double c,s,cs;
+    while(true) {
+      c = 2.*rnd()-1.;
+      s = 2.*rnd()-1.;
+      cs = c*c+s*s;
+      if(cs <= 1.&&cs!=0.) break;
+    }
+    T qt = pt/cs;
+    px = (c*c-s*s)*qt;
+    py = 2.*c*s*qt;
+  }
+
+  inline Energy randExt(Energy AM0,InvEnergy B) const{
+    double r = rnd();
+    // Starting value
+    Energy am = AM0-log(r)/B;
+    for(int i = 1; i<20; ++i) {
+      double a = exp(-B*(am-AM0))/(1.+B*AM0);
+      double f = (1.+B*am)*a-r;
+      InvEnergy df = -B*B*am*a;
+      Energy dam = -f/df;
+      am += dam;
+      if(am<AM0) am = AM0 + .001*MeV;
+      if(abs(dam) < .001*MeV) break;
+    }
+    return am;
+  }
 
   /**
    * Method to add a particle to the step
@@ -583,6 +653,7 @@ private:
    */
   double ladderNorm_;
 
+  double ladderMult_;
   /**
    * Variable to store the gaussian width of the 
    * fluctuation of the longitudinal momentum
@@ -653,6 +724,11 @@ private:
   unsigned int DISRemnantOpt_;
 
   /**
+   *  Option for the pT generation
+   */
+  unsigned int PtDistribution_;
+
+  /**
    *  Option for the treatment of the pomeron structure
    */
   unsigned int pomeronStructure_;
@@ -665,41 +741,6 @@ private:
 
 };
 
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of HwRemDecayer. */
-template <>
-struct BaseClassTrait<Herwig::HwRemDecayer,1> {
-  /** Typedef of the first base class of HwRemDecayer. */
-  typedef RemnantDecayer NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the HwRemDecayer class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::HwRemDecayer>
-  : public ClassTraitsBase<Herwig::HwRemDecayer> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::HwRemDecayer"; }
-  /**
-   * The name of a file containing the dynamic library where the class
-   * HwRemDecayer is implemented. It may also include several, space-separated,
-   * libraries if the class HwRemDecayer depends on other classes (base classes
-   * excepted). In this case the listed libraries will be dynamically
-   * linked in the order they are specified.
-   */
-  static string library() { return "HwShower.so"; }
-};
-
-/** @endcond */
 
 }
 

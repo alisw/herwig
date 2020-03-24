@@ -44,6 +44,21 @@ parser.add_argument(
     help="Don't include the automatically generated generic loop vertices for h->gg and h->gamma gamma"
 )
 parser.add_argument(
+    '--include-generic',
+    action="store_true",
+    help="Include support for generic spin structures"
+)
+parser.add_argument(
+    '--use-Herwig-Higgs',
+    action="store_true",
+    help="Use the internal Herwig SM modeling and vertices for Higgs interactions, there may be sign issues but some UFO models have very minimal Higgs interactions"
+)
+parser.add_argument(
+    '--use-generic-for-tensors',
+    action="store_true",
+    help="Use the generic machinery for all tensor vertices (debugging only)"
+)
+parser.add_argument(
     '--forbidden-particle-name',
     action="append",
     default=["eta","phi"],
@@ -56,7 +71,6 @@ args = parser.parse_args()
 import imp
 path,mod = os.path.split(os.path.abspath(args.ufodir))
 FR = imp.load_module(mod,*imp.find_module(mod,[path]))
-
 ##################################################
 ##################################################
 
@@ -86,7 +100,9 @@ def evaluate(x):
     import cmath
     return eval(x, 
                 {'cmath':cmath,
-                 'complexconjugate':FR.function_library.complexconjugate}, 
+                 'complexconjugate':FR.function_library.complexconjugate,
+                 'im':FR.function_library.im,
+                 're':FR.function_library.re},
                 parmsubs)
 
 
@@ -130,6 +146,20 @@ static Parameter<{modelname}, {type}> interface{pname}
    &{modelname}::{pname}_, {value}, 0, 0,
    false, false, Interface::nolimits);
 """
+
+# sort out the couplings
+couplingDefns = { "QED" : 99, "QCD" : 99 }
+try :
+    for coupling in FR.all_orders:
+        name = coupling.name.upper()
+        couplingDefns[name]= coupling.expansion_order
+except:
+    for coupling in FR.all_couplings:
+        for name,value in coupling.order.iteritems():
+            if(name not in couplingDefns) :
+                couplingDefns[name]=99
+
+# sort out the particles
 
 massnames = {}
 widthnames = {}
@@ -194,17 +224,6 @@ for p in FR.all_parameters:
     elif p.type == 'complex':
         value = complex(value)
         if p.nature == 'external':
-#
-# TODO: WE DO NOT HAVE COMPLEX INTERFACES IN THEPEG (yet?)
-#
-#            interfaceDecls.append( 
-#                interfacedecl_T.format(modelname=modelname,
-#                                       pname=p.name,
-#                                       value='Complex(%s,%s)'%(value.real,value.imag),
-#                                       type=typemap(p.type)) 
-#            )
-#
-#            parmmodelconstr.append('set %s:%s (%s,%s)' % (modelname, p.name, value.real, value.imag))
             parmconstr.append('%s_(%s,%s)' % (p.name, value.real, value.imag))
         else :
             parmconstr.append('%s_(%s,%s)' % (p.name, 0.,0.))
@@ -221,6 +240,11 @@ for p in FR.all_parameters:
         text = add_brackets(expression, symbols)
         text=text.replace('()()','()')
         doinit.append('   %s_ = %s;'  % (p.name, text) )
+        if(p.type == 'complex') :
+            doinit.append('   if(std::isnan(%s_.real()) || std::isnan(%s_.imag()) || std::isinf(%s_.real()) || std::isinf(%s_.imag())) {throw InitException() << "Calculated parameter %s is nan or inf in Feynrules model. Check your input parameters.";}' % (p.name,p.name,p.name,p.name,p.name) )
+
+        else :
+            doinit.append('   if(std::isnan(%s_) || std::isinf(%s_)) {throw InitException() << "Calculated parameter %s is nan or inf in Feynrules model. Check your input parameters.";}' % (p.name,p.name,p.name) )
         if p in massnames:
             for idCode in massnames[p] :
                 doinit.append('   resetMass(%s,%s_ * GeV);'  % (idCode, p.name) )
@@ -299,18 +323,44 @@ parmtextsubs = { 'parmgetters' : '\n'.join(parmgetters),
 
 
 # set up the conversion of the vertices
-vertexConverter = VertexConverter(FR,parmvalues)
+vertexConverter = VertexConverter(FR,parmvalues,couplingDefns)
 vertexConverter.readArgs(args)
 # convert the vertices
 vertexConverter.convert()
+cdefs=""
+couplingOrders=""
+ncount=2
+for name,value in couplingDefns.iteritems() :
+    if(name=="QED") :
+        couplingOrders+="  setCouplings(\"%s\",make_pair(%s,%s));\n" %(name,1,value)
+    elif (name=="QCD") :
+        couplingOrders+="  setCouplings(\"%s\",make_pair(%s,%s));\n" %(name,2,value)
+    else :
+        ncount+=1
+        cdefs +="  const T %s = %s;\n" % (name,ncount)
+        couplingOrders+="  setCouplings(\"%s\",make_pair(%s,%s));\n" % (name,ncount,value)
+# coupling definitions
+couplingTemplate= """\
+namespace ThePEG {{
+namespace Helicity {{
+namespace CouplingType {{
+  typedef unsigned T;
+  /**
+   *  Enums for couplings
+   */
+{coup}
+}}
+}}
+}}
+"""
+if(cdefs!="") :
+    cdefs = couplingTemplate.format(coup=cdefs)
+parmtextsubs['couplings'] = cdefs
+parmtextsubs['couplingOrders']  = couplingOrders
 
-##################################################
-##################################################
-##################################################
+# particles
 
-
-
-plist, names = thepeg_particles(FR,parmsubs,modelname,modelparameters,args.forbidden_particle_name)
+plist, names = thepeg_particles(FR,parmsubs,modelname,modelparameters,args.forbidden_particle_name,args.use_Herwig_Higgs)
 
 particlelist = [
     "# insert HPConstructor:Outgoing 0 /Herwig/{n}/Particles/{p}".format(n=modelname,p=p)

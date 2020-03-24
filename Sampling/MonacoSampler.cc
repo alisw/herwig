@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MonacoSampler.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -26,8 +26,6 @@
 
 #include "ThePEG/Handlers/StandardEventHandler.h"
 #include "ThePEG/Handlers/StandardXComb.h"
-
-#include <boost/progress.hpp>
 
 #include "MonacoSampler.h"
 #include "Herwig/Sampling/GeneralSampler.h"

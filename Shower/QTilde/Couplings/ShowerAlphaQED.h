@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ShowerAlphaQED.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,7 +12,7 @@
 // This is the declaration of the ShowerAlphaQED class.
 //
 
-#include "Herwig/Shower/Core/Couplings/ShowerAlpha.h"
+#include "Herwig/Shower/ShowerAlpha.h"
 
 namespace Herwig {
 
@@ -40,7 +40,8 @@ public:
   /**
    * The default constructor.
    */
-  inline ShowerAlphaQED() : ShowerAlpha(), _alpha(1./137.) {}
+  ShowerAlphaQED() : ShowerAlpha(), _alpha(1./137.), couplingSource_(1)
+  {}
   //@}
 
 public:
@@ -145,6 +146,11 @@ private:
    *  this is always \f$\alpha(q^2=0)\f$.
    */
   double _alpha; 
+
+  /**
+   * Source of coupling value
+   */
+  unsigned int couplingSource_;
 };
 
 }

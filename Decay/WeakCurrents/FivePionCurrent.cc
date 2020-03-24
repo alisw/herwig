@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // FivePionCurrent.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "FivePionCurrent.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
@@ -97,8 +98,10 @@ void FivePionCurrent::persistentInput(PersistentIStream & is, int) {
      >> iunit(_preomega,InvGeV7) >> iunit(_presigma,InvGeV3) >> _rhoomega;
 }
 
-ClassDescription<FivePionCurrent> FivePionCurrent::initFivePionCurrent;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<FivePionCurrent,WeakDecayCurrent>
+describeHerwigFivePionCurrent("Herwig::FivePionCurrent", "HwWeakCurrents.so");
 
 void FivePionCurrent::Init() {
 

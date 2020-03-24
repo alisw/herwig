@@ -143,14 +143,8 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
-BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
-BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
 BOOST_LDPATH = @BOOST_LDPATH@
 BOOST_ROOT = @BOOST_ROOT@
-BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
-BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
-BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS = @BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS@
 BOOST_UNIT_TEST_FRAMEWORK_LDPATH = @BOOST_UNIT_TEST_FRAMEWORK_LDPATH@
 BOOST_UNIT_TEST_FRAMEWORK_LIBS = @BOOST_UNIT_TEST_FRAMEWORK_LIBS@
@@ -350,39 +344,24 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-BUILT_SOURCES = Perturbative__all.cc PerturbativeHiggs__all.cc
-CLEANFILES = Perturbative__all.cc PerturbativeHiggs__all.cc
-EXTRA_DIST = $(ALL_H_FILES) $(ALL_CC_FILES) $(ALL_H_FILES_2) \
-	$(ALL_CC_FILES_2)
+BUILT_SOURCES = Perturbative__all.cc
+CLEANFILES = Perturbative__all.cc
+EXTRA_DIST = $(ALL_H_FILES) $(ALL_CC_FILES)
 DIR_H_FILES = $(addprefix $(srcdir)/,$(ALL_H_FILES))
 ALL_H_FILES = \
  SMWDecayer.h\
  SMZDecayer.h\
  SMTopDecayer.h\
- SMTopPOWHEGDecayer.h\
- SMZFermionsPOWHEGDecayer.h\
- SMWFermionsPOWHEGDecayer.h
+ SMHiggsFermionsDecayer.h \
+ SMHiggsGGHiggsPPDecayer.h\
+ SMHiggsWWDecayer.h
 
 DIR_CC_FILES = $(addprefix $(srcdir)/,$(ALL_CC_FILES))
 ALL_CC_FILES = \
  SMWDecayer.cc  \
  SMZDecayer.cc  \
  SMTopDecayer.cc \
- SMTopPOWHEGDecayer.cc \
- SMZFermionsPOWHEGDecayer.cc  \
- SMWFermionsPOWHEGDecayer.cc  
-
-DIR_H_FILES_2 = $(addprefix $(srcdir)/,$(ALL_H_FILES_2))
-ALL_H_FILES_2 = \
- SMHiggsFermionsDecayer.h \
- SMHiggsFermionsPOWHEGDecayer.h \
- SMHiggsGGHiggsPPDecayer.h\
- SMHiggsWWDecayer.h
-
-DIR_CC_FILES_2 = $(addprefix $(srcdir)/,$(ALL_CC_FILES_2))
-ALL_CC_FILES_2 = \
  SMHiggsFermionsDecayer.cc \
- SMHiggsFermionsPOWHEGDecayer.cc \
  SMHiggsGGHiggsPPDecayer.cc \
  SMHiggsWWDecayer.cc 
 
@@ -586,10 +565,6 @@ uninstall-am:
 Perturbative__all.cc : $(DIR_H_FILES) $(DIR_CC_FILES) Makefile
 	@echo "Concatenating .cc files into $@"
 	@$(top_srcdir)/cat_with_cpplines $(DIR_CC_FILES) > $@
-
-PerturbativeHiggs__all.cc : $(DIR_H_FILES_2) $(DIR_CC_FILES_2) Makefile
-	@echo "Concatenating .cc files into $@"
-	@$(top_srcdir)/cat_with_cpplines $(DIR_CC_FILES_2) > $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

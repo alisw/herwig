@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // TauDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -14,6 +14,7 @@
 //
 
 #include "TauDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/PDT/DecayMode.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Switch.h"
@@ -155,8 +156,10 @@ void TauDecayer::persistentInput(PersistentIStream & is, int) {
      >> _wgtmax >> _weights >> _polOpt >> _tauMpol >> _tauPpol;
 }
 
-ClassDescription<TauDecayer> TauDecayer::initTauDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<TauDecayer,DecayIntegrator>
+describeHerwigTauDecayer("Herwig::TauDecayer", "HwTauDecay.so");
 
 void TauDecayer::Init() {
 
@@ -241,6 +244,8 @@ double TauDecayer::me2(const int ichan,const Particle & inpart,
       SpinorBarWaveFunction::calculateWaveFunctions(_inbar ,_rho,
 						    const_ptr_cast<tPPtr>(&inpart),
 						    incoming);
+    // fix rho if no correlations
+    fixRho(_rho);
     if(_polOpt) {
       _rho(0,1) = _rho(1,0) = 0.;
       if(inpart.id()==ParticleID::tauminus) {

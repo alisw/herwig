@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // GaussianIntegrator.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -40,8 +40,7 @@ public:
    * Default Constructor
    */
   GaussianIntegrator() 
-    : _abserr(1.E-35), _relerr(5.E-5), _binwidth(1.E-5), 
-      _maxint(100), _maxeval(100000) {
+    : _abserr(1.E-35), _relerr(5.E-5), _binwidth(1.E-5), _maxeval(100000) {
     // setup the weights and abscissae
     Init();
   }
@@ -51,16 +50,21 @@ public:
    * @param abserr Absolute error.
    * @param relerr Relative error.
    * @param binwidth Width of the bin as a fraction of the integration region.
-   * @param maxint Maximum number of intervals
    * @param maxeval Maximum number of function evaluations
    */
   GaussianIntegrator(double abserr, double relerr, double binwidth,
-		     int maxint, int maxeval)
-    : _abserr(abserr), _relerr(relerr), _binwidth(binwidth), _maxint(maxint),
+                     int maxeval)
+    : _abserr(abserr), _relerr(relerr), 
+      _binwidth(binwidth),
       _maxeval(maxeval) {
     // setup the weights and abscissae
     Init();
   }
+
+  /// helper type for the integration result
+  template <class T>
+  using ValT = decltype(std::declval<typename T::ValType>() 
+                      * std::declval<typename T::ArgType>());
 
   /**
    * The value of the integral
@@ -68,11 +72,9 @@ public:
    * @param upper The upper limit of integration.
    */
   template <class T>
-  inline typename BinaryOpTraits<typename T::ValType,
-				 typename T::ArgType>::MulT
-  value(const T &, 
-	const typename T::ArgType lower,
-	const typename T::ArgType upper) const;
+  inline ValT<T> value(const T &, 
+	               const typename T::ArgType lower,
+	               const typename T::ArgType upper) const;
 
 private:
 
@@ -108,11 +110,6 @@ private:
    * The minimum width of a bin as a fraction of the integration region.
    */
   double _binwidth;
-
-  /**
-   * Maximum number of bins.
-   */
-  int _maxint;
 
   /**
    * Maximum number of function evaluations.

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEee2VectorMeson.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "MEee2VectorMeson.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/Interface/Parameter.h"
@@ -23,17 +24,17 @@
 #include "ThePEG/Cuts/Cuts.h"
 #include "Herwig/PDT/GenericMassGenerator.h"
 #include "ThePEG/Handlers/StandardXComb.h"
+#include "Herwig/Models/StandardModel/StandardModel.h"
 #include "Herwig/MatrixElement/HardVertex.h"
 
 using namespace Herwig;
 using namespace ThePEG;
 using namespace ThePEG::Helicity;
 
-
 void MEee2VectorMeson::getDiagrams() const {
   tcPDPtr em = getParticleData(ParticleID::eminus);
   tcPDPtr ep = getParticleData(ParticleID::eplus);
-  add(new_ptr((Tree2toNDiagram(2), em, ep, 1, _vector,-1)));
+  add(new_ptr((Tree2toNDiagram(2), em, ep, 1, vector_,-1)));
 }
 
 Energy2 MEee2VectorMeson::scale() const {
@@ -41,14 +42,14 @@ Energy2 MEee2VectorMeson::scale() const {
 }
 
 int MEee2VectorMeson::nDim() const {
-  return 1;
+  return 0;
 }
 
 void MEee2VectorMeson::setKinematics() {
-  MEBase::setKinematics(); // Always call the base class method first.
+  MEBase::setKinematics();
 }
 
-bool MEee2VectorMeson::generateKinematics(const double *r) {
+bool MEee2VectorMeson::generateKinematics(const double *) {
   Lorentz5Momentum pout=meMomenta()[0]+meMomenta()[1];
   pout.rescaleMass();
   meMomenta()[2] = pout;
@@ -56,8 +57,6 @@ bool MEee2VectorMeson::generateKinematics(const double *r) {
   // check passes all the cuts
   vector<LorentzMomentum> out(1,meMomenta()[2]);
   tcPDVector tout(1,mePartonData()[2]);
-  jacobian(1.+0.002*(0.5-r[0]));
-  // return true if passes the cuts
   return lastCuts().passCuts(tout, out, mePartonData()[0], mePartonData()[1]);
 }
 
@@ -66,7 +65,7 @@ unsigned int MEee2VectorMeson::orderInAlphaS() const {
 }
 
 unsigned int MEee2VectorMeson::orderInAlphaEW() const {
-  return 0;
+  return 2;
 }
 
 Selector<const ColourLines *>
@@ -77,15 +76,17 @@ MEee2VectorMeson::colourGeometries(tcDiagPtr) const {
 }
 
 void MEee2VectorMeson::persistentOutput(PersistentOStream & os) const {
-  os << _coupling << _vector << _massgen << _lineshape;
+  os << coupling_ << vector_ << massGen_ << lineShape_;
 }
 
 void MEee2VectorMeson::persistentInput(PersistentIStream & is, int) {
-  is >> _coupling >> _vector >> _massgen >> _lineshape;
+  is >> coupling_ >> vector_ >> massGen_ >> lineShape_;
 }
 
-ClassDescription<MEee2VectorMeson> MEee2VectorMeson::initMEee2VectorMeson;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEee2VectorMeson,MEBase>
+describeHerwigMEee2VectorMeson("Herwig::MEee2VectorMeson", "HwMELepton.so");
 
 void MEee2VectorMeson::Init() {
 
@@ -96,7 +97,7 @@ void MEee2VectorMeson::Init() {
   static Switch<MEee2VectorMeson,bool> interfaceLineShape
     ("LineShape",
      "Option for the vector meson lineshape",
-     &MEee2VectorMeson::_lineshape, false, false, false);
+     &MEee2VectorMeson::lineShape_, false, false, false);
   static SwitchOption interfaceLineShapeMassGenerator
     (interfaceLineShape,
      "MassGenerator",
@@ -111,12 +112,12 @@ void MEee2VectorMeson::Init() {
   static Reference<MEee2VectorMeson,ParticleData> interfaceVectorMeson
     ("VectorMeson",
      "The vector meson produced",
-     &MEee2VectorMeson::_vector, false, false, true, false, false);
+     &MEee2VectorMeson::vector_, false, false, true, false, false);
 
   static Parameter<MEee2VectorMeson,double> interfaceCoupling
     ("Coupling",
      "The leptonic coupling of the vector meson",
-     &MEee2VectorMeson::_coupling, 0.0012, 0.0, 10.0,
+     &MEee2VectorMeson::coupling_, 0., 0.0, 100.0,
      false, false, Interface::limited);
 
 }
@@ -129,23 +130,21 @@ MEee2VectorMeson::diagrams(const DiagramVector &) const {
 
 CrossSection MEee2VectorMeson::dSigHatDR() const {
   InvEnergy2 wgt;
-  Energy  M(_vector->mass()),G(_vector->width());
-  Energy2 M2(sqr(M)),GM(G*M);
-  if(_massgen&&_lineshape) {
-    wgt =Constants::pi*_massgen->weight(sqrt(sHat()))/(sqr(sHat()-M2)+sqr(GM))*UnitRemoval::E2;
-  }
-  else {
+  Energy  M(vector_->mass()),G(vector_->width());
+  Energy2 M2(sqr(M));
+  if(massGen_&&lineShape_)
+    wgt = Constants::pi*massGen_->BreitWignerWeight(sqrt(sHat()));
+  else
     wgt = sHat()*G/M/(sqr(sHat()-M2)+sqr(sHat()*G/M));
-  }
-  return me2()*jacobian()*wgt*sqr(hbarc);
+  return sqr(4.*Constants::pi*SM().alphaEM(sHat()))*me2()*jacobian()*wgt*sqr(hbarc)*sqr(M2/sHat());
 }
 
 void MEee2VectorMeson::doinit() {
   MEBase::doinit();
   // mass generator
-  tMassGenPtr mass=_vector->massGenerator();
+  tMassGenPtr mass=vector_->massGenerator();
   if(mass) {
-    _massgen=dynamic_ptr_cast<GenericMassGeneratorPtr>(mass);
+    massGen_=dynamic_ptr_cast<GenericMassGeneratorPtr>(mass);
   }
 }
 
@@ -180,21 +179,21 @@ ProductionMatrixElement MEee2VectorMeson::HelicityME(vector<SpinorWaveFunction> 
   Complex product;
   // sum over helicities to get the matrix element
   unsigned int inhel1,inhel2,outhel1;
-  double me(0.);
-  LorentzPolarizationVector vec;
-  Complex ii(0.,1.);
+  aver = 0.;
+  LorentzPolarizationVectorE vec;
+  Energy ecms = sqrt(sHat());
   for(inhel1=0;inhel1<2;++inhel1) {	  
     for(inhel2=0;inhel2<2;++inhel2) {
-      vec =  fin[inhel1].wave().vectorCurrent(ain[inhel2].wave());
-      vec*=_coupling;
+      vec =  fin[inhel1].dimensionedWave().vectorCurrent(ain[inhel2].dimensionedWave());
+      vec /= coupling_;
       for(outhel1=0;outhel1<3;++outhel1) {
-	product = vec.dot(vout[outhel1].wave());
+	product = vec.dot(vout[outhel1].wave())/ecms;
 	output(inhel1,inhel2,outhel1)=product;
-	me+=real(product*conj(product));
+	aver += norm(product);
       }
     }
   }
-  aver=(me*UnitRemoval::E2)/sHat();
+  aver *= 0.25;
   return output;
 }
 

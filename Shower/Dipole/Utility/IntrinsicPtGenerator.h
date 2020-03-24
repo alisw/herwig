@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // IntrinsicPtGenerator.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -13,7 +13,7 @@
 //
 
 #include "ThePEG/Handlers/HandlerBase.h"
-#include "ThePEG/Vectors/SpinOneLorentzRotation.h"
+#include "ThePEG/Vectors/LorentzRotation.h"
 
 namespace Herwig {
 
@@ -54,7 +54,7 @@ public:
    * applied on the final state particles. Add the
    * old incoming partons to the given list.
    */
-  SpinOneLorentzRotation kick(PPair& in,
+  LorentzRotation kick(PPair& in,
 			      PList& intermediates);
 
 public:

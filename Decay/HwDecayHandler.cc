@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // HwDecayHandler.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "HwDecayHandler.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Handlers/EventHandler.h"
 #include "ThePEG/Handlers/Hint.h"
 #include "ThePEG/PDT/ParticleData.h"
@@ -191,7 +192,10 @@ void HwDecayHandler::persistentInput(PersistentIStream & is, int)  {
   is >> _newstep >> _excluded >> _excludedVector;
 }
 
-ClassDescription<HwDecayHandler> HwDecayHandler::initHwDecayHandler;
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<HwDecayHandler,DecayHandler>
+describeHerwigHwDecayHandler("Herwig::HwDecayHandler", "Herwig.so");
 
 void HwDecayHandler::Init() {
 

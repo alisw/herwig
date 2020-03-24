@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SSNNPVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -31,6 +31,7 @@ SSNNPVertex::SSNNPVertex() : _includeOnShell(false), _realIntegral(false),
 			     _leftlast(ZERO), _rightlast(ZERO) {
   orderInGem(3);
   orderInGs(0);
+  colourStructure(ColourStructure::SINGLET);
 }
 
 void SSNNPVertex::doinit() {

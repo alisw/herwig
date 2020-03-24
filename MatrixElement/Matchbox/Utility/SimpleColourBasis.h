@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SimpleColourBasis.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -66,7 +66,27 @@ public:
    */
   virtual double tMatrixElement(size_t i, size_t a, size_t b,
 				const vector<PDT::Colour>& aBasis,
-				const vector<PDT::Colour>& bBasis) const;
+				const vector<PDT::Colour>& bBasis,
+				size_t k, size_t l,
+				const map<size_t,size_t>& dict
+				) const;
+
+  virtual double sMatrixElement(size_t, size_t, size_t,
+				const vector<PDT::Colour>&,
+				const vector<PDT::Colour>&,
+				size_t, size_t,
+				const map<size_t,size_t>&
+				) const {
+    assert( 0 == 1 );
+    return 0;
+  }
+
+  /**
+   * Return true, if this colour basis supports gluon splittings.
+   */
+  virtual bool canSplitGluons() const {
+    return false;
+  }
 
   /**
    * Return true, if a large-N colour connection exists for the

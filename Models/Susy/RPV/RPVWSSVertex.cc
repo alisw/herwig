@@ -23,6 +23,7 @@ RPVWSSVertex::RPVWSSVertex() :_sw(0.), _cw(0.), _s2w(0.), _c2w(0.),
 			      _factlast(0.), _couplast(0.) {
   orderInGs(0);
   orderInGem(1);
+  colourStructure(ColourStructure::DELTA);
 }				 
 
 IBPtr RPVWSSVertex::clone() const {
@@ -432,5 +433,8 @@ void RPVWSSVertex::setCoupling(Energy2 q2,tcPDPtr part1,
     _q2last = q2;
     _couplast = electroMagneticCoupling(q2);
   }
-  norm(_couplast*_factlast);
+  if(part2->id()>0)
+    norm(-_couplast*_factlast);
+  else
+    norm(+_couplast*_factlast);
 }

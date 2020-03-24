@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // VectorMesonVectorPScalarDecayer.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -152,11 +152,6 @@ protected:
 private:
 
   /**
-   * Describe a concrete class with persistent data.
-   */
-  static ClassDescription<VectorMesonVectorPScalarDecayer> initVectorMesonVectorPScalarDecayer;
-
-  /**
    * Private and non-existent assignment operator.
    */
   VectorMesonVectorPScalarDecayer & operator=(const VectorMesonVectorPScalarDecayer &) = delete;
@@ -208,41 +203,4 @@ private:
 }
 
 
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/**
- * The following template specialization informs ThePEG about the
- * base class of VectorMesonVectorPScalarDecayer.
- */
-template <>
-struct BaseClassTrait<Herwig::VectorMesonVectorPScalarDecayer,1> {
-    /** Typedef of the base class of  VectorMesonVectorPScalarDecayer. */
-  typedef Herwig::DecayIntegrator NthBase;
-};
-
-/**
- * The following template specialization informs ThePEG about the
- * name of this class and the shared object where it is defined.
- */
-template <>
-struct ClassTraits<Herwig::VectorMesonVectorPScalarDecayer>
-  : public ClassTraitsBase<Herwig::VectorMesonVectorPScalarDecayer> {
-  /** Return the class name. */
-  static string className() { return "Herwig::VectorMesonVectorPScalarDecayer"; }
-  /**
-   * Return the name of the shared library to be loaded to get
-   * access to this class and every other class it uses
-   * (except the base class).
-   */
-  static string library() { return "HwVMDecay.so"; }
-
-};
-
-/** @endcond */
-
-}
 #endif /* HERWIG_VectorMesonVectorPScalarDecayer_H */

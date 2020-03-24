@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // DipoleChainOrdering.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -41,25 +41,14 @@ Energy DipoleChainOrdering::hardScale(tPPtr emitter, tPPtr spectator,
   Energy scale = 
     split.splittingKinematics()->dipoleScale(emitter->momentum(),
 					     spectator->momentum());
-
-  if ( !index.incomingDecaySpectator() && !index.incomingDecayEmitter() ) {
   return 
     virtualityOrdering ?
-    split.splittingKinematics()->QMax(scale,emitterX,spectatorX,index,split) :
-    split.splittingKinematics()->ptMax(scale,emitterX,spectatorX,index,split);
-  }
-
-  else {
-	DipoleSplittingInfo temp;
-	temp.index(index);
-	temp.recoilMass(split.splittingKinematics()->recoilMassKin(emitter->momentum(),
-								spectator->momentum()));
-	  return 
-    virtualityOrdering ?
-    split.splittingKinematics()->QMax(scale,emitterX,spectatorX,temp,split):
-    split.splittingKinematics()->ptMax(scale,emitterX,spectatorX,temp,split);
-  }
+    split.splittingKinematics()->QMax(scale,emitterX,spectatorX,
+				      index,split,emitter,spectator) :
+    split.splittingKinematics()->ptMax(scale,emitterX,spectatorX,
+				       index,split,emitter,spectator);
 }
+
 
 void DipoleChainOrdering::setEvolutionScale(Energy scale,
 					    const DipoleSplittingInfo&,

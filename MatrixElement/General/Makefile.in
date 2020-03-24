@@ -108,10 +108,11 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libHwGeneralME_la_LIBADD =
-am_libHwGeneralME_la_OBJECTS = GeneralHardME.lo MEvv2ff.lo MEvv2ss.lo \
-	MEfv2fs.lo MEff2ss.lo MEff2ff.lo MEff2vv.lo MEfv2vf.lo \
-	MEff2vs.lo MEff2sv.lo MEvv2vv.lo MEvv2vs.lo MEff2tv.lo \
-	MEvv2tv.lo MEfv2tf.lo GeneralfftoVH.lo GeneralfftoffH.lo \
+am_libHwGeneralME_la_OBJECTS = GeneralHardME.lo MEvv2ff.lo MEvv2rf.lo \
+	MEvv2ss.lo MEfv2fs.lo MEfv2rs.lo MEff2ss.lo MEff2ff.lo \
+	MEff2rf.lo MEff2vv.lo MEfv2vf.lo MEfv2rv.lo MEff2vs.lo \
+	MEvv2vv.lo MEvv2vs.lo MEff2tv.lo MEff2ts.lo MEvv2tv.lo \
+	MEfv2tf.lo GeneralfftoVH.lo GeneralfftoffH.lo \
 	GeneralQQHiggs.lo
 libHwGeneralME_la_OBJECTS = $(am_libHwGeneralME_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -214,14 +215,8 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
-BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
-BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
 BOOST_LDPATH = @BOOST_LDPATH@
 BOOST_ROOT = @BOOST_ROOT@
-BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
-BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
-BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS = @BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS@
 BOOST_UNIT_TEST_FRAMEWORK_LDPATH = @BOOST_UNIT_TEST_FRAMEWORK_LDPATH@
 BOOST_UNIT_TEST_FRAMEWORK_LIBS = @BOOST_UNIT_TEST_FRAMEWORK_LIBS@
@@ -425,17 +420,21 @@ noinst_LTLIBRARIES = libHwGeneralME.la
 libHwGeneralME_la_SOURCES = \
 GeneralHardME.cc GeneralHardME.h GeneralHardME.fh \
 MEvv2ff.cc MEvv2ff.h \
+MEvv2rf.cc MEvv2rf.h \
 MEvv2ss.cc MEvv2ss.h \
 MEfv2fs.cc MEfv2fs.h \
+MEfv2rs.cc MEfv2rs.h \
 MEff2ss.cc MEff2ss.h \
 MEff2ff.cc MEff2ff.h \
+MEff2rf.cc MEff2rf.h \
 MEff2vv.cc MEff2vv.h \
 MEfv2vf.cc MEfv2vf.h \
+MEfv2rv.cc MEfv2rv.h \
 MEff2vs.cc MEff2vs.h \
-MEff2sv.cc MEff2sv.h \
 MEvv2vv.cc MEvv2vv.h \
 MEvv2vs.cc MEvv2vs.h \
 MEff2tv.cc MEff2tv.h \
+MEff2ts.cc MEff2ts.h \
 MEvv2tv.cc MEvv2tv.h \
 MEfv2tf.cc MEfv2tf.h \
 GeneralfftoVH.cc GeneralfftoVH.h GeneralfftoVH.fh\
@@ -501,15 +500,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GeneralfftoVH.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GeneralfftoffH.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEff2ff.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEff2rf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEff2ss.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEff2sv.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEff2ts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEff2tv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEff2vs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEff2vv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEfv2fs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEfv2rs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEfv2rv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEfv2tf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEfv2vf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEvv2ff.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEvv2rf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEvv2ss.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEvv2tv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEvv2vs.Plo@am__quote@

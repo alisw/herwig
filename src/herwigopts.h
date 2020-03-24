@@ -66,6 +66,9 @@ struct gengetopt_args_info
   char * setupfile_arg;	/**< @brief An input file to modify run parameters..  */
   char * setupfile_orig;	/**< @brief An input file to modify run parameters. original value given at command line.  */
   const char *setupfile_help; /**< @brief An input file to modify run parameters. help description.  */
+  char * cachedir_arg;	/**< @brief Matchbox cache directory. (default='Herwig-cache').  */
+  char * cachedir_orig;	/**< @brief Matchbox cache directory. original value given at command line.  */
+  const char *cachedir_help; /**< @brief Matchbox cache directory. help description.  */
   long jobsize_arg;	/**< @brief The number of subprocesses to integrate per job (build only)..  */
   char * jobsize_orig;	/**< @brief The number of subprocesses to integrate per job (build only). original value given at command line.  */
   const char *jobsize_help; /**< @brief The number of subprocesses to integrate per job (build only). help description.  */
@@ -114,6 +117,7 @@ struct gengetopt_args_info
   unsigned int quiet_given ;	/**< @brief Whether quiet was given.  */
   unsigned int jobs_given ;	/**< @brief Whether jobs was given.  */
   unsigned int setupfile_given ;	/**< @brief Whether setupfile was given.  */
+  unsigned int cachedir_given ;	/**< @brief Whether cachedir was given.  */
   unsigned int jobsize_given ;	/**< @brief Whether jobsize was given.  */
   unsigned int maxjobs_given ;	/**< @brief Whether maxjobs was given.  */
   unsigned int jobid_given ;	/**< @brief Whether jobid was given.  */

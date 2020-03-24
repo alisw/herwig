@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SSGOGOHVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -34,6 +34,7 @@ SSGOGOHVertex::SSGOGOHVertex() : theMw(), theSij(2, {0., 0.}),
 				 theID1Last(0), theID2Last(0), theq2last() {
   orderInGem(1);
   orderInGs(0);
+  colourStructure(ColourStructure::SINGLET);
 }
 
 void SSGOGOHVertex::doinit() {

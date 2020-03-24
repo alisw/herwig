@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // QuarkoniumDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "QuarkoniumDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include <ThePEG/PDT/EnumParticles.h>
 #include <ThePEG/PDT/DecayMode.h>
 #include <ThePEG/Interface/ClassDocumentation.h>
@@ -57,7 +58,10 @@ void QuarkoniumDecayer::Init() {
   
 }
 
-ClassDescription<QuarkoniumDecayer> QuarkoniumDecayer::initQuarkoniumDecayer;
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<QuarkoniumDecayer,PartonicDecayerBase>
+describeHerwigQuarkoniumDecayer("Herwig::QuarkoniumDecayer", "HwPartonicDecay.so");
 
 bool QuarkoniumDecayer::accept(tcPDPtr, const tPDVector & children) const {
   return (children.size() == 3 || children.size() == 2);

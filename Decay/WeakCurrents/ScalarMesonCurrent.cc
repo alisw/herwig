@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ScalarMesonCurrent.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "ScalarMesonCurrent.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/StandardModel/StandardModelBase.h"
 #include "ThePEG/Interface/ParVector.h"
@@ -78,8 +79,10 @@ void ScalarMesonCurrent::persistentInput(PersistentIStream & is, int) {
   is >> _id >> iunit(_decay_constant,GeV) >> _thetaeta;
 }
 
-ClassDescription<ScalarMesonCurrent> ScalarMesonCurrent::initScalarMesonCurrent;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<ScalarMesonCurrent,WeakDecayCurrent>
+describeHerwigScalarMesonCurrent("Herwig::ScalarMesonCurrent", "HwWeakCurrents.so");
 
 void ScalarMesonCurrent::Init() {
 

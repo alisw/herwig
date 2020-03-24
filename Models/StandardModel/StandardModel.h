@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // StandardModel.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -302,6 +302,13 @@ public:
   trunPtr massPtr() const {
     return runningMass_;
   }
+
+  /**
+   *  Set the couplings in the model
+   */
+  const map<string,pair<unsigned int,int> > & couplings() const {
+    return couplings_;
+  }
   
 protected:
   
@@ -346,14 +353,18 @@ protected:
    */
   void resetMass(long id, Energy mass,tPDPtr particle=tPDPtr());
 
+protected:
+
+  /**
+   *  Set the couplings in the model
+   */
+  void setCouplings(string name,pair<unsigned int,int> vals) {
+    couplings_[name] = vals;
+  }
+
 private:
   
   /**
-   * Describe a concrete class with persistent data.
-   */
-  static ClassDescription<StandardModel> initStandardModel;
-  
-  /** 
    * Private and non-existent assignment operator.
    */
   StandardModel & operator=(const StandardModel &) = delete;
@@ -456,41 +467,12 @@ private:
    */
   ModelGeneratorPtr modelGenerator_;
 
-};
-
-}
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/**
- * The following template specialization informs ThePEG about the
- * base class of StandardModel.
- */
-template <>
-struct BaseClassTrait<Herwig::StandardModel,1> {
-    /** Typedef of the base class of StandardModel. */
-  typedef StandardModelBase NthBase;
-};
-
-/**
- * The following template specialization informs ThePEG about the
- * name of this class and the shared object where it is defined.
- */
-template <>
-struct ClassTraits<Herwig::StandardModel>
-  : public ClassTraitsBase<Herwig::StandardModel> {
-
   /**
-   * Return the class name.
+   *  Couplings in the model
    */
-  static string className() { return "Herwig::StandardModel"; }
+  map<string,pair<unsigned int,int> > couplings_;
 };
 
-/** @endcond */
-
 }
-
 
 #endif /* HERWIG_StandardModel_H */

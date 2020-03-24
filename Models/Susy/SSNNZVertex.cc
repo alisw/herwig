@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SSNNZVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -27,6 +27,7 @@ SSNNZVertex::SSNNZVertex() : _sw(0.), _cw(0.), _id1last(0),
 			     _leftlast(0.), _rightlast(0.) {
   orderInGem(1);
   orderInGs(0);
+  colourStructure(ColourStructure::SINGLET);
 }
 
 void SSNNZVertex::doinit() {
@@ -64,11 +65,8 @@ void SSNNZVertex::persistentInput(PersistentIStream & is, int) {
   _rightlast = 0.;
 }
 
-// *** Attention *** The following static variable is needed for the type
-// description system in ThePEG. Please check that the template arguments
-// are correct (the class and its base class), and that the constructor
-// arguments are correct (the class name and the name of the dynamically
-// loadable library where the class implementation can be found).
+// The following static variable is needed for the type
+// description system in ThePEG.
 DescribeClass<SSNNZVertex,Helicity::FFVVertex>
 describeSSNNZVertex("Herwig::SSNNZVertex", "HwSusy.so");
 

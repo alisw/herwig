@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // HeavyDecayer.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -124,11 +124,6 @@ private:
 private:
 
   /**
-   *  Describe a concrete class with persistent data.
-   */
-  static ClassDescription<HeavyDecayer> initHeavyDecayer;
-
-  /**
    *  Private and non-existent assignment operator.
    */
   const HeavyDecayer & operator=(const HeavyDecayer &) = delete;
@@ -140,39 +135,6 @@ private:
    */
   int MECode;
 };
-
-}
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/**
- * This template specialization informs ThePEG about the base class of
- * HeavyDecayer.
- */
-template <>
-struct BaseClassTrait<Herwig::HeavyDecayer,1> {
-  /** Typedef of the base class of HeavyDecayer. */
-  typedef Herwig::PartonicDecayerBase NthBase;
-};
-
-/**
- * This template specialization informs ThePEG about the name of the
- * HeavyDecayer class.
- */
-template <>
-struct ClassTraits<Herwig::HeavyDecayer>: public ClassTraitsBase<Herwig::HeavyDecayer> {
-  /** Return the class name. */
-  static string className() { return "Herwig::HeavyDecayer"; }
-  /** Return the name of the shared library to be loaded to get
-   * access to this class and every other class it uses
-   * (except the base class).
-   */
-  static string library() { return "HwPartonicDecay.so"; }
-};
-
-/** @endcond */
 
 }
 

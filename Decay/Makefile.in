@@ -188,14 +188,6 @@ HwPerturbativeDecay_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(AM_CXXFLAGS) $(CXXFLAGS) $(HwPerturbativeDecay_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
-HwPerturbativeHiggsDecay_la_LIBADD =
-nodist_HwPerturbativeHiggsDecay_la_OBJECTS = Perturbative/HwPerturbativeHiggsDecay_la-PerturbativeHiggs__all.lo
-HwPerturbativeHiggsDecay_la_OBJECTS =  \
-	$(nodist_HwPerturbativeHiggsDecay_la_OBJECTS)
-HwPerturbativeHiggsDecay_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) \
-	$(HwPerturbativeHiggsDecay_la_LDFLAGS) $(LDFLAGS) -o $@
 HwSMDecay_la_LIBADD =
 nodist_HwSMDecay_la_OBJECTS =  \
 	ScalarMeson/HwSMDecay_la-SMDecayer__all.lo
@@ -310,7 +302,6 @@ SOURCES = $(Hw64Decay_la_SOURCES) $(nodist_HwBaryonDecay_la_SOURCES) \
 	$(nodist_HwFormFactors_la_SOURCES) $(HwMamboDecay_la_SOURCES) \
 	$(nodist_HwPartonicDecay_la_SOURCES) \
 	$(nodist_HwPerturbativeDecay_la_SOURCES) \
-	$(nodist_HwPerturbativeHiggsDecay_la_SOURCES) \
 	$(nodist_HwSMDecay_la_SOURCES) $(nodist_HwSOPHTY_la_SOURCES) \
 	$(nodist_HwTMDecay_la_SOURCES) $(HwTauDecay_la_SOURCES) \
 	$(nodist_HwVMDecay_la_SOURCES) \
@@ -363,8 +354,7 @@ CTAGS = ctags
 DIST_SUBDIRS = FormFactors Tau Baryon VectorMeson Perturbative \
 	WeakCurrents ScalarMeson TensorMeson Partonic General \
 	Radiation EvtGen
-am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/Config/depcomp \
-	README
+am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/Config/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
   dir0=`pwd`; \
@@ -407,14 +397,8 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
-BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
-BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
 BOOST_LDPATH = @BOOST_LDPATH@
 BOOST_ROOT = @BOOST_ROOT@
-BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
-BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
-BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS = @BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS@
 BOOST_UNIT_TEST_FRAMEWORK_LDPATH = @BOOST_UNIT_TEST_FRAMEWORK_LDPATH@
 BOOST_UNIT_TEST_FRAMEWORK_LIBS = @BOOST_UNIT_TEST_FRAMEWORK_LIBS@
@@ -645,7 +629,8 @@ DecayVertex.fh DecayVertex.h \
 DecayMatrixElement.fh DecayMatrixElement.h \
 TwoBodyDecayMatrixElement.h \
 GeneralDecayMatrixElement.fh GeneralDecayMatrixElement.h \
-BranchingRatioReweighter.h 
+BranchingRatioReweighter.h\
+PerturbativeDecayer.h
 
 DIR_CC_FILES = $(addprefix $(srcdir)/,$(ALL_CC_FILES))
 ALL_CC_FILES = \
@@ -658,10 +643,9 @@ DecayVertex.cc \
 DecayMatrixElement.cc \
 TwoBodyDecayMatrixElement.cc \
 GeneralDecayMatrixElement.cc \
-BranchingRatioReweighter.cc
+BranchingRatioReweighter.cc\
+PerturbativeDecayer.cc
 
-
-##################
 
 ##################
 
@@ -682,17 +666,16 @@ BranchingRatioReweighter.cc
 ##################
 pkglib_LTLIBRARIES = Hw64Decay.la HwMamboDecay.la HwFormFactors.la \
 	HwTauDecay.la HwBaryonDecay.la HwVMDecay.la \
-	HwPerturbativeDecay.la HwPerturbativeHiggsDecay.la \
-	HwWeakCurrents.la HwSMDecay.la HwTMDecay.la HwPartonicDecay.la \
-	HwSOPHTY.la
+	HwPerturbativeDecay.la HwWeakCurrents.la HwSMDecay.la \
+	HwTMDecay.la HwPartonicDecay.la HwSOPHTY.la
 Hw64Decay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 10:0:0
+$(AM_LDFLAGS) -module -version-info 11:0:0
 
 Hw64Decay_la_SOURCES = \
 Hw64Decayer.h Hw64Decayer.cc
 
 HwMamboDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 11:0:0
+$(AM_LDFLAGS) -module -version-info 12:0:0
 
 HwMamboDecay_la_SOURCES = \
 MamboDecayer.h MamboDecayer.cc
@@ -709,7 +692,7 @@ FormFactors/BtoSGammaHadronicMass.h \
 FormFactors/BtoSGammaHadronicMass.fh
 
 HwFormFactors_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 11:0:0
+$(AM_LDFLAGS) -module -version-info 12:0:0
 
 HwFormFactors_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/FormFactors
@@ -718,13 +701,13 @@ nodist_HwFormFactors_la_SOURCES = \
 FormFactors/Formfactor__all.cc
 
 HwTauDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 11:0:0
+$(AM_LDFLAGS) -module -version-info 12:0:0
 
 HwTauDecay_la_SOURCES = \
 Tau/TauDecayer.cc
 
 HwBaryonDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 10:0:0
+$(AM_LDFLAGS) -module -version-info 11:0:0
 
 HwBaryonDecay_la_LIBADD = \
 $(top_builddir)/PDT/libHwBaryonWidth.la
@@ -736,7 +719,7 @@ nodist_HwBaryonDecay_la_SOURCES = \
 Baryon/BaryonDecayer__all.cc
 
 HwVMDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 10:0:0
+$(AM_LDFLAGS) -module -version-info 11:0:0
 
 HwVMDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/VectorMeson
@@ -745,22 +728,13 @@ nodist_HwVMDecay_la_SOURCES = \
 VectorMeson/VMDecayer__all.cc
 
 HwPerturbativeDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 11:0:0
+$(AM_LDFLAGS) -module -version-info 12:0:0
 
 HwPerturbativeDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/Perturbative
 
 nodist_HwPerturbativeDecay_la_SOURCES = \
 Perturbative/Perturbative__all.cc
-
-HwPerturbativeHiggsDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 11:0:0
-
-HwPerturbativeHiggsDecay_la_CPPFLAGS = \
-$(AM_CPPFLAGS) -I$(srcdir)/Perturbative
-
-nodist_HwPerturbativeHiggsDecay_la_SOURCES = \
-Perturbative/PerturbativeHiggs__all.cc
 
 libHwWeakCurrent_la_SOURCES = \
 WeakCurrents/WeakDecayCurrent.cc \
@@ -771,7 +745,7 @@ WeakCurrents/LeptonNeutrinoCurrent.fh \
 WeakCurrents/LeptonNeutrinoCurrent.h
 
 HwWeakCurrents_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 11:0:0
+$(AM_LDFLAGS) -module -version-info 12:0:0
 
 HwWeakCurrents_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/WeakCurrents
@@ -780,7 +754,7 @@ nodist_HwWeakCurrents_la_SOURCES = \
 WeakCurrents/WeakCurrents__all.cc
 
 HwSMDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 12:0:0
+$(AM_LDFLAGS) -module -version-info 13:0:0
 
 HwSMDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/ScalarMeson
@@ -789,7 +763,7 @@ nodist_HwSMDecay_la_SOURCES = \
 ScalarMeson/SMDecayer__all.cc
 
 HwTMDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 10:0:0
+$(AM_LDFLAGS) -module -version-info 11:0:0
 
 HwTMDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/TensorMeson
@@ -798,7 +772,7 @@ nodist_HwTMDecay_la_SOURCES = \
 TensorMeson/TMDecayer__all.cc
 
 HwPartonicDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 11:0:0
+$(AM_LDFLAGS) -module -version-info 12:0:0
 
 HwPartonicDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/Partonic
@@ -815,7 +789,7 @@ Radiation/QEDRadiationHandler.fh \
 Radiation/QEDRadiationHandler.h
 
 HwSOPHTY_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 5:0:0
+$(AM_LDFLAGS) -module -version-info 6:0:0
 
 HwSOPHTY_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/Radiation
@@ -955,12 +929,6 @@ Perturbative/HwPerturbativeDecay_la-Perturbative__all.lo:  \
 
 HwPerturbativeDecay.la: $(HwPerturbativeDecay_la_OBJECTS) $(HwPerturbativeDecay_la_DEPENDENCIES) $(EXTRA_HwPerturbativeDecay_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(HwPerturbativeDecay_la_LINK) -rpath $(pkglibdir) $(HwPerturbativeDecay_la_OBJECTS) $(HwPerturbativeDecay_la_LIBADD) $(LIBS)
-Perturbative/HwPerturbativeHiggsDecay_la-PerturbativeHiggs__all.lo:  \
-	Perturbative/$(am__dirstamp) \
-	Perturbative/$(DEPDIR)/$(am__dirstamp)
-
-HwPerturbativeHiggsDecay.la: $(HwPerturbativeHiggsDecay_la_OBJECTS) $(HwPerturbativeHiggsDecay_la_DEPENDENCIES) $(EXTRA_HwPerturbativeHiggsDecay_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(HwPerturbativeHiggsDecay_la_LINK) -rpath $(pkglibdir) $(HwPerturbativeHiggsDecay_la_OBJECTS) $(HwPerturbativeHiggsDecay_la_LIBADD) $(LIBS)
 ScalarMeson/$(am__dirstamp):
 	@$(MKDIR_P) ScalarMeson
 	@: > ScalarMeson/$(am__dirstamp)
@@ -1093,7 +1061,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@FormFactors/$(DEPDIR)/ScalarFormFactor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Partonic/$(DEPDIR)/HwPartonicDecay_la-Partonic__all.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Perturbative/$(DEPDIR)/HwPerturbativeDecay_la-Perturbative__all.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Perturbative/$(DEPDIR)/HwPerturbativeHiggsDecay_la-PerturbativeHiggs__all.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Radiation/$(DEPDIR)/DecayRadiationGenerator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Radiation/$(DEPDIR)/HwSOPHTY_la-Sophty__all.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Radiation/$(DEPDIR)/QEDRadiationHandler.Plo@am__quote@
@@ -1156,13 +1123,6 @@ Perturbative/HwPerturbativeDecay_la-Perturbative__all.lo: Perturbative/Perturbat
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Perturbative/Perturbative__all.cc' object='Perturbative/HwPerturbativeDecay_la-Perturbative__all.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(HwPerturbativeDecay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Perturbative/HwPerturbativeDecay_la-Perturbative__all.lo `test -f 'Perturbative/Perturbative__all.cc' || echo '$(srcdir)/'`Perturbative/Perturbative__all.cc
-
-Perturbative/HwPerturbativeHiggsDecay_la-PerturbativeHiggs__all.lo: Perturbative/PerturbativeHiggs__all.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(HwPerturbativeHiggsDecay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Perturbative/HwPerturbativeHiggsDecay_la-PerturbativeHiggs__all.lo -MD -MP -MF Perturbative/$(DEPDIR)/HwPerturbativeHiggsDecay_la-PerturbativeHiggs__all.Tpo -c -o Perturbative/HwPerturbativeHiggsDecay_la-PerturbativeHiggs__all.lo `test -f 'Perturbative/PerturbativeHiggs__all.cc' || echo '$(srcdir)/'`Perturbative/PerturbativeHiggs__all.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) Perturbative/$(DEPDIR)/HwPerturbativeHiggsDecay_la-PerturbativeHiggs__all.Tpo Perturbative/$(DEPDIR)/HwPerturbativeHiggsDecay_la-PerturbativeHiggs__all.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Perturbative/PerturbativeHiggs__all.cc' object='Perturbative/HwPerturbativeHiggsDecay_la-PerturbativeHiggs__all.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(HwPerturbativeHiggsDecay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Perturbative/HwPerturbativeHiggsDecay_la-PerturbativeHiggs__all.lo `test -f 'Perturbative/PerturbativeHiggs__all.cc' || echo '$(srcdir)/'`Perturbative/PerturbativeHiggs__all.cc
 
 ScalarMeson/HwSMDecay_la-SMDecayer__all.lo: ScalarMeson/SMDecayer__all.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(HwSMDecay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ScalarMeson/HwSMDecay_la-SMDecayer__all.lo -MD -MP -MF ScalarMeson/$(DEPDIR)/HwSMDecay_la-SMDecayer__all.Tpo -c -o ScalarMeson/HwSMDecay_la-SMDecayer__all.lo `test -f 'ScalarMeson/SMDecayer__all.cc' || echo '$(srcdir)/'`ScalarMeson/SMDecayer__all.cc
@@ -1527,7 +1487,6 @@ uninstall-am: uninstall-pkglibLTLIBRARIES
 hwdecay__all.cc : $(DIR_H_FILES) $(DIR_CC_FILES) Makefile
 	@echo "Concatenating .cc files into $@"
 	@$(top_srcdir)/cat_with_cpplines $(DIR_CC_FILES) > $@
-
 ##################
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

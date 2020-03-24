@@ -88,6 +88,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@WANT_LIBFASTJET_TRUE@am__append_1 = FxFx
 subdir = MatrixElement
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compare_version.m4 \
@@ -109,7 +110,8 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libHwME_la_LIBADD =
 am_libHwME_la_OBJECTS = HwMEBase.lo MEfftoVH.lo MEfftoffH.lo \
-	HardVertex.lo ProductionMatrixElement.lo DrellYanBase.lo
+	HardVertex.lo ProductionMatrixElement.lo DrellYanBase.lo \
+	BlobME.lo MEMinBias.lo
 libHwME_la_OBJECTS = $(am_libHwME_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -209,7 +211,8 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = General Lepton Hadron DIS Powheg Gamma Matchbox \
+	Reweighters FxFx
 am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/Config/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
@@ -253,14 +256,8 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
-BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
-BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
 BOOST_LDPATH = @BOOST_LDPATH@
 BOOST_ROOT = @BOOST_ROOT@
-BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
-BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
-BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS = @BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS@
 BOOST_UNIT_TEST_FRAMEWORK_LDPATH = @BOOST_UNIT_TEST_FRAMEWORK_LDPATH@
 BOOST_UNIT_TEST_FRAMEWORK_LIBS = @BOOST_UNIT_TEST_FRAMEWORK_LIBS@
@@ -460,7 +457,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = General Lepton Hadron DIS Powheg Gamma Matchbox Reweighters
+SUBDIRS = General Lepton Hadron DIS Powheg Gamma Matchbox Reweighters \
+	$(am__append_1)
 noinst_LTLIBRARIES = libHwME.la 
 libHwME_la_SOURCES = \
 HwMEBase.h HwMEBase.fh HwMEBase.cc \
@@ -468,7 +466,9 @@ MEfftoVH.h MEfftoVH.cc \
 MEfftoffH.h MEfftoffH.cc \
 HardVertex.fh HardVertex.h HardVertex.cc \
 ProductionMatrixElement.h ProductionMatrixElement.cc \
-DrellYanBase.h DrellYanBase.cc
+DrellYanBase.h DrellYanBase.cc \
+BlobME.h BlobME.cc \
+MEMinBias.h MEMinBias.cc
 
 all: all-recursive
 
@@ -524,9 +524,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BlobME.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DrellYanBase.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HardVertex.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HwMEBase.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEMinBias.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEfftoVH.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MEfftoffH.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProductionMatrixElement.Plo@am__quote@
