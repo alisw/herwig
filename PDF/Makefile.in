@@ -146,6 +146,13 @@ HwIncomingPhotonEvolver_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(HwIncomingPhotonEvolver_la_LDFLAGS) $(LDFLAGS) -o $@
+HwPartonExtractor_la_LIBADD =
+am_HwPartonExtractor_la_OBJECTS = MultiPartonExtractor.lo
+HwPartonExtractor_la_OBJECTS = $(am_HwPartonExtractor_la_OBJECTS)
+HwPartonExtractor_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(HwPartonExtractor_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
 HwPomeronFlux_la_LIBADD =
 am_HwPomeronFlux_la_OBJECTS = PomeronFlux.lo
 HwPomeronFlux_la_OBJECTS = $(am_HwPomeronFlux_la_OBJECTS)
@@ -254,15 +261,15 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(HwIncomingPhotonEvolver_la_SOURCES) \
-	$(HwPomeronFlux_la_SOURCES) $(HwPomeronPDF_la_SOURCES) \
-	$(HwReggeonPDF_la_SOURCES) $(HwSaSPhotonPDF_la_SOURCES) \
-	$(HwSatPDF_la_SOURCES) $(libHwMPIPDF_la_SOURCES) \
-	$(libHwRemDecayer_la_SOURCES)
+	$(HwPartonExtractor_la_SOURCES) $(HwPomeronFlux_la_SOURCES) \
+	$(HwPomeronPDF_la_SOURCES) $(HwReggeonPDF_la_SOURCES) \
+	$(HwSaSPhotonPDF_la_SOURCES) $(HwSatPDF_la_SOURCES) \
+	$(libHwMPIPDF_la_SOURCES) $(libHwRemDecayer_la_SOURCES)
 DIST_SOURCES = $(HwIncomingPhotonEvolver_la_SOURCES) \
-	$(HwPomeronFlux_la_SOURCES) $(HwPomeronPDF_la_SOURCES) \
-	$(HwReggeonPDF_la_SOURCES) $(HwSaSPhotonPDF_la_SOURCES) \
-	$(HwSatPDF_la_SOURCES) $(libHwMPIPDF_la_SOURCES) \
-	$(libHwRemDecayer_la_SOURCES)
+	$(HwPartonExtractor_la_SOURCES) $(HwPomeronFlux_la_SOURCES) \
+	$(HwPomeronPDF_la_SOURCES) $(HwReggeonPDF_la_SOURCES) \
+	$(HwSaSPhotonPDF_la_SOURCES) $(HwSatPDF_la_SOURCES) \
+	$(libHwMPIPDF_la_SOURCES) $(libHwRemDecayer_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -307,14 +314,8 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
-BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
-BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
 BOOST_LDPATH = @BOOST_LDPATH@
 BOOST_ROOT = @BOOST_ROOT@
-BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
-BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
-BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS = @BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS@
 BOOST_UNIT_TEST_FRAMEWORK_LDPATH = @BOOST_UNIT_TEST_FRAMEWORK_LDPATH@
 BOOST_UNIT_TEST_FRAMEWORK_LIBS = @BOOST_UNIT_TEST_FRAMEWORK_LIBS@
@@ -516,7 +517,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIST = diffraction
 pkglib_LTLIBRARIES = HwPomeronPDF.la HwReggeonPDF.la HwPomeronFlux.la \
-	HwSatPDF.la HwIncomingPhotonEvolver.la HwSaSPhotonPDF.la
+	HwSatPDF.la HwPartonExtractor.la HwIncomingPhotonEvolver.la \
+	HwSaSPhotonPDF.la
 HwPomeronPDF_la_SOURCES = \
 PomeronPDF.cc PomeronPDF.h
 
@@ -541,6 +543,10 @@ HwSatPDF_la_SOURCES = \
 SatPDF.h SatPDF.cc
 
 HwSatPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 7:0:0
+HwPartonExtractor_la_SOURCES = \
+MultiPartonExtractor.h MultiPartonExtractor.cc
+
+HwPartonExtractor_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 7:0:0
 HwIncomingPhotonEvolver_la_SOURCES = \
 IncomingPhotonEvolver.h IncomingPhotonEvolver.cc
 
@@ -644,6 +650,9 @@ clean-pkglibLTLIBRARIES:
 HwIncomingPhotonEvolver.la: $(HwIncomingPhotonEvolver_la_OBJECTS) $(HwIncomingPhotonEvolver_la_DEPENDENCIES) $(EXTRA_HwIncomingPhotonEvolver_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(HwIncomingPhotonEvolver_la_LINK) -rpath $(pkglibdir) $(HwIncomingPhotonEvolver_la_OBJECTS) $(HwIncomingPhotonEvolver_la_LIBADD) $(LIBS)
 
+HwPartonExtractor.la: $(HwPartonExtractor_la_OBJECTS) $(HwPartonExtractor_la_DEPENDENCIES) $(EXTRA_HwPartonExtractor_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(HwPartonExtractor_la_LINK) -rpath $(pkglibdir) $(HwPartonExtractor_la_OBJECTS) $(HwPartonExtractor_la_LIBADD) $(LIBS)
+
 HwPomeronFlux.la: $(HwPomeronFlux_la_OBJECTS) $(HwPomeronFlux_la_DEPENDENCIES) $(EXTRA_HwPomeronFlux_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(HwPomeronFlux_la_LINK) -rpath $(pkglibdir) $(HwPomeronFlux_la_OBJECTS) $(HwPomeronFlux_la_LIBADD) $(LIBS)
 
@@ -675,6 +684,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IncomingPhotonEvolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MPIPDF.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MinBiasPDF.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MultiPartonExtractor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PomeronFlux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PomeronPDF.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReggeonPDF.Plo@am__quote@

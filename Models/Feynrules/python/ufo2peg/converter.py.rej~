@@ -1,0 +1,11 @@
+--- Models/Feynrules/python/ufo2peg/converter.py	Fri Apr 05 09:09:36 2019 +0100
++++ Models/Feynrules/python/ufo2peg/converter.py	Fri Apr 05 09:13:02 2019 +0100
+@@ -123,6 +123,8 @@
+             text = 'Complex'
+         elif text == 'complexconjugate': 
+             text = 'conj'
++        elif text == 'im':
++            text = 'imag'
+         elif convertHerwig :
+             if text == 'I' :
+                 text = "ii"

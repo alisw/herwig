@@ -136,8 +136,8 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libHerwigAPI_la_LIBADD =
-am_libHerwigAPI_la_OBJECTS = libHerwigAPI_la-RunDirectories.lo \
-	libHerwigAPI_la-HerwigAPI.lo
+am_libHerwigAPI_la_OBJECTS = libHerwigAPI_la-Filesystem.lo \
+	libHerwigAPI_la-RunDirectories.lo libHerwigAPI_la-HerwigAPI.lo
 libHerwigAPI_la_OBJECTS = $(am_libHerwigAPI_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -243,14 +243,8 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
-BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
-BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
 BOOST_LDPATH = @BOOST_LDPATH@
 BOOST_ROOT = @BOOST_ROOT@
-BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
-BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
-BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS = @BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS@
 BOOST_UNIT_TEST_FRAMEWORK_LDPATH = @BOOST_UNIT_TEST_FRAMEWORK_LDPATH@
 BOOST_UNIT_TEST_FRAMEWORK_LIBS = @BOOST_UNIT_TEST_FRAMEWORK_LIBS@
@@ -452,7 +446,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 pkglib_LTLIBRARIES = libHerwigAPI.la
 libHerwigAPI_la_SOURCES = \
-RunDirectories.h RunDirectories.cc HerwigAPI.h HerwigAPI.cc \
+Filesystem.h Filesystem.cc \
+RunDirectories.h RunDirectories.cc \
+HerwigAPI.h HerwigAPI.cc \
 HerwigUI.h
 
 libHerwigAPI_la_LDFLAGS = $(AM_LDFLAGS) -version-info 2:0:0
@@ -539,6 +535,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libHerwigAPI_la-Filesystem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libHerwigAPI_la-HerwigAPI.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libHerwigAPI_la-RunDirectories.Plo@am__quote@
 
@@ -565,6 +562,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+libHerwigAPI_la-Filesystem.lo: Filesystem.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libHerwigAPI_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libHerwigAPI_la-Filesystem.lo -MD -MP -MF $(DEPDIR)/libHerwigAPI_la-Filesystem.Tpo -c -o libHerwigAPI_la-Filesystem.lo `test -f 'Filesystem.cc' || echo '$(srcdir)/'`Filesystem.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libHerwigAPI_la-Filesystem.Tpo $(DEPDIR)/libHerwigAPI_la-Filesystem.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Filesystem.cc' object='libHerwigAPI_la-Filesystem.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libHerwigAPI_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libHerwigAPI_la-Filesystem.lo `test -f 'Filesystem.cc' || echo '$(srcdir)/'`Filesystem.cc
 
 libHerwigAPI_la-RunDirectories.lo: RunDirectories.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libHerwigAPI_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libHerwigAPI_la-RunDirectories.lo -MD -MP -MF $(DEPDIR)/libHerwigAPI_la-RunDirectories.Tpo -c -o libHerwigAPI_la-RunDirectories.lo `test -f 'RunDirectories.cc' || echo '$(srcdir)/'`RunDirectories.cc

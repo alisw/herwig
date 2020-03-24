@@ -5,6 +5,7 @@
 //
 
 #include "SMHHHVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 
 
@@ -16,6 +17,7 @@ using namespace Herwig;
 SMHHHVertex::SMHHHVertex() : ratio_(ZERO), couplast_(0.), q2last_(ZERO) {
   orderInGem(1);
   orderInGs (0);
+  colourStructure(ColourStructure::SINGLET);
 }
 
 IBPtr SMHHHVertex::clone() const {
@@ -34,8 +36,10 @@ void SMHHHVertex::persistentInput(PersistentIStream & is, int) {
   is >> iunit(ratio_,GeV);
 }
 
-ClassDescription<SMHHHVertex> SMHHHVertex::initSMHHHVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<SMHHHVertex,SSSVertex>
+describeHerwigSMHHHVertex("Herwig::SMHHHVertex", "Herwig.so");
 
 void SMHHHVertex::Init() {
 

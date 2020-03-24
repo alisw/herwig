@@ -2,7 +2,7 @@
 //
 // exponential_generator.h is part of ExSample -- A Library for Sampling Sudakov-Type Distributions
 //
-// Copyright (C) 2008-2017 Simon Platzer -- simon.plaetzer@desy.de, The Herwig Collaboration
+// Copyright (C) 2008-2019 Simon Platzer -- simon.plaetzer@desy.de, The Herwig Collaboration
 //
 // ExSample is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -56,17 +56,18 @@ namespace exsample {
     /// generate an event, returning
     /// the sign of the weight or zero
     /// for an event below the evolution cutoff
-    double generate();
+    double generate(double enhance = 1.);
 
     /// generate an event, returning
     /// the sign of the weight or zero
     /// for an event below the evolution cutoff
-    double generate(double cutoff) {
+    double generate(double cutoff,
+		    double enhance) {
       double oldcut = evolution_cutoff_;
       evolution_cutoff_ = cutoff;
       double w = 0.0;
       try {
-	w = generate();
+	w = generate(enhance);
       } catch(...) {
 	evolution_cutoff_ = oldcut;
 	throw;

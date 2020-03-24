@@ -1,7 +1,7 @@
   // -*- C++ -*-
   //
   // Merger.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-  // Copyright (C) 2002-2017 The Herwig Collaboration
+  // Copyright (C) 2002-2019 The Herwig Collaboration
   //
   // Herwig is licenced under version 3 of the GPL , see COPYING for details.
   // Please respect the MCnet academic guidelines , see GUIDELINES for details.
@@ -958,7 +958,8 @@ void Merger::CKKW_PrepareSudakov( NodePtr node , Energy running ){
   DSH()->currentHandler()->generator()->currentEventHandler(currentNode()->xcomb()->eventHandlerPtr() );
   DSH()->currentHandler()->remnantDecayer()->setHadronContent( currentNode()->xcomb()->lastParticles() );
   DSH()->eventRecord().clear();
-  DSH()->eventRecord().slimprepare( sub , dynamic_ptr_cast<tStdXCombPtr>( node->xcomb() ) , DSH()->pdfs() , currentNode()->xcomb()->lastParticles() );
+  DSH()->eventRecord().slimprepare( sub , dynamic_ptr_cast<tStdXCombPtr>( node->xcomb() ) , DSH()->pdfs() ,
+				    currentNode()->xcomb()->lastParticles(), DSH()->offShellPartons() );
   DSH()->hardScales( sqr( running ) );
 }
 
@@ -1168,8 +1169,13 @@ double Merger::singlesudakov( Dipole dip  , Energy next , Energy running , pair<
     Energy dScale  = 	gen->second->splittingKinematics()->dipoleScale( emitter->momentum() , spectator->momentum() );
     candidate.scale( dScale );
     candidate.continuesEvolving();
-    Energy ptMax = gen->second->splittingKinematics()->ptMax( candidate.scale() , candidate.emitterX() , candidate.spectatorX() , 
-                                                             candidate.index() , *gen->second->splittingKernel() );
+
+    Energy ptMax = gen->second->splittingKinematics()->ptMax( 
+                  candidate.scale() , 
+                  candidate.emitterX() , 
+                  candidate.spectatorX() ,
+                  candidate , 
+                  *gen->second->splittingKernel() );
     
     candidate.hardPt( min( running , ptMax ) );
     
@@ -1207,8 +1213,10 @@ double Merger::singleHistExpansion( Dipole dip  , Energy next , Energy running ,
     candidate.continuesEvolving();
     Energy ptMax = gen->second->
                    splittingKinematics()->ptMax(
-                      candidate.scale() , candidate.emitterX() , 
-                      candidate.spectatorX() , candidate.index() , 
+                      candidate.scale() ,
+                      candidate.emitterX() ,
+                      candidate.spectatorX() ,
+                      candidate ,
                       *gen->second->splittingKernel() );
     
     candidate.hardPt( min( running , ptMax ) );

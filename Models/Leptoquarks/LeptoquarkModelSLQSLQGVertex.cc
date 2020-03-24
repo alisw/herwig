@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // LeptoquarkModelSLQSLQGVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "LeptoquarkModelSLQSLQGVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -19,10 +20,11 @@
 using namespace Herwig;
 using namespace ThePEG;
 
-LeptoquarkModelSLQSLQGVertex::LeptoquarkModelSLQSLQGVertex() : _q2last(ZERO),
-							       _couplast(0.) {
+LeptoquarkModelSLQSLQGVertex::LeptoquarkModelSLQSLQGVertex() : q2last_(ZERO),
+							       couplast_(0.) {
   orderInGs(1);
   orderInGem(0);
+  colourStructure(ColourStructure::SU3TFUND);
 }
 
 void LeptoquarkModelSLQSLQGVertex::doinit() {
@@ -47,16 +49,10 @@ void LeptoquarkModelSLQSLQGVertex::doinit() {
   VSSVertex::doinit();
 }
 
-void LeptoquarkModelSLQSLQGVertex::persistentOutput(PersistentOStream & os) const {
-  os << _theModel;
-}
-
-void LeptoquarkModelSLQSLQGVertex::persistentInput(PersistentIStream & is, int) {
-   is >> _theModel;
-}
-
-ClassDescription<LeptoquarkModelSLQSLQGVertex> LeptoquarkModelSLQSLQGVertex::initLeptoquarkModelSLQSLQGVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeNoPIOClass<LeptoquarkModelSLQSLQGVertex,VSSVertex>
+describeHerwigLeptoquarkModelSLQSLQGVertex("Herwig::LeptoquarkModelSLQSLQGVertex", "HwLeptoquarkModel.so");
 
 void LeptoquarkModelSLQSLQGVertex::Init() {
   static ClassDocumentation<LeptoquarkModelSLQSLQGVertex> documentation
@@ -65,11 +61,14 @@ void LeptoquarkModelSLQSLQGVertex::Init() {
   
 }
 
-void LeptoquarkModelSLQSLQGVertex::setCoupling(Energy2 q2,tcPDPtr ,tcPDPtr ,tcPDPtr ) { 
-   if(q2 != _q2last || _couplast == 0.) {
-     _couplast = strongCoupling(q2);
-     _q2last = q2;
-   }
-  norm(_couplast);
+void LeptoquarkModelSLQSLQGVertex::setCoupling(Energy2 q2,tcPDPtr ,tcPDPtr p2,tcPDPtr ) { 
+  if(q2 != q2last_ || couplast_ == 0.) {
+    couplast_ = strongCoupling(q2);
+    q2last_ = q2;
+  }
+  if(p2->id()<0)
+    norm( couplast_);
+  else
+    norm(-couplast_);
 }
 

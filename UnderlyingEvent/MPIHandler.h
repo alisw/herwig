@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MPIHandler.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -88,9 +88,9 @@ public:
 		algorithm_(2), numSubProcs_(0), 
 		colourDisrupt_(0.0), softInt_(true), twoComp_(true),
 		DLmode_(2), avgNhard_(0.0), avgNsoft_(0.0),
-                energyExtrapolation_(2), EEparamA_(0.6*GeV),
+                energyExtrapolation_(3), EEparamA_(0.6*GeV),
                 EEparamB_(37.5*GeV), refScale_(7000.*GeV),
-		pT0_(3.11*GeV), b_(0.21) {}
+		pT0_(2.875*GeV), b_(0.3101), offset_(622.204*GeV) {}
 
   /**
    * The destructor.
@@ -204,6 +204,25 @@ public:
    * Return the inelastic cross section
    */
   CrossSection inelasticXSec() const { return inelXSec_; }
+
+  /**
+   * Return the non-diffractive cross section assumed by the model.
+   * TODO: See comment at diffractiveXSec.
+   */
+  CrossSection nonDiffractiveXSec() const {
+      return (1.-diffratio_)*inelXSec_;
+  }
+
+  /**
+   * Return the diffractive cross section assumed by the model.
+   * For now the diffractive cross section is seen as a fixed part of the
+   * inelastic cross section. 
+   * TODO: Energy dependence and/or Include diffraction in Eikonalisation.
+   */
+  CrossSection diffractiveXSec() const {
+      return diffratio_*inelXSec_;
+  }
+
 
   /** @name Simple access functions. */
   //@{
@@ -352,11 +371,6 @@ private:
 		 unsigned int N, Energy2 mu2=ZERO) const;
 
   /**
-   *  Return n!
-   */
-  double factorial (unsigned int n) const;
-
-  /**
    * Returns the total cross section for the current CMenergy.  The
    * decision which parametrization will be used is steered by a
    * external parameter of this class.
@@ -396,12 +410,6 @@ private:
 
 
 private:
-
-  /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MPIHandler> initMPIHandler;
 
   /**
    * The assignment operator is private and must never be called.
@@ -576,6 +584,12 @@ private:
   Energy refScale_;
   Energy pT0_;
   double b_;
+  Energy offset_;
+
+  /**
+   * Parameters to set the fraction of diffractive cross section in the inelastic cross section.
+   */
+  double diffratio_=0.2;
 
 protected:
 
@@ -591,37 +605,6 @@ protected:
   /** @endcond */
 
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MPIHandler. */
-template <>
-struct BaseClassTrait<Herwig::MPIHandler,1> {
-  /** Typedef of the first base class of MPIHandler. */
-  typedef Interfaced NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MPIHandler class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MPIHandler>
-  : public ClassTraitsBase<Herwig::MPIHandler> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MPIHandler"; }
-  /** Return the name(s) of the shared library (or libraries) be loaded to get
-   *  access to the MPIHandler class and any other class on which it depends
-   *  (except the base class). */
-  static string library() { return "JetCuts.so SimpleKTCut.so HwMPI.so"; }
-};
-
-/** @endcond */
 
 }
 
@@ -804,7 +787,7 @@ namespace Herwig {
   /**
    *  Typedef for derivative of the length
    */
-  typedef Qty<1,-2,0> LengthDiff;
+  typedef decltype(mm/GeV2) LengthDiff;
 
   /**
    *  A struct for the integrand for the slope
@@ -911,10 +894,5 @@ namespace Herwig {
 
   };
 }
-
-
-#ifndef ThePEG_TEMPLATES_IN_CC_FILE
-// #include "MPIHandler.tcc"
-#endif
 
 #endif /* HERWIG_MPIHandler_H */

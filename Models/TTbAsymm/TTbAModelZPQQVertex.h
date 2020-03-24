@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // TTbAModelZPQQVertex.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -96,11 +96,6 @@ protected:
 private:
   
   /**
-   * Describe a concrete class with persistent data.
-   */
-  static ClassDescription<TTbAModelZPQQVertex> initTTbAModelZPQQVertex;
-  
-  /**
    * Private and non-existent assignment operator.
    */
   TTbAModelZPQQVertex & operator=(const TTbAModelZPQQVertex &) = delete;
@@ -162,40 +157,5 @@ private:
 };  
 
 }
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/**
- * The following template specialization informs ThePEG about the
- * base class of TTbAModelZPQQVertex.
- */
-template <>
-struct BaseClassTrait<Herwig::TTbAModelZPQQVertex,1> {
-  /** Typedef of the base class of TTbAModelZPQQVertex. */
-  typedef ThePEG::Helicity::FFVVertex NthBase;
-};
-  
-/**
- * The following template specialization informs ThePEG about the
- * name of this class and the shared object where it is defined.
- */
-  template <>
-  
-struct ClassTraits<Herwig::TTbAModelZPQQVertex>
-  : public ClassTraitsBase<Herwig::TTbAModelZPQQVertex> {
-  
-  /**
-   * Return the class name.
-   */
-  static string className() { return "Herwig::TTbAModelZPQQVertex"; }
-  
-};
-
-/** @endcond */
-  
-}
-
 
 #endif /* HERWIG_TTbAModelZPQQVertex_H */

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ADDModelWWWGRVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "ADDModelWWWGRVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -25,6 +26,7 @@ ADDModelWWWGRVertex::ADDModelWWWGRVertex()
   // order in the couplings
   orderInGem(2);
   orderInGs (0);
+  colourStructure(ColourStructure::SINGLET);
 }
 
 void ADDModelWWWGRVertex::doinit() {
@@ -49,8 +51,10 @@ void ADDModelWWWGRVertex::persistentInput(PersistentIStream & is, int) {
   is >> iunit(kappa_,InvGeV) >> zfact_ >> iunit(r_,GeV);
 }
 
-ClassDescription<ADDModelWWWGRVertex> ADDModelWWWGRVertex::initADDModelWWWGRVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<ADDModelWWWGRVertex,VVVTVertex>
+describeHerwigADDModelWWWGRVertex("Herwig::ADDModelWWWGRVertex", "HwADDModel.so");
 
 void ADDModelWWWGRVertex::Init() {
  static ClassDocumentation<ADDModelWWWGRVertex> documentation

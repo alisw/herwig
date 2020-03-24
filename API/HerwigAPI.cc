@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // HerwigAPI.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -23,8 +23,6 @@
 
 #include <unistd.h>
 #include <sys/wait.h>
-
-#include <boost/filesystem.hpp>
 
 #include "RunDirectories.h"
 
@@ -120,8 +118,7 @@ namespace {
 		      bool usePWD) {
     // Search path for read command uses CWD first
     if ( usePWD ) {
-      string cwd = boost::filesystem::current_path().string();
-      Repository::prependReadDir( cwd );
+      Repository::prependReadDir( "." );
     }
     // append command line choices for directories from which Herwig will read.
     Repository::appendReadDir(ui.appendReadDirectories());

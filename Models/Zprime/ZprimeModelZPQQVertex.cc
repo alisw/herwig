@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ZprimeModelZPQQVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "ZprimeModelZPQQVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -46,6 +47,7 @@ ZprimeModelZPQQVertex::ZprimeModelZPQQVertex()  {
   addToList(-16,16,32);
   orderInGem(1);
   orderInGs(0);
+  colourStructure(ColourStructure::SU3F);
 }
 
 void ZprimeModelZPQQVertex::doinit() {
@@ -99,9 +101,10 @@ void ZprimeModelZPQQVertex::persistentInput(PersistentIStream & is, int) {
 
 }
 
-ClassDescription<ZprimeModelZPQQVertex> 
-ZprimeModelZPQQVertex::initZprimeModelZPQQVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<ZprimeModelZPQQVertex,FFVVertex>
+describeHerwigZprimeModelZPQQVertex("Herwig::ZprimeModelZPQQVertex", "Herwig.so");
 
 
 void ZprimeModelZPQQVertex::Init() {

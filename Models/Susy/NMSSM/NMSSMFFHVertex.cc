@@ -5,6 +5,7 @@
 //
 
 #include "NMSSMFFHVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -21,6 +22,7 @@ NMSSMFFHVertex::NMSSMFFHVertex() : _mw(0.*MeV), _sinb(0.), _cosb(0.),
 				   _couplast(0.) {
   orderInGem(1);
   orderInGs(0);
+  colourStructure(ColourStructure::DELTA);
 }
 
 void NMSSMFFHVertex::persistentOutput(PersistentOStream & os) const {
@@ -91,8 +93,10 @@ void NMSSMFFHVertex::doinit() {
   FFSVertex::doinit();
 }
 
-ClassDescription<NMSSMFFHVertex> NMSSMFFHVertex::initNMSSMFFHVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<NMSSMFFHVertex,FFSVertex>
+describeHerwigNMSSMFFHVertex("Herwig::NMSSMFFHVertex", "HwSusy.so HwNMSSM.so");
 
 void NMSSMFFHVertex::Init() {
 

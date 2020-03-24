@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // DtoKPiPiE691.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "DtoKPiPiE691.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/ParVector.h"
 #include "ThePEG/Interface/Switch.h"
@@ -256,8 +257,10 @@ void DtoKPiPiE691::persistentInput(PersistentIStream & is, int) {
      >> iunit(_wrhop ,GeV) >> _maxwgt >> _weights;
 }
 
-ClassDescription<DtoKPiPiE691> DtoKPiPiE691::initDtoKPiPiE691;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<DtoKPiPiE691,DecayIntegrator>
+describeHerwigDtoKPiPiE691("Herwig::DtoKPiPiE691", "HwSMDecay.so");
 
 void DtoKPiPiE691::Init() {
 

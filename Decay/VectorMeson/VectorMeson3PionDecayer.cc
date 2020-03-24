@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // VectorMeson3PionDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "VectorMeson3PionDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "Herwig/Utilities/Kinematics.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/ParVector.h"
@@ -270,9 +271,10 @@ void VectorMeson3PionDecayer::persistentInput(PersistentIStream & is, int) {
      >> iunit(_ccoupling,1/MeV2) >> iunit(_mpi0,MeV) >> iunit(_mpic,MeV);
 }
 
-ClassDescription<VectorMeson3PionDecayer> 
-VectorMeson3PionDecayer::initVectorMeson3PionDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<VectorMeson3PionDecayer,DecayIntegrator>
+describeHerwigVectorMeson3PionDecayer("Herwig::VectorMeson3PionDecayer", "HwVMDecay.so");
 
 void VectorMeson3PionDecayer::Init() {
 

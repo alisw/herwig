@@ -139,7 +139,8 @@ HwDipoleShower_la_DEPENDENCIES = Base/libHwDipoleShowerBase.la \
 	Kernels/libHwDipoleShowerKernels.la \
 	Kinematics/libHwDipoleShowerKinematics.la \
 	Utility/libHwDipoleShowerUtility.la \
-	Merging/libHwDipoleShowerMerging.la
+	Merging/libHwDipoleShowerMerging.la \
+	SpinCorrelations/libHwDipoleShowerSpinCorrelations.la
 am_HwDipoleShower_la_OBJECTS = DipoleShowerHandler.lo
 HwDipoleShower_la_OBJECTS = $(am_HwDipoleShower_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -299,14 +300,8 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
-BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
-BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
 BOOST_LDPATH = @BOOST_LDPATH@
 BOOST_ROOT = @BOOST_ROOT@
-BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
-BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
-BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS = @BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS@
 BOOST_UNIT_TEST_FRAMEWORK_LDPATH = @BOOST_UNIT_TEST_FRAMEWORK_LDPATH@
 BOOST_UNIT_TEST_FRAMEWORK_LIBS = @BOOST_UNIT_TEST_FRAMEWORK_LIBS@
@@ -506,15 +501,16 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = Base Kernels Kinematics Utility AlphaS Merging 
+SUBDIRS = Base Kernels Kinematics Utility AlphaS Merging SpinCorrelations 
 pkglib_LTLIBRARIES = HwDipoleShower.la HwKrknloEventReweight.la
-HwDipoleShower_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 10:0:0
+HwDipoleShower_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 11:0:0
 HwDipoleShower_la_LIBADD = \
 	Base/libHwDipoleShowerBase.la \
 	Kernels/libHwDipoleShowerKernels.la \
 	Kinematics/libHwDipoleShowerKinematics.la \
 	Utility/libHwDipoleShowerUtility.la \
-	Merging/libHwDipoleShowerMerging.la
+	Merging/libHwDipoleShowerMerging.la \
+	SpinCorrelations/libHwDipoleShowerSpinCorrelations.la 
 
 HwDipoleShower_la_SOURCES = \
 	DipoleShowerHandler.h DipoleShowerHandler.fh DipoleShowerHandler.cc
@@ -522,7 +518,7 @@ HwDipoleShower_la_SOURCES = \
 HwKrknloEventReweight_la_SOURCES = \
 	KrkNLO/KrknloEventReweight.h KrkNLO/KrknloEventReweight.cc
 
-HwKrknloEventReweight_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 2:0:0
+HwKrknloEventReweight_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 3:0:0
 all: all-recursive
 
 .SUFFIXES:

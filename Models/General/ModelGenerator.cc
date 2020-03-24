@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ModelGenerator.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -270,7 +270,6 @@ void ModelGenerator::doinit() {
     ofs.open(filename.c_str());
   }
 
-
   if(decayOutput_!=0) {
     if(decayOutput_==1) {
       os << "# The decay modes listed below will have spin\n"
@@ -333,14 +332,15 @@ void ModelGenerator::doinit() {
       }
 
     }
-
+    // set the offshellness 
+    Energy minMass = minimumMass(parent);
+    Energy offShellNess = howOffShell_*parent->width();
+    if(minMass>parent->mass()-offShellNess) {
+      offShellNess = parent->mass()-minMass;
+    }
+    parent->widthCut(offShellNess);
+    
     if( parent->massGenerator() ) {
-      Energy minMass = minimumMass(parent);
-      Energy offShellNess = howOffShell_*parent->width();
-      if(minMass>parent->mass()-offShellNess) {
-	offShellNess = parent->mass()-minMass;
-      }
-      parent->widthCut(offShellNess);
 
       parent->massGenerator()->reset();
       if(decayOutput_==1)
@@ -451,7 +451,7 @@ void ModelGenerator::checkDecays(PDPtr parent) {
 
 namespace {
   struct DecayModeOrdering {
-    bool operator()(tcDMPtr m1, tcDMPtr m2) {
+    bool operator()(tcDMPtr m1, tcDMPtr m2) const {
       if(m1->brat()!=m2->brat()) {
 	return m1->brat()>m2->brat();
       }

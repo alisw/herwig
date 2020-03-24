@@ -25,14 +25,12 @@ library HwPomeronPDF.so
 library HwPomeronFlux.so
 library HwPartonicDecay.so
 library HwPerturbativeDecay.so
-library HwPerturbativeHiggsDecay.so
 library HwShower.so
 library HwSMDecay.so
 library HwTauDecay.so
 library HwTMDecay.so
 library HwBaryonDecay.so
 library HwSOPHTY.so
-library HwUA5.so
 library HwVMDecay.so
 library HwSatPDF.so
 library HwIncomingPhotonEvolver.so

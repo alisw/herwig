@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SMHiggsMassGenerator.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "SMHiggsMassGenerator.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/PDT/EnumParticles.h"
@@ -28,8 +29,10 @@ void SMHiggsMassGenerator::persistentInput(PersistentIStream & is, int) {
   is >> _shape >> _hwidth;
 }
 
-ClassDescription<SMHiggsMassGenerator> SMHiggsMassGenerator::initSMHiggsMassGenerator;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<SMHiggsMassGenerator,GenericMassGenerator>
+describeHerwigSMHiggsMassGenerator("Herwig::SMHiggsMassGenerator", "Herwig.so");
 
 void SMHiggsMassGenerator::Init() {
 

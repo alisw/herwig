@@ -5,6 +5,7 @@
 //
 
 #include "NMSSMWWHVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/PDT/EnumParticles.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
@@ -18,6 +19,7 @@ NMSSMWWHVertex::NMSSMWWHVertex()
   : _couplast(0.), _q2last(), _mw(), _zfact(0.), _sinb(0.),_cosb(0.) {
   orderInGem(1);
   orderInGs(0);
+  colourStructure(ColourStructure::SINGLET);
 }
 
 void NMSSMWWHVertex::doinit() {
@@ -59,8 +61,10 @@ void NMSSMWWHVertex::persistentInput(PersistentIStream & is, int) {
   is >> iunit(_mw,GeV) >> _zfact >> _sinb >> _cosb >> _mixS;
 }
 
-ClassDescription<NMSSMWWHVertex> NMSSMWWHVertex::initNMSSMWWHVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<NMSSMWWHVertex,VVSVertex>
+describeHerwigNMSSMWWHVertex("Herwig::NMSSMWWHVertex", "HwSusy.so HwNMSSM.so");
 
 void NMSSMWWHVertex::Init() {
 

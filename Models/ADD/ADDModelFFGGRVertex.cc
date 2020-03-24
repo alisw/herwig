@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ADDModelFFGGRVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "ADDModelFFGGRVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -24,6 +25,7 @@ ADDModelFFGGRVertex::ADDModelFFGGRVertex()
   : couplast_(0.), q2last_(ZERO), kappa_(ZERO), r_(ZERO) {
   orderInGem(1);
   orderInGs (1);
+  colourStructure(ColourStructure::SU3TFUND);
 }
 
 void ADDModelFFGGRVertex::doinit() {
@@ -47,8 +49,10 @@ void ADDModelFFGGRVertex::persistentInput(PersistentIStream & is, int) {
   is >> iunit(kappa_,InvGeV) >> iunit(r_,GeV);
 }
 
-ClassDescription<ADDModelFFGGRVertex> ADDModelFFGGRVertex::initADDModelFFGGRVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<ADDModelFFGGRVertex,FFVTVertex>
+describeHerwigADDModelFFGGRVertex("Herwig::ADDModelFFGGRVertex", "HwADDModel.so");
 
 void ADDModelFFGGRVertex::Init() {
   static ClassDocumentation<ADDModelFFGGRVertex> documentation
@@ -66,7 +70,6 @@ void ADDModelFFGGRVertex::setCoupling(Energy2 q2,tcPDPtr,tcPDPtr,
 #endif
   // work out the particles
   assert(cc->id()==ParticleID::g && abs(aa->id()) <= 6);
-  Complex coup;
   // overall factor
   if(q2last_!=q2||couplast_==0.) {
     couplast_ = strongCoupling(q2);

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // DipoleEventRecord.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "DipoleEventRecord.h"
+#include "Herwig/Shower/Dipole/DipoleShowerHandler.h"
 #include "Herwig/Shower/Dipole/Utility/DipolePartonSplitter.h"
 #include "Herwig/Shower/ShowerHandler.h"
 #include "ThePEG/PDT/DecayMode.h"
@@ -19,6 +20,9 @@
 #include "ThePEG/Repository/EventGenerator.h"
 #include "ThePEG/PDF/PartonExtractor.h"
 #include "Herwig/Shower/RealEmissionProcess.h"
+#include "Herwig/MatrixElement/Matchbox/Base/MatchboxMEBase.h"
+#include "Herwig/MatrixElement/Matchbox/Base/MatchboxAmplitude.h"
+
 #include <boost/utility.hpp>
 #include <algorithm>
 #include <iterator>
@@ -286,8 +290,10 @@ void DipoleEventRecord::splitSubleading(SubleadingSplittingInfo& dsplit,
   }
 }
 
-void DipoleEventRecord::findChains(const PList& ordered, const bool decay) {
-
+void DipoleEventRecord::findChains(const PList& ordered, 
+				   const set<long>& offShellPartons,
+				   const bool decay) {
+  
   // All uses of findChains should guarantee
   // a non-empty list of particles
   assert( !ordered.empty() );
@@ -305,7 +311,8 @@ void DipoleEventRecord::findChains(const PList& ordered, const bool decay) {
   bool endIsTriplet =
     (ordered.back()->hasColour() && !ordered.back()->hasAntiColour()) ||
     (!ordered.back()->hasColour() && ordered.back()->hasAntiColour());
-  
+
+
   if (!( ordered.size() == 2 && startIsTriplet && endIsTriplet)) {
     
     PList::const_iterator theStart = ordered.begin();
@@ -374,9 +381,44 @@ void DipoleEventRecord::findChains(const PList& ordered, const bool decay) {
         decayed_parton.first = (*p == currentDecay()->incoming()[0].first);
         decayed_parton.second = (*next_it == currentDecay()->incoming()[0].first);
       }
-      
-      current_chain.dipoles().push_back(Dipole({*p,*next_it},pdf,xs,decayed_parton));
+     
+      // Identify if either parton can have an off-shell mass
+      // The first test for partons with zero nominal mass should
+      // avoid issues of e.g. non-zero mass gluons
+      pair<bool,bool> off_shell (false,false);
 
+      // Note we could do away with the offShellPartons set but,
+      // to be safe in the case of an off-shell parton with a mass
+      // *very* close to its on-shell mass, we would need to include tests on the
+      // offShell indicators in the DipoleIndex == and < operators AND
+      // in canHandle and canHandleEquivalent in each massive kernel.
+      // Testing these in every splitting will probably be more expensive
+      // than doing the following checks for each hard process and decay process
+
+      // Only do off-shell check if the nominal mass is non-zero
+      if ( (*p)->nominalMass() != ZERO ) {
+	if ( offShellPartons.find(abs((*p)->id())) != offShellPartons.end() )
+	  off_shell.first = true;
+	else 
+	  assert( abs((*p)->mass() - (*p)->nominalMass()) < (*p)->nominalMass()*1.e-5
+		  && "There is an off-shell coloured particle in the hard process or a decay"
+		  "which  needs to be added to DipoleShowerHandler:OffShellInShower." );
+      }
+     
+      if ( (*next_it)->nominalMass() != ZERO ) {
+	if ( offShellPartons.find(abs((*next_it)->id())) != offShellPartons.end() )
+	  off_shell.second = true;
+	else
+	  assert( abs((*next_it)->mass() - (*next_it)->nominalMass())
+		  < (*next_it)->nominalMass()*1.e-5
+		  && "There is an off-shell coloured particle in the hard process or a decay"
+		  "which  needs to be added to DipoleShowerHandler:OffShellInShower." );
+      }
+
+      
+      current_chain.dipoles().push_back(Dipole({*p,*next_it},pdf,xs,
+					       decayed_parton, off_shell));
+      
       if ( onceMore ) {
         next_it = theStart;
         current_chain.check();
@@ -386,10 +428,10 @@ void DipoleEventRecord::findChains(const PList& ordered, const bool decay) {
         current_chain.dipoles().clear();
         onceMore = false;
       }
-
+      
     }
   } else {
-
+    
     // treat 2 -> singlet, singlet -> 2 and 1 + singlet -> 1 + singlet special
     // to prevent duplicate dipole
 
@@ -431,8 +473,36 @@ void DipoleEventRecord::findChains(const PList& ordered, const bool decay) {
       decayed_parton.first = (ordered.front() == currentDecay()->incoming()[0].first);
       decayed_parton.second = (ordered.back() == currentDecay()->incoming()[0].first);
     }
+
     
-    current_chain.dipoles().push_back(Dipole({ordered.front(),ordered.back()},pdf,xs,decayed_parton));
+    // Identify if either parton can have an off-shell mass
+    // The first test for partons with zero nominal mass should
+    // avoid issues of e.g. non-zero mass gluons
+    pair<bool,bool> off_shell (false,false);
+
+    // Only do off-shell check if the nominal mass is non-zero
+    if ( ordered.front()->nominalMass() != ZERO ) {
+      if ( offShellPartons.find(abs(ordered.front()->id())) != offShellPartons.end() )
+	off_shell.first = true;
+      else
+	assert( abs(ordered.front()->mass() - ordered.front()->nominalMass())
+		< ordered.front()->nominalMass()*1.e-5
+		&& "There is an off-shell coloured particle in the hard process or a decay"
+		"which  needs to be added to DipoleShowerHandler:OffShellInShower." );
+    }
+   
+    if ( ordered.back()->nominalMass() != ZERO ) {
+      if ( offShellPartons.find(abs(ordered.back()->id())) != offShellPartons.end() )
+	off_shell.second = true;
+      else
+	assert( abs(ordered.back()->mass() - ordered.back()->nominalMass())
+		< ordered.back()->nominalMass()*1.e-5
+		&& "There is an off-shell coloured particle in the hard process or a decay"
+		"which  needs to be added to DipoleShowerHandler:OffShellInShower." );
+    }
+        
+    current_chain.dipoles().push_back(Dipole({ordered.front(),ordered.back()},
+					     pdf,xs, decayed_parton, off_shell));
     
   }
 
@@ -450,7 +520,9 @@ DipoleEventRecord::prepare(tSubProPtr subpro,
                            tStdXCombPtr xc,
 			   StepPtr step,
                            const pair<PDF,PDF>& pdf,tPPair beam,
-			   bool firstInteraction, bool dipoles) {
+			   bool firstInteraction,
+			   const set<long>& offShellPartons,
+			   bool dipoles) {
   // set the subprocess
   subProcess(subpro);
   // clear the event record
@@ -459,6 +531,35 @@ DipoleEventRecord::prepare(tSubProPtr subpro,
   theOriginals.clear();
   theDecays.clear();
   theCurrentDecay = PerturbativeProcessPtr();
+
+  subEmDone = 0;
+  if ( doSubleadingNc && firstInteraction ) {
+
+    theDensityOperator.clear();
+    continueSubleadingNc = true;
+   
+    const Ptr<MatchboxXComb>::tptr MBXCombPtr
+      = dynamic_ptr_cast<Ptr<MatchboxXComb>::tptr >(xc);
+    if ( !MBXCombPtr ) {
+      throw Exception() << "Cannot cast StandardXComb as MatchboxXComb. "
+			<< "Matchbox is required for "
+			<< "colour matrix element corrections."
+			<< Exception::runerror; 
+    }
+    // Set the colour basis if it has not been set
+    if ( !theDensityOperator.colourBasis() ) {
+      theDensityOperator.colourBasis(MBXCombPtr->matchboxME()->matchboxAmplitude()->colourBasis());
+    } else if ( theDensityOperator.colourBasis() != 
+	 MBXCombPtr->matchboxME()->matchboxAmplitude()->colourBasis() ) {
+      throw Exception() << "The colour basis used in the colour matrix "
+			<< "element corrections should not change between events. "
+			<< Exception::runerror; 
+    }
+
+  } else {
+    continueSubleadingNc = false;
+  }
+
   // extract incoming particles
   PPair in = subpro->incoming();
   // get the incoming momentum fractions
@@ -468,6 +569,7 @@ DipoleEventRecord::prepare(tSubProPtr subpro,
   xs.first = in.first->momentum().dirPlus()/beam.first->momentum().dirPlus();
   dir.reverse();
   xs.second = in.second->momentum().dirPlus()/beam.second->momentum().dirPlus();
+
   xcombPtr(xc);
   pdfs() = pdf;
   fractions() = xs;
@@ -547,7 +649,7 @@ DipoleEventRecord::prepare(tSubProPtr subpro,
   if ( dipoles ) {
     PList cordered = colourOrdered(incoming(),outgoing());
     if ( !cordered.empty() )
-      findChains(cordered,false);
+      findChains(cordered, offShellPartons, false);
   }
   
   
@@ -586,13 +688,55 @@ DipoleEventRecord::prepare(tSubProPtr subpro,
   for ( ; XFirst != XLast; ++XFirst )
     thePX += (**XFirst).momentum();
   identifyEventType();
+
+
+  if ( doSubleadingNc ) {
+    theParticlesBefore.clear();
+    theParticlesAfter.clear();
+    theMomentaAfter.clear();
+    theParticleIndices.clear();
+    
+    // Set the particles and fill the dictionary
+    theParticleIndices[incoming().first] = 0;
+    theParticleIndices[incoming().second] = 1;
+    size_t i = 2;
+    theParticlesAfter.reserve(2 + outgoing().size()  + theHard.size());
+    theParticlesAfter.push_back(incoming().first->dataPtr());
+    theParticlesAfter.push_back(incoming().second->dataPtr());
+    theMomentaAfter.push_back(incoming().first->momentum());
+    theMomentaAfter.push_back(incoming().second->momentum());
+    for ( PList::const_iterator it = outgoing().begin(); it != outgoing().end(); it++ ) {
+      theParticlesAfter.push_back((*it)->dataPtr());
+      theMomentaAfter.push_back((*it)->momentum());
+      theParticleIndices[*it] = i;
+      i++;
+    }
+    // theHard is not added to theParticleIndices, as they aren't needed there
+    for ( PList::const_iterator it = theHard.begin(); it != theHard.end(); it++ ) {
+      theParticlesAfter.push_back((*it)->dataPtr());
+      theMomentaAfter.push_back((*it)->momentum());
+    }
+
+    // theParticlesAfter is required for fill
+    const Ptr<MatchboxXComb>::tptr MBXCombPtr
+      = dynamic_ptr_cast<Ptr<MatchboxXComb>::tptr >(xc);
+    if ( !MBXCombPtr ) {
+      throw Exception() << "Cannot cast StandardXComb as MatchboxXComb. "
+			<< "Matchbox is required for "
+			<< "colour matrix element corrections."
+			<< Exception::runerror; 
+    }
+    theDensityOperator.fill(MBXCombPtr,theParticlesAfter,theMomentaAfter);
+  }
+  
   return theOriginals;
   
 }
 
 void DipoleEventRecord::slimprepare(tSubProPtr subpro,
                                     tStdXCombPtr xc,
-                                    const pair<PDF,PDF>& pdf,tPPair beam,
+                                    const pair<PDF,PDF>& pdf,tPPair beam,			 
+				    const set<long>& offShellPartons,
                                     bool dipoles) {
   // set the subprocess
   subProcess(subpro);
@@ -627,7 +771,7 @@ void DipoleEventRecord::slimprepare(tSubProPtr subpro,
   if ( dipoles ) {
     PList cordered = colourOrdered(incoming(),outgoing());
     if ( !cordered.empty() )
-      findChains(cordered,false);
+      findChains(cordered, offShellPartons, false);
   }
   
 }
@@ -678,8 +822,12 @@ void DipoleEventRecord::clear() {
   theChains.clear();
   theDoneChains.clear();
   theOriginals.clear();
+  theDensityOperator.clear();
+  theParticlesBefore.clear();
+  theParticlesAfter.clear();
+  theMomentaAfter.clear();
+  theNextDecays.clear();
 }
-
 
 
 
@@ -720,19 +868,19 @@ pair<PVector,PVector> DipoleEventRecord::tmpupdate(DipoleSplittingInfo& dsplit) 
   for ( tcPPtr h : theHard ){
     PPtr p = h->data().produceParticle(h->momentum());
     if ( dsplit.splittingKinematics()->doesTransform() ) {
-      p->set5Momentum( dsplit.splittingKinematics()->transform(p->momentum()) );
+      dsplit.splittingKinematics()->transform(p);
     }
     out.push_back(p);
   }
   
   for ( tcPPtr p : outgoing() )
     if ( p != DE &&
-	 p != DS &&
-	 p != dsplit.emission() ){
+         p != DS &&
+         p != dsplit.emission() ){
     
       PPtr ou = p->data().produceParticle(p->momentum());;
       if ( dsplit.splittingKinematics()->doesTransform() ){
-	ou->set5Momentum( dsplit.splittingKinematics()->transform(ou->momentum()) );
+        dsplit.splittingKinematics()->transform(ou);
       }
       out.push_back(ou);
     }
@@ -740,25 +888,55 @@ pair<PVector,PVector> DipoleEventRecord::tmpupdate(DipoleSplittingInfo& dsplit) 
 }
 
 
+
 void DipoleEventRecord::update(DipoleSplittingInfo& dsplit) {
+
+  if ( continueSubleadingNc ) {
+    subEmDone++;
+    theParticlesBefore = theParticlesAfter;
+  }
   if ( incoming().first == dsplit.emitter() ) {
     intermediates().push_back(dsplit.emitter());
     incoming().first = dsplit.splitEmitter();
     fractions().first /= dsplit.lastEmitterZ();
+    if ( continueSubleadingNc ) {
+      theParticleIndices[dsplit.splitEmitter()] = 0;
+      theParticlesAfter[0] = dsplit.splitEmitter()->dataPtr();
+      theEmitterEmissionIndices.first = 0;
+      theEmitterEmissionIndices.second.first = 0;
+    }
   } else if ( incoming().first == dsplit.spectator() ) {
     intermediates().push_back(dsplit.spectator());
     incoming().first = dsplit.splitSpectator();
-    fractions().first /= dsplit.lastSpectatorZ();    
+    fractions().first /= dsplit.lastSpectatorZ();
+    if ( continueSubleadingNc ) {
+      theParticleIndices[dsplit.splitSpectator()] = 0;
+      theParticlesAfter[0] = dsplit.splitSpectator()->dataPtr();
+      theSpectatorIndices.first = 0;
+      theSpectatorIndices.second = 0;
+    }
   }
 
   if ( incoming().second == dsplit.emitter() ) {
     intermediates().push_back(dsplit.emitter());
     incoming().second = dsplit.splitEmitter();
     fractions().second /= dsplit.lastEmitterZ();
+    if ( continueSubleadingNc ) {
+      theParticleIndices[dsplit.splitEmitter()] = 1;
+      theParticlesAfter[1] = dsplit.splitEmitter()->dataPtr();
+      theEmitterEmissionIndices.first = 1;
+      theEmitterEmissionIndices.second.first = 1;
+    }
   } else if ( incoming().second == dsplit.spectator() ) {
     intermediates().push_back(dsplit.spectator());
     incoming().second = dsplit.splitSpectator();
     fractions().second /= dsplit.lastSpectatorZ();    
+    if ( continueSubleadingNc ) {
+      theParticleIndices[dsplit.splitSpectator()] = 1;
+      theParticlesAfter[1] = dsplit.splitSpectator()->dataPtr();
+      theSpectatorIndices.first = 1;
+      theSpectatorIndices.second = 1;
+    }
   }
 
   PList::iterator pos;
@@ -767,37 +945,83 @@ void DipoleEventRecord::update(DipoleSplittingInfo& dsplit) {
   if (pos != outgoing().end()) {
     intermediates().push_back(*pos);
     *pos = dsplit.splitEmitter();
+    if ( continueSubleadingNc ) {
+      // The two first elements in theParticlesBefore/After are the incoming
+      theEmitterEmissionIndices.first = 2 + distance(outgoing().begin(), pos);
+      theEmitterEmissionIndices.second.first = theEmitterEmissionIndices.first;
+      theParticlesAfter[theEmitterEmissionIndices.second.first] = dsplit.splitEmitter()->dataPtr();
+      theParticleIndices[dsplit.splitEmitter()] = theEmitterEmissionIndices.second.first;
+    }
   }
 
   pos = find(outgoing().begin(), outgoing().end(), dsplit.spectator());
   if (pos != outgoing().end()) {
     intermediates().push_back(*pos);
     *pos = dsplit.splitSpectator();
+    if ( continueSubleadingNc ) {
+      // The two first elements in theParticlesBefore/After are the incoming
+      theSpectatorIndices.first = 2 + distance(outgoing().begin(), pos);
+      theSpectatorIndices.second = theSpectatorIndices.first;
+      theParticlesAfter[theSpectatorIndices.second] = dsplit.splitSpectator()->dataPtr();
+      theParticleIndices[dsplit.splitSpectator()] = theSpectatorIndices.second;
+    }
+  }
+
+  if ( continueSubleadingNc ) {
+    theEmitterEmissionIndices.second.second = 2 + outgoing().size();
+    theParticlesAfter.insert(theParticlesAfter.begin()+theEmitterEmissionIndices.second.second,
+			     dsplit.emission()->dataPtr());
+    theMomentaAfter.insert(theMomentaAfter.begin()+theEmitterEmissionIndices.second.second,
+			   dsplit.emission()->momentum());
+    theParticleIndices[dsplit.emission()] = theEmitterEmissionIndices.second.second;
   }
 
   outgoing().push_back(dsplit.emission());
 
   if (dsplit.splittingKinematics()->doesTransform()) {
 
-    for (PList::iterator p = intermediates().begin();
-	 p != intermediates().end(); ++p) {
-      (**p).set5Momentum(dsplit.splittingKinematics()->transform((**p).momentum()));
-    }
-
     for (PList::iterator h = theHard.begin();
-	 h != theHard.end(); ++h) {
-      (**h).set5Momentum(dsplit.splittingKinematics()->transform((**h).momentum()));
-    }
+         h != theHard.end(); ++h)
+      dsplit.splittingKinematics()->transform(*h);
+
+    for (PList::iterator p = intermediates().begin();
+         p != intermediates().end(); ++p) 
+      dsplit.splittingKinematics()->transform(*p);
 
     for (PList::iterator p = outgoing().begin();
          p != outgoing().end(); ++p) {
       if ((*p) != dsplit.splitEmitter() &&
 	  (*p) != dsplit.splitSpectator() &&
 	  (*p) != dsplit.emission())
-	(**p).set5Momentum(dsplit.splittingKinematics()->transform((**p).momentum()));
+        dsplit.splittingKinematics()->transform(*p);	
     }
+    
+    if ( continueSubleadingNc ) {
+      theMomentaAfter[0] = incoming().first->momentum();
+      theMomentaAfter[1] = incoming().second->momentum();
+      size_t i = 2;
+      for (PList::iterator p = outgoing().begin();
+	   p != outgoing().end(); p++) {
+	theMomentaAfter[i] = (*p)->momentum();
+	i++;
+      }
+      for (PList::iterator p = theHard.begin();
+       	   p != theHard.end(); p++) {
+       	theMomentaAfter[i] = (*p)->momentum();
+       	i++;
+      }
+    }
+    
+  } else if ( continueSubleadingNc ) {
+    theMomentaAfter[theEmitterEmissionIndices.second.first] = dsplit.splitEmitter()->momentum();//
+    theMomentaAfter[theSpectatorIndices.second] = dsplit.splitSpectator()->momentum();//
   }
-  
+
+  // Stop with subleading emissions if the limit has been reached
+  if ( doSubleadingNc ) 
+    if ( subEmDone == subleadingNcEmissionsLimit ) 
+      continueSubleadingNc = false;
+
   // Handle updates related to decays
   // Showering of decay processes
   // Treat the evolution of the incoming
@@ -849,7 +1073,7 @@ void DipoleEventRecord::update(DipoleSplittingInfo& dsplit) {
           outIt = {dsplit.splitSpectator(), PerturbativeProcessPtr() };
           decayProcSp = true;
         }
-        
+	
         if ( decayProcEm && decayProcSp )
 	  break;
       }
@@ -933,6 +1157,117 @@ void DipoleEventRecord::update(DipoleSplittingInfo& dsplit) {
     }
     
   }
+
+  if ( continueSubleadingNc ) {
+    // Fixed alphaS
+    double alphaS = 0.118;
+
+    map<pair<size_t,size_t>,Complex> Vijk;
+    double Vtemp;
+    const Lorentz5Momentum pEmission = dsplit.emission()->momentum();
+
+    // Special cases for the density operator evolution
+    // g->qqbar splitting
+    bool splitAGluon = (dsplit.emitter()->id() == ParticleID::g) && 
+      (dsplit.emission()->id() != ParticleID::g);
+    // initial state g->qqbar splitting 
+    bool initialGluonSplitting = (dsplit.splitEmitter()->id() == ParticleID::g) && 
+      (dsplit.emission()->id() != ParticleID::g);
+    if ( initialGluonSplitting )
+      assert(dsplit.splitEmitter() == incoming().first
+	     || dsplit.splitEmitter() == incoming().second);
+
+    // Set up the dictionary
+    std::tuple<size_t,size_t,size_t> tmpTuple;
+    map<size_t,size_t> tmpMap;
+    size_t n = theEmitterEmissionIndices.second.second;
+    theEmissionsMap.clear();
+    if ( splitAGluon || initialGluonSplitting ) {
+      tmpTuple = std::make_tuple(theEmitterEmissionIndices.first,
+				 theEmitterEmissionIndices.second.first,
+				 theEmitterEmissionIndices.second.second);
+      tmpMap.clear();
+      for ( size_t j = 0; j < theParticlesBefore.size(); j++ ) {
+	if ( j != theEmitterEmissionIndices.first )
+	  tmpMap[j] = j; 
+      }
+      theEmissionsMap[tmpTuple] = tmpMap;
+    } else {
+      for ( size_t i = 0; i < theParticlesBefore.size(); i++ ) {
+	if ( theParticlesBefore[i]->coloured() ) {
+	  tmpTuple = std::make_tuple(i,i,n);
+	  tmpMap.clear();
+	  for ( size_t j = 0; j < theParticlesBefore.size(); j++ ) {
+	    if ( j != i )
+	      tmpMap[j] = j; 
+	  }
+	  theEmissionsMap[tmpTuple] = tmpMap;
+	}
+      }
+    }
+
+    Energy2 pEmitpEmis;
+    Energy2 pEmispSpec;
+
+    Lorentz5Momentum pEmitter;
+    Lorentz5Momentum pSpectator;
+
+    // Calculate all required dipole factors
+    int i,k;
+    typedef map<std::tuple<size_t,size_t,size_t>,map<size_t,size_t> > dictMap;
+    for(dictMap::const_iterator ijit = theEmissionsMap.begin();
+	ijit != theEmissionsMap.end(); ijit++) {
+      i = std::get<1>(ijit->first);
+      pEmitter = theMomentaAfter[i];
+      pEmitpEmis = pEmitter*pEmission;
+      for(dictMap::const_iterator kit = theEmissionsMap.begin();
+	  kit != theEmissionsMap.end(); kit++) {
+	// For gluon splitting ijit == kit
+	if ( ijit != kit ) {
+	  k = std::get<1>(kit->first);
+	  pSpectator = theMomentaAfter[k];
+	  pEmispSpec = pEmission*pSpectator;
+	  Vtemp = 4*Constants::pi*alphaS*dipoleKernelForEvolution(i, k,
+								  pEmitter*pSpectator, pEmitpEmis, 
+								  pEmispSpec);
+	  Vijk.insert(make_pair(make_pair(i,k),Complex(Vtemp,0.0)));
+	} else if ( splitAGluon || initialGluonSplitting ) {
+	  k = std::get<1>(kit->first);
+	  Vijk.insert(make_pair(make_pair(i,k),Complex(1.0,0.0)));
+	}
+      }
+    }
+
+    theDensityOperator.evolve(Vijk,theParticlesBefore,theParticlesAfter,
+			      theEmissionsMap,splitAGluon,initialGluonSplitting);
+  }
+}
+
+double 
+DipoleEventRecord::dipoleKernelForEvolution(size_t em, size_t spec,
+					    Energy2 pEmitpSpec, Energy2 pEmitpEmis, 
+					    Energy2 pEmispSpec) {
+  double Vijk;
+
+  if ( densityOperatorEvolution == 3 ) {
+    if ( em == theEmitterEmissionIndices.second.first && 
+	 spec == theSpectatorIndices.second ) { 
+      Vijk = 1.0;
+    } else {
+      Vijk = 0.0;
+    }
+  } else if ( densityOperatorEvolution == 2 ) {
+    Vijk = 1.0;
+  } else {
+    if ( densityOperatorEvolution == 0 ) {
+      if ( pEmitpEmis < densityOperatorCutoff ) pEmitpEmis = densityOperatorCutoff; 
+      if ( pEmispSpec < densityOperatorCutoff ) pEmispSpec = densityOperatorCutoff;
+    }
+    Vijk = ((pEmitpSpec)/GeV2)/((pEmitpEmis/GeV2)*
+				(pEmispSpec/GeV2));
+  }
+  
+  return Vijk;
 }
 
 void
@@ -944,7 +1279,9 @@ DipoleEventRecord::split(list<Dipole>::iterator dip,
                          bool colourSpectator) {
   
   static DipoleChain empty;
-  pair<Dipole,Dipole> children = dip->split(dsplit,colourSpectator);
+
+  pair<Dipole,Dipole> children = dip->split(dsplit,colourSpectator,
+					    continueSubleadingNc);
 
   list<Dipole>::iterator breakup =
     ch->insertSplitting(dip,children,childIterators);
@@ -973,6 +1310,7 @@ DipoleEventRecord::split(list<Dipole>::iterator dip,
   }
 }
 
+ 
 
 pair<PVector,PVector> DipoleEventRecord::tmpsplit(list<Dipole>::iterator dip,
                                                   list<DipoleChain>::iterator ,
@@ -1032,26 +1370,35 @@ DipoleEventRecord::inDipoles() {
 
 }
 
-void DipoleEventRecord::transform(const SpinOneLorentzRotation& rot) {
+void DipoleEventRecord::transform(const LorentzRotation& rot) {
 
 
   Lorentz5Momentum tmp;
 
   for (PList::iterator p = intermediates().begin();
        p != intermediates().end(); ++p) {
-    tmp = (**p).momentum(); tmp = rot * tmp;
+    tmp = (**p).momentum();
+    if ( (*p)->spinInfo() )
+      (*p)->spinInfo()->transform(tmp, rot);
+    tmp = rot * tmp;
     (**p).set5Momentum(tmp);
   }
 
   for (PList::iterator h = theHard.begin();
        h != theHard.end(); ++h) {
-    tmp = (**h).momentum(); tmp = rot * tmp;
+    tmp = (**h).momentum();
+    if ( (*h)->spinInfo() )
+      (*h)->spinInfo()->transform(tmp, rot);
+    tmp = rot * tmp;
     (**h).set5Momentum(tmp);
   }
 
   for (PList::iterator p = outgoing().begin();
        p != outgoing().end(); ++p) {
-    tmp = (**p).momentum(); tmp = rot * tmp;
+    tmp = (**p).momentum();
+    if ( (*p)->spinInfo() )
+      (*p)->spinInfo()->transform(tmp, rot);
+    tmp = rot * tmp;
     (**p).set5Momentum(tmp);
   }
 
@@ -1101,6 +1448,10 @@ tPPair DipoleEventRecord::fillEventRecord(StepPtr step, bool firstInteraction, b
   while ( !theOriginals.empty() ) {
     PPtr outSubPro = theOriginals.begin()->first;
     PPtr outParton = theOriginals.begin()->second;
+    outSubPro->setLifeLength(Lorentz5Distance());
+    outSubPro->setVertex(LorentzPoint());
+    outParton->setLifeLength(Lorentz5Distance());
+    outParton->setVertex(LorentzPoint());
     // workaround for OS X Mavericks LLVM libc++
 #ifdef _LIBCPP_VERSION
     map<PPtr,PPtr>::const_iterator beg = theOriginals.begin();
@@ -1137,7 +1488,8 @@ tPPair DipoleEventRecord::fillEventRecord(StepPtr step, bool firstInteraction, b
 }
 
 
-bool DipoleEventRecord::prepareDecay( PerturbativeProcessPtr decayProc ) {
+ bool DipoleEventRecord::prepareDecay( PerturbativeProcessPtr decayProc,
+				       const set<long>& offShellPartons ) {
   
   // Create objects containing the incoming and outgoing partons,
   // required as inputs for colourOrdered.
@@ -1157,13 +1509,16 @@ bool DipoleEventRecord::prepareDecay( PerturbativeProcessPtr decayProc ) {
     PPair in;
     in.first = decayProc->incoming()[0].first;
     
-    // Create an ordered list of particles
-    PList cordered;
-    cordered = colourOrdered(in,out);
+
+    // Chains are found later if the subleading shower is used
+    if ( !doSubleadingNc ) {
+      // Create an ordered list of particles
+      PList cordered;
+      cordered = colourOrdered(in,out);
     
-    // Find the dipole chains for this decay
-    findChains(cordered,true);
-    
+      // Find the dipole chains for this decay
+      findChains(cordered,offShellPartons,true);
+    }    
     return true;
   }
 }
@@ -1425,7 +1780,21 @@ void DipoleEventRecord::updateDecayMom( PPtr decayParent, PerturbativeProcessPtr
   // Boost the children
   PList::iterator beginChildren = children.begin();
   PList::iterator endChildren = children.end();
-  ThePEG::UtilityBase::setMomentum(beginChildren, endChildren, decayParent->momentum().vect() );
+
+  const Momentum3 transformMom = decayParent->momentum().vect();
+  Lorentz5Momentum sum = ThePEG::UtilityBase::sumMomentum(beginChildren, endChildren);
+  LorentzRotation rot = ThePEG::UtilityBase::transformToCMS(sum);
+  rot = ThePEG::UtilityBase::transformFromCMS
+    (Lorentz5Momentum(transformMom, sqrt(transformMom.mag2() + sum.m2()))) * rot;
+      
+  // Must transform the spinInfo using the momentum prior to transforming
+  for ( const auto& p : children ) {
+    if ( p->spinInfo() )
+      p->spinInfo()->transform(p->momentum(),rot);
+  }
+      
+  ThePEG::UtilityBase::transform(beginChildren, endChildren, rot );
+
 }
 
 
@@ -1445,8 +1814,58 @@ void DipoleEventRecord::updateDecayChainMom( PPtr decayParent, PerturbativeProce
     if ( outg.second ) {
 
       for ( auto & dec : theDecays ) {
-        if(dec.second==outg.second) {
-          dec.first->setMomentum(outg.first->momentum());
+        if ( dec.second == outg.second ) {
+
+          // If the particle has spininfo
+          if ( dec.first->spinInfo() ) {
+            
+            // Copied from DipoleVertexRecord::updateSpinInfo,
+            // would be better to use a common function
+            // Update any spin information
+            const Lorentz5Momentum& oldMom = dec.first->momentum();
+            const Lorentz5Momentum& newMom = outg.first->momentum();
+            
+            // Rotation from old momentum to +ve z-axis
+            LorentzRotation oldToZAxis;
+            Axis axisOld(oldMom.vect().unit());
+            if( axisOld.perp2() > 1e-12 ) {
+              double sinth(sqrt(1.-sqr(axisOld.z())));
+              oldToZAxis.rotate( -acos(axisOld.z()),Axis(-axisOld.y()/sinth,axisOld.x()/sinth,0.));
+            }
+            
+            // Rotation from new momentum to +ve z-axis
+            LorentzRotation newToZAxis;
+            Axis axisNew(newMom.vect().unit());
+            if( axisNew.perp2() > 1e-12 ) {
+              double sinth(sqrt(1.-sqr(axisNew.z())));
+              newToZAxis.rotate( -acos(axisNew.z()),Axis(-axisNew.y()/sinth,axisNew.x()/sinth,0.));
+            }
+            
+            // Boost from old momentum to new momentum along z-axis
+            Lorentz5Momentum momOldRotated = oldToZAxis*Lorentz5Momentum(oldMom);
+            Lorentz5Momentum momNewRotated = newToZAxis*Lorentz5Momentum(newMom);
+            
+            Energy2 a = sqr(momOldRotated.z()) + sqr(momNewRotated.t());
+            Energy2 b = 2.*momOldRotated.t()*momOldRotated.z();
+            Energy2 c = sqr(momOldRotated.t()) - sqr(momNewRotated.t());
+            double beta;
+            
+            // The rotated momentum should always lie along the +ve z-axis
+            if ( momOldRotated.z() > ZERO )
+              beta = (-b + sqrt(sqr(b)-4.*a*c)) / 2. / a;
+            else
+              beta = (-b - sqrt(sqr(b)-4.*a*c)) / 2. / a;
+            
+            LorentzRotation boostOldToNew(0., 0., beta);
+            
+            // Total transform
+            LorentzRotation transform = (newToZAxis.inverse())*boostOldToNew*oldToZAxis;
+
+            // Transform spin info and mom
+            dec.first->spinInfo()->transform(oldMom, transform);
+          }
+
+          dec.first->setMomentum(outg.first->momentum());          
           break;
         }
       }
@@ -1466,6 +1885,12 @@ void DipoleEventRecord::updateDecays(PerturbativeProcessPtr decayProc, bool iter
   // i.e. it is for use following the (non-)showering 
   // of a decay when the daughter momentum are correct.
   // With iterate = true, this updates the rest of the decay chain.
+
+  // Update the list of next decays
+  if ( decayProc == theCurrentDecay && !theNextDecays.empty() ) {
+    assert( theNextDecays.back() == decayProc->incoming()[0].first );
+    theNextDecays.pop_back();
+  }
   
   // Loop over the outgoing from this decay
   for ( auto & outg : decayProc->outgoing() ) {
@@ -1486,8 +1911,11 @@ void DipoleEventRecord::updateDecays(PerturbativeProcessPtr decayProc, bool iter
       }
       // Add to theDecays
       theDecays[newDecayed] = newDecayProc;
-      //assert(theDecays[newDecayed]->incoming()[0].second==decayProc);
-      
+
+      // Update the list of next decays
+      if ( decayProc == theCurrentDecay )
+        theNextDecays.push_back(newDecayed);
+	
       // Iteratively update theDecays from the decay chain
       if ( iterate ) 
 	updateDecays( newDecayProc );
@@ -1499,6 +1927,10 @@ void DipoleEventRecord::updateDecays(PerturbativeProcessPtr decayProc, bool iter
       PerturbativeProcessPtr newDecay=new_ptr(PerturbativeProcess());
       newDecay->incoming().push_back({ outg.first , decayProc } );
       theDecays[outg.first] = newDecay;
+      
+      // Update the list of next decays
+      if ( decayProc )
+        theNextDecays.push_back(outg.first);
       
     }
   }

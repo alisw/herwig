@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // IFLightKinematics.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -85,17 +85,52 @@ public:
    */
   virtual Energy ptMax(Energy dScale, 
 		       double emX, double specX,
-		       const DipoleIndex& ind,
+		       const DipoleSplittingInfo& dInfo,
 		       const DipoleSplittingKernel& split) const;
-
+  
+  /**
+   * Return the maximum pt for the given dipole scale.
+   */
+  virtual Energy ptMax(Energy dScale, 
+		       double, double,
+		       const DipoleIndex& dIndex,
+		       const DipoleSplittingKernel& split,
+		       tPPtr emitter, tPPtr) const;
+  
+  /**
+   * Return the maximum pt for the given dipole scale.
+   */
+  virtual Energy ptMax(Energy, 
+		       double, double,
+		       const DipoleIndex&,
+		       const DipoleSplittingKernel&) const {
+      // Only the DipoleSplittingInfo version should be used for massive
+      // dipoles, for now anyway.
+    assert(false);
+    return ZERO;
+  }
+  
   /**
    * Return the maximum virtuality for the given dipole scale.
    */
   virtual Energy QMax(Energy dScale, 
 		      double emX, double specX,
-		      const DipoleIndex& dIndex,
-		      const DipoleSplittingKernel&) const;
-
+		      const DipoleSplittingInfo& dInfo,
+		      const DipoleSplittingKernel& split) const;
+  
+  /**
+   * Return the maximum virtuality for the given dipole scale.
+   */
+  virtual Energy QMax(Energy, 
+		      double, double,
+		      const DipoleIndex&,
+		      const DipoleSplittingKernel&) const { 
+    // Only the DipoleSplittingInfo version should be used for massive
+    // dipoles, for now anyway.
+    assert(false);
+    return ZERO;
+  }
+  
   /**
    * Return the pt given a virtuality.
    */
@@ -193,7 +228,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  IFMassiveKinematics & operator=(const IFMassiveKinematics &) = delete;
+  IFMassiveKinematics & operator=(const IFMassiveKinematics &);
 
 private:
 

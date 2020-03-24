@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // IFLightKinematics.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -127,7 +127,7 @@ bool IFLightKinematics::generateSplitting(double kappa, double xi, double rphi,
   }
 
   double ratio = sqr(pt/info.scale());
-
+  
   double rho = 1. - 4.*ratio*z*(1.-z)/sqr(1.-z+ratio);
   if ( rho < 0.0 ) {
     jacobian(0.0);
@@ -145,7 +145,7 @@ bool IFLightKinematics::generateSplitting(double kappa, double xi, double rphi,
 
   double phi = 2.*Constants::pi*rphi;
 
-    jacobian(weight*(1./(u+x-2.*u*x)));
+  jacobian(weight*(1./(u+x-2.*u*x)));
   
   lastPt(pt);
   lastZ(z);
@@ -168,51 +168,43 @@ void IFLightKinematics::generateKinematics(const Lorentz5Momentum& pEmitter,
 
   double ratio = sqr(pt)/(2.*pEmitter*pSpectator);
   double rho = 1. - 4.*ratio*z*(1.-z)/sqr(1.-z+ratio);
-
+  
   double x = 0.5*((1.-z+ratio)/ratio)*(1.-sqrt(rho));
   double u = 0.5*((1.-z+ratio)/(1.-z))*(1.-sqrt(rho));
 
   Lorentz5Momentum kt =
-    getKt (pEmitter, pSpectator, pt, dInfo.lastPhi(),true);
+    getKt(pEmitter, pSpectator, pt, dInfo.lastPhi(), true);
 
+  // Initialise the momenta
   Lorentz5Momentum em;
   Lorentz5Momentum emm;
   Lorentz5Momentum spe;
 
   if ( !theCollinearScheme &&
        x > u && (1.-x)/(x-u) < 1. ) {
-
+    
     assert(false);
 
-    em =
-      ((1.-u)/(x-u))*pEmitter + ((u/x)*(1.-x)/(x-u))*pSpectator - kt/(x-u);
-    em.setMass(0.*GeV);
-    em.rescaleEnergy();
-
-    emm =
-      ((1.-x)/(x-u))*pEmitter + ((u/x)*(1.-u)/(x-u))*pSpectator - kt/(x-u);
-    emm.setMass(0.*GeV);
-    emm.rescaleEnergy();
-
-    spe =
-      (1.-u/x)*pSpectator;
-    spe.setMass(0.*GeV);
-    spe.rescaleEnergy();
+    em = ((1.-u)/(x-u))*pEmitter + ((u/x)*(1.-x)/(x-u))*pSpectator - kt/(x-u);
+    emm = ((1.-x)/(x-u))*pEmitter + ((u/x)*(1.-u)/(x-u))*pSpectator - kt/(x-u);
+    spe = (1.-u/x)*pSpectator;
 
   } else {
 
     em = (1./x)*pEmitter;
-
     emm = ((1.-x)*(1.-u)/x)*pEmitter + u*pSpectator + kt;
-    emm.setMass(0.*GeV);
-    emm.rescaleEnergy();
-
     spe = ((1.-x)*u/x)*pEmitter + (1.-u)*pSpectator - kt;
-    spe.setMass(0.*GeV);
-    spe.rescaleEnergy();
-
   }
-    
+
+  em.setMass(ZERO);
+  em.rescaleEnergy();
+
+  emm.setMass(ZERO);
+  emm.rescaleEnergy();
+
+  spe.setMass(ZERO);
+  spe.rescaleEnergy();
+  
   emitterMomentum(em);
   emissionMomentum(emm);
   spectatorMomentum(spe);
@@ -255,7 +247,7 @@ void IFLightKinematics::Init() {
      "No",
      "Switch off the collinear scheme",
      false);
-
+  
   interfaceCollinearScheme.rank(-1);
   */
 

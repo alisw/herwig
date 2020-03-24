@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // DecayIntegrator.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -85,7 +85,7 @@ public:
    */
   DecayIntegrator() : _niter(10), _npoint(10000), _ntry(500),
 		      _generateinter(false), _imode(-1),
-		      _realME(false), _virtualME(false) {}
+		      _realME(false), _virtualME(false), _eps(ZERO) {}
   
   /**
    * Check if this decayer can perfom the decay for a particular mode.
@@ -222,6 +222,11 @@ public:
    * @param header Whether or not to output the information for MySQL
    */
   virtual void dataBaseOutput(ofstream & os,bool header) const;
+
+  /**
+   *  Access to the epsilon parameter
+   */
+  Energy epsilonPS() const {return _eps;}
 
 public:
 
@@ -384,6 +389,16 @@ protected:
    */
   void hasRealEmissionME(bool in) {_realME=in;}
 
+  /**
+   * Set the epsilon parameter
+   */
+  void epsilonPS(Energy in) {_eps=in;}
+
+  /**
+   *  Clear the models
+   */
+  void clearModes() {_modes.clear();}
+
 protected:
   
   /** @name Standard Interfaced functions. */
@@ -395,11 +410,6 @@ protected:
   //@}
 
 private:
-  
-  /**
-   * Describe an abstract base class with persistent data.
-   */
-  static AbstractClassDescription<DecayIntegrator> initDecayIntegrator;
   
   /**
    * Private and non-existent assignment operator.
@@ -457,6 +467,11 @@ private:
    *  Whether or not the one-loop matrix element exists
    */
   bool _virtualME;
+
+  /**
+   *   Epsilon parameter for phase-space integration
+   */
+  Energy _eps;
   
 };
   /**
@@ -471,34 +486,5 @@ private:
 
 }
 
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-  
-/**
- * The following template specialization informs ThePEG about the
- * base class of DecayIntegrator.
- */
-template <>
-struct BaseClassTrait<Herwig::DecayIntegrator,1> {
-  /** Typedef of the base class of DecayIntegrator. */
-  typedef Herwig::HwDecayerBase NthBase;
-};
-  
-/**
- * The following template specialization informs ThePEG about the
- * name of this class and the shared object where it is defined.
- */
-template <>
-struct ClassTraits<Herwig::DecayIntegrator>
-  : public ClassTraitsBase<Herwig::DecayIntegrator> {
-  /** Return the class name. */
-  static string className() { return "Herwig::DecayIntegrator"; }
-};
-  
-/** @endcond */
-
-}
 
 #endif /* HERWIG_DecayIntegrator_H */

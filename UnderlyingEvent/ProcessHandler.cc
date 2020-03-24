@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ProcessHandler.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "ProcessHandler.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "MPISampler.h"
 
 #include "ThePEG/Handlers/StandardXComb.h"
@@ -398,8 +399,10 @@ void ProcessHandler::persistentInput(PersistentIStream & is, int) {
      >> theSampler >> theHandler;
 }
 
-ClassDescription<ProcessHandler> ProcessHandler::initProcessHandler;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<ProcessHandler,Interfaced>
+describeHerwigProcessHandler("Herwig::ProcessHandler", "JetCuts.so SimpleKTCut.so HwMPI.so");
 
 void ProcessHandler::Init() {
 

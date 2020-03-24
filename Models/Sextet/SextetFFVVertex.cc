@@ -34,11 +34,8 @@ void SextetFFVVertex::persistentInput(PersistentIStream & is, int) {
 }
 
 
-// *** Attention *** The following static variable is needed for the type
-// description system in ThePEG. Please check that the template arguments
-// are correct (the class and its base class), and that the constructor
-// arguments are correct (the class name and the name of the dynamically
-// loadable library where the class implementation can be found).
+// The following static variable is needed for the type
+// description system in ThePEG.
 DescribeClass<SextetFFVVertex,Helicity::FFVVertex>
 describeSextetFFVVertex("Herwig::SextetFFVVertex", "HwSextetModel.so");
 
@@ -102,7 +99,9 @@ void SextetFFVVertex::setCoupling(Energy2, tcPDPtr part1,
   //check quarks
   assert(!(q1ID>6) && !(q2ID>6));
   bool part1Up = (q1ID==2 || q1ID==4 || q1ID==6) ? true : false;
+#ifndef NDEBUG
   bool part2Up = (q2ID==2 || q2ID==4 || q2ID==6) ? true : false;
+#endif
   Complex cRight(1.,1.), cLeft(1.,1.), prefactor(1.,0.);
 
   if(vDQID==ParticleID::VectorDQY16P){

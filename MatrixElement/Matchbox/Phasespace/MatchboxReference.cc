@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxReference.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -74,8 +74,6 @@ double MatchboxReference::generateTwoToNKinematics(const double*,
 
   lastXCombPtr()->lastX1X2(make_pair(x1,x2));
   lastXCombPtr()->lastSHat((momenta[0]+momenta[1]).m2());
-
-  fillDiagramWeights();
 
   return weight;
 

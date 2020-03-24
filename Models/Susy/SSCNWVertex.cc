@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SSCNWVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -26,6 +26,7 @@ SSCNWVertex::SSCNWVertex() : _sw(0.),  _couplast(0.), _q2last(ZERO),
 			     _rightlast(0.) {
   orderInGs(0);
   orderInGem(1);
+  colourStructure(ColourStructure::SINGLET);
 }
 
 void SSCNWVertex::doinit() {
@@ -62,11 +63,8 @@ void SSCNWVertex::persistentInput(PersistentIStream & is, int) {
   is >> _sw >> _theN >> _theU >> _theV;
 }
 
-// *** Attention *** The following static variable is needed for the type
-// description system in ThePEG. Please check that the template arguments
-// are correct (the class and its base class), and that the constructor
-// arguments are correct (the class name and the name of the dynamically
-// loadable library where the class implementation can be found).
+// The following static variable is needed for the type
+// description system in ThePEG.
 DescribeClass<SSCNWVertex,Helicity::FFVVertex>
 describeSSCNWVertex("Herwig::SSCNWVertex", "HwSusy.so");
 

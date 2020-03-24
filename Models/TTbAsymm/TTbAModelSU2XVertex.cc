@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // TTbAModelSU2XVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "TTbAModelSU2XVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -49,7 +50,7 @@ TTbAModelSU2XVertex::TTbAModelSU2XVertex()  {
   addToList(-2,6,-71);
   addToList(2,-6,-71);
 
-
+  colourStructure(ColourStructure::DELTA);
 }
 
 void TTbAModelSU2XVertex::doinit() {
@@ -72,9 +73,10 @@ void TTbAModelSU2XVertex::persistentInput(PersistentIStream & is, int) {
   is >> _alphaX >> _costhetaX >> _models;
 }
 
-ClassDescription<TTbAModelSU2XVertex> 
-TTbAModelSU2XVertex::initTTbAModelSU2XVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<TTbAModelSU2XVertex,FFVVertex>
+describeHerwigTTbAModelSU2XVertex("Herwig::TTbAModelSU2XVertex", "Herwig.so");
 
 
 void TTbAModelSU2XVertex::Init() {

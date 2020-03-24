@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // UEDG1G1G0Vertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -25,6 +25,7 @@ UEDG1G1G0Vertex::UEDG1G1G0Vertex()
   : theq2Last(ZERO), theCoupLast(0.) {
   orderInGs(1);
   orderInGem(0);
+  colourStructure(ColourStructure::SU3F);
 }
 
 void UEDG1G1G0Vertex::doinit() {
@@ -33,11 +34,8 @@ void UEDG1G1G0Vertex::doinit() {
   VVVVertex::doinit();
 }
 
-// *** Attention *** The following static variable is needed for the type
-// description system in ThePEG. Please check that the template arguments
-// are correct (the class and its base class), and that the constructor
-// arguments are correct (the class name and the name of the dynamically
-// loadable library where the class implementation can be found).
+// The following static variable is needed for the type
+// description system in ThePEG.
 DescribeNoPIOClass<UEDG1G1G0Vertex,Helicity::VVVVertex>
 describeUEDG1G1G0Vertex("Herwig::UEDG1G1G0Vertex", "HwUED.so");
 

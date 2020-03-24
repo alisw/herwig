@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SSHPPVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "SSHPPVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
@@ -41,6 +42,7 @@ SSHPPVertex::SSHPPVertex() : theIncludeTriLinear(true),
 			     theq2last(), theHaveCoeff(false), theLastID(0) {
   orderInGs(0);
   orderInGem(3);
+  colourStructure(ColourStructure::SINGLET);
 }
 
 void SSHPPVertex::persistentOutput(PersistentOStream & os) const {
@@ -65,8 +67,10 @@ void SSHPPVertex::persistentInput(PersistentIStream & is, int) {
      >> iunit(theSfmass, GeV) >> theU >> theV;
 }
 
-ClassDescription<SSHPPVertex> SSHPPVertex::initSSHPPVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<SSHPPVertex,VVSLoopVertex>
+describeHerwigSSHPPVertex("Herwig::SSHPPVertex", "HwSusy.so");
 
 void SSHPPVertex::Init() {
   

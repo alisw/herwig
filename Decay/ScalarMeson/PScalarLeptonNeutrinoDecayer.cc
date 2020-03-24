@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // PScalarLeptonNeutrinoDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "PScalarLeptonNeutrinoDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/ParVector.h"
 #include "ThePEG/Interface/Parameter.h"
@@ -168,8 +169,10 @@ void PScalarLeptonNeutrinoDecayer::persistentInput(PersistentIStream & is, int) 
      >> _maxweighttau;
 }
 
-ClassDescription<PScalarLeptonNeutrinoDecayer> PScalarLeptonNeutrinoDecayer::initPScalarLeptonNeutrinoDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<PScalarLeptonNeutrinoDecayer,DecayIntegrator>
+describeHerwigPScalarLeptonNeutrinoDecayer("Herwig::PScalarLeptonNeutrinoDecayer", "HwSMDecay.so");
 
 void PScalarLeptonNeutrinoDecayer::Init() {
 

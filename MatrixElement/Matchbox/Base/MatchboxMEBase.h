@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxMEBase.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -65,11 +65,6 @@ public:
    * Return the factory which produced this matrix element
    */
   Ptr<MatchboxFactory>::tptr factory() const;
-
-  /**
-   * Set the factory which produced this matrix element
-   */
-  void factory(Ptr<MatchboxFactory>::tptr f);
 
   /** @name Subprocess and diagram information. */
   //@{
@@ -1099,11 +1094,6 @@ protected:
   //@}
 
 private:
-
-  /**
-   * The factory which produced this matrix element
-   */
-  Ptr<MatchboxFactory>::tptr theFactory;
 
   /**
    * The phase space generator to be used.

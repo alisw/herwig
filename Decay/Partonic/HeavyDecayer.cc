@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // HeavyDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "HeavyDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include <ThePEG/PDT/EnumParticles.h>
 #include <ThePEG/PDT/DecayMode.h>
 #include <ThePEG/Interface/ClassDocumentation.h>
@@ -56,7 +57,10 @@ void HeavyDecayer::Init() {
      100);
 }
 
-ClassDescription<HeavyDecayer> HeavyDecayer::initHeavyDecayer;
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<HeavyDecayer,PartonicDecayerBase>
+describeHerwigHeavyDecayer("Herwig::HeavyDecayer", "HwPartonicDecay.so");
 
 bool HeavyDecayer::accept(tcPDPtr parent, const tPDVector & children) const { 
   long id = parent->id();

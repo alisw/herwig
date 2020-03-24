@@ -16,7 +16,6 @@ library HwMamboDecay.so
 library HwPerturbativeDecay.so
 library HwBaryonDecay.so
 library HwTauDecay.so
-library HwPerturbativeHiggsDecay.so
 #
 create Herwig::TauDecayer  Tau1Meson
 newdef Tau1Meson:Iteration 1
@@ -4092,7 +4091,7 @@ create Herwig::SemiLeptonicScalarDecayer  ISGW
 newdef ISGW:Iteration 1
 newdef ISGW:Ntry 500
 newdef ISGW:Points 10000
-newdef ISGW:GenerateIntermediates 1 
+newdef ISGW:GenerateIntermediates 0
 insert ISGW:MaximumWeight 0 5.424e-05
 insert ISGW:MaximumWeight 1 5.41804e-05
 insert ISGW:MaximumWeight 2 3.893e-05
@@ -4950,7 +4949,7 @@ create Herwig::SemiLeptonicScalarDecayer  ISGW2
 newdef ISGW2:Iteration 1
 newdef ISGW2:Ntry 500
 newdef ISGW2:Points 10000
-newdef ISGW2:GenerateIntermediates 1 
+newdef ISGW2:GenerateIntermediates 0
 insert ISGW2:MaximumWeight 0 3.95005e-05
 insert ISGW2:MaximumWeight 1 3.94637e-05
 insert ISGW2:MaximumWeight 2 2.93349e-05
@@ -6475,7 +6474,8 @@ newdef ISGW2:FormFactor ISGW2FormFactor
 
 #
 create Herwig::SMZDecayer  ZDecayer HwPerturbativeDecay.so
-newdef ZDecayer:Coupling /Herwig/Shower/AlphaQCD
+newdef ZDecayer:AlphaS  /Herwig/Shower/AlphaQCD
+newdef ZDecayer:AlphaEM /Herwig/Shower/AlphaQED
 newdef ZDecayer:QuarkMax 0 0.43
 newdef ZDecayer:QuarkMax 1 0.30
 newdef ZDecayer:QuarkMax 2 0.43
@@ -6493,29 +6493,11 @@ newdef ZDecayer:Points 10000
 newdef ZDecayer:GenerateIntermediates 0 
 newdef ZDecayer:PhotonGenerator /Herwig/QEDRadiation/SOPHTY
 
-#
-create Herwig::SMZFermionsPOWHEGDecayer ZPowhegDecayer HwPerturbativeDecay.so
-newdef ZPowhegDecayer:Coupling /Herwig/Shower/AlphaQCD
-newdef ZPowhegDecayer:QuarkMax 0 0.43
-newdef ZPowhegDecayer:QuarkMax 1 0.30
-newdef ZPowhegDecayer:QuarkMax 2 0.43
-newdef ZPowhegDecayer:QuarkMax 3 0.30
-newdef ZPowhegDecayer:QuarkMax 4 0.43
-newdef ZPowhegDecayer:LeptonMax 0 0.1
-newdef ZPowhegDecayer:LeptonMax 1 0.2
-newdef ZPowhegDecayer:LeptonMax 2 0.1
-newdef ZPowhegDecayer:LeptonMax 3 0.2
-newdef ZPowhegDecayer:LeptonMax 4 0.1
-newdef ZPowhegDecayer:LeptonMax 5 0.2
-newdef ZPowhegDecayer:Iteration 1
-newdef ZPowhegDecayer:Ntry 500
-newdef ZPowhegDecayer:Points 10000
-newdef ZPowhegDecayer:GenerateIntermediates 0 
-newdef ZPowhegDecayer:PhotonGenerator /Herwig/QEDRadiation/SOPHTY
 
 #
 create Herwig::SMWDecayer  WDecayer HwPerturbativeDecay.so
-newdef WDecayer:Coupling /Herwig/Shower/AlphaQCD
+newdef WDecayer:AlphaS  /Herwig/Shower/AlphaQCD
+newdef WDecayer:AlphaEM /Herwig/Shower/AlphaQED
 newdef WDecayer:QuarkMax 0 1.0
 newdef WDecayer:QuarkMax 1 0.05
 newdef WDecayer:QuarkMax 2 0.05
@@ -6530,24 +6512,6 @@ newdef WDecayer:Ntry 500
 newdef WDecayer:Points 10000
 newdef WDecayer:GenerateIntermediates 0 
 newdef WDecayer:PhotonGenerator /Herwig/QEDRadiation/SOPHTY
-
-#
-create Herwig::SMWFermionsPOWHEGDecayer WPowhegDecayer HwPerturbativeDecay.so
-newdef WPowhegDecayer:Coupling /Herwig/Shower/AlphaQCD
-newdef WPowhegDecayer:QuarkMax 0 1.0
-newdef WPowhegDecayer:QuarkMax 1 0.05
-newdef WPowhegDecayer:QuarkMax 2 0.05
-newdef WPowhegDecayer:QuarkMax 3 1.0
-newdef WPowhegDecayer:QuarkMax 4 2.e-05
-newdef WPowhegDecayer:QuarkMax 5 0.0016
-newdef WPowhegDecayer:LeptonMax 0 0.33
-newdef WPowhegDecayer:LeptonMax 1 0.33
-newdef WPowhegDecayer:LeptonMax 2 0.33
-newdef WPowhegDecayer:Iteration 1
-newdef WPowhegDecayer:Ntry 500
-newdef WPowhegDecayer:Points 10000
-newdef WPowhegDecayer:GenerateIntermediates 0 
-newdef WPowhegDecayer:PhotonGenerator /Herwig/QEDRadiation/SOPHTY
 
 #
 create Herwig::PVectorMesonVectorPScalarDecayer  PVectorVP
@@ -6966,7 +6930,7 @@ create Herwig::ScalarMesonFactorizedDecayer  ISGW2Hadronic
 newdef ISGW2Hadronic:Iteration 1
 newdef ISGW2Hadronic:Ntry 500
 newdef ISGW2Hadronic:Points 10000
-newdef ISGW2Hadronic:GenerateIntermediates 1 
+newdef ISGW2Hadronic:GenerateIntermediates 0
 newdef ISGW2Hadronic:a1Bottom 1.1
 newdef ISGW2Hadronic:a2Bottom -0.24
 newdef ISGW2Hadronic:a1Charm 1.3
@@ -12503,7 +12467,7 @@ create Herwig::SemiLeptonicBaryonDecayer  BaryonLight1
 newdef BaryonLight1:Iteration 1
 newdef BaryonLight1:Ntry 500
 newdef BaryonLight1:Points 10000
-newdef BaryonLight1:GenerateIntermediates 1 
+newdef BaryonLight1:GenerateIntermediates 0
 insert BaryonLight1:MaximumWeight 0 2.29031 
 insert BaryonLight1:MaximumWeight 1 3.98905e-05 
 insert BaryonLight1:MaximumWeight 2 0.000122986 
@@ -14352,7 +14316,7 @@ create Herwig::SemiLeptonicScalarDecayer  WSB
 newdef WSB:Iteration 1
 newdef WSB:Ntry 500
 newdef WSB:Points 10000
-newdef WSB:GenerateIntermediates 1 
+newdef WSB:GenerateIntermediates 0
 insert WSB:MaximumWeight 0 0.21439
 insert WSB:MaximumWeight 1 0.0902162
 insert WSB:MaximumWeight 2 2.29241e-14
@@ -17538,7 +17502,7 @@ create Herwig::SemiLeptonicScalarDecayer  BZVector
 newdef BZVector:Iteration 1
 newdef BZVector:Ntry 500
 newdef BZVector:Points 10000
-newdef BZVector:GenerateIntermediates 1 
+newdef BZVector:GenerateIntermediates 0
 insert BZVector:MaximumWeight 0 0.000599733
 insert BZVector:MaximumWeight 1 0.000579422
 insert BZVector:MaximumWeight 2 0.000339457
@@ -17874,7 +17838,7 @@ create Herwig::SemiLeptonicScalarDecayer  BZScalar
 newdef BZScalar:Iteration 1
 newdef BZScalar:Ntry 500
 newdef BZScalar:Points 10000
-newdef BZScalar:GenerateIntermediates 1 
+newdef BZScalar:GenerateIntermediates 0
 insert BZScalar:MaximumWeight 0 0.000172345
 insert BZScalar:MaximumWeight 1 0.00017204
 insert BZScalar:MaximumWeight 2 0.00012728
@@ -18027,7 +17991,7 @@ create Herwig::ScalarMesonFactorizedDecayer  WSBHadronic
 newdef WSBHadronic:Iteration 1
 newdef WSBHadronic:Ntry 500
 newdef WSBHadronic:Points 10000
-newdef WSBHadronic:GenerateIntermediates 1 
+newdef WSBHadronic:GenerateIntermediates 0
 newdef WSBHadronic:a1Bottom 1.1
 newdef WSBHadronic:a2Bottom -0.24
 newdef WSBHadronic:a1Charm 1.3
@@ -19661,7 +19625,7 @@ create Herwig::SemiLeptonicScalarDecayer  Melikhov
 newdef Melikhov:Iteration 1
 newdef Melikhov:Ntry 500
 newdef Melikhov:Points 10000
-newdef Melikhov:GenerateIntermediates 1 
+newdef Melikhov:GenerateIntermediates 0
 insert Melikhov:MaximumWeight 0 0.000574253
 insert Melikhov:MaximumWeight 1 0.000523847
 insert Melikhov:MaximumWeight 2 0.000240896
@@ -19739,7 +19703,7 @@ create Herwig::SemiLeptonicScalarDecayer  MelikhovStech
 newdef MelikhovStech:Iteration 1
 newdef MelikhovStech:Ntry 500
 newdef MelikhovStech:Points 10000
-newdef MelikhovStech:GenerateIntermediates 1 
+newdef MelikhovStech:GenerateIntermediates 0
 insert MelikhovStech:MaximumWeight 0 0.132629
 insert MelikhovStech:MaximumWeight 1 0.113122
 insert MelikhovStech:MaximumWeight 2 0.337711
@@ -21409,7 +21373,7 @@ create Herwig::SemiLeptonicBaryonDecayer  BaryonLight2
 newdef BaryonLight2:Iteration 1
 newdef BaryonLight2:Ntry 500
 newdef BaryonLight2:Points 10000
-newdef BaryonLight2:GenerateIntermediates 1 
+newdef BaryonLight2:GenerateIntermediates 0
 insert BaryonLight2:MaximumWeight 0 2.29013 
 insert BaryonLight2:MaximumWeight 1 4.14333e-05 
 insert BaryonLight2:MaximumWeight 2 0.00012764 
@@ -21546,7 +21510,7 @@ create Herwig::SemiLeptonicScalarDecayer  KiselevBc
 newdef KiselevBc:Iteration 1
 newdef KiselevBc:Ntry 500
 newdef KiselevBc:Points 10000
-newdef KiselevBc:GenerateIntermediates 1 
+newdef KiselevBc:GenerateIntermediates 0
 insert KiselevBc:MaximumWeight 0 0.175615
 insert KiselevBc:MaximumWeight 1 0.136474
 insert KiselevBc:MaximumWeight 2 0.137341
@@ -21877,7 +21841,7 @@ create Herwig::ScalarMesonFactorizedDecayer  BcHadronic
 newdef BcHadronic:Iteration 1
 newdef BcHadronic:Ntry 500
 newdef BcHadronic:Points 10000
-newdef BcHadronic:GenerateIntermediates 1 
+newdef BcHadronic:GenerateIntermediates 0
 newdef BcHadronic:a1Bottom 1.14
 newdef BcHadronic:a2Bottom -0.2
 newdef BcHadronic:a1Charm 1.2
@@ -24084,8 +24048,9 @@ newdef BtosgammaMass:Spectrum 99 1.04156e-05
 newdef BtosgammaKagan:HadronicMass BtosgammaMass 
 
 #
-create Herwig::SMTopPOWHEGDecayer  Top
-newdef Top:Coupling /Herwig/Shower/AlphaQCD
+create Herwig::SMTopDecayer  Top
+newdef Top:AlphaS  /Herwig/Shower/AlphaQCD
+newdef Top:AlphaEM /Herwig/Shower/AlphaQED
 newdef Top:QuarkWeights 0 5.
 newdef Top:QuarkWeights 1 5.
 newdef Top:QuarkWeights 2 5.
@@ -24102,7 +24067,8 @@ newdef Top:GenerateIntermediates 1
 newdef Top:PhotonGenerator /Herwig/QEDRadiation/SOPHTY
 
 #
-create Herwig::SMHiggsFermionsPOWHEGDecayer  Hff
+create Herwig::SMHiggsFermionsDecayer  Hff
+newdef Hff:NLO Yes
 newdef Hff:MaxWeights 0 2.116e-06
 newdef Hff:MaxWeights 1 4.47418e-07
 newdef Hff:MaxWeights 2 0.000763237
@@ -24116,7 +24082,8 @@ newdef Hff:Iteration 1
 newdef Hff:Ntry 500
 newdef Hff:Points 10000
 newdef Hff:GenerateIntermediates 0 
-newdef Hff:Coupling /Herwig/Shower/AlphaQCD
+newdef Hff:AlphaS  /Herwig/Shower/AlphaQCD
+newdef Hff:AlphaEM /Herwig/Shower/AlphaQED
 newdef Hff:PhotonGenerator /Herwig/QEDRadiation/SOPHTY
 
 #
@@ -24132,11 +24099,25 @@ newdef HWW:GenerateIntermediates 0
 newdef HWW:PhotonGenerator /Herwig/QEDRadiation/SOPHTY
 
 #
+create Herwig::SMHiggsGGHiggsPPDecayer  HPP
+newdef HPP:MaxWeights 0 0.624291
+newdef HPP:MaxWeights 1 1.17718
+newdef HPP:MaxWeights 2 1.15963
+newdef HPP:SMHGGVertex /Herwig/Vertices/HGGVertex
+newdef HPP:SMHPPVertex /Herwig/Vertices/HPPVertex
+newdef HPP:SMHZPVertex /Herwig/Vertices/HZPVertex
+newdef HPP:Iteration 10
+newdef HPP:Ntry 500
+newdef HPP:Points 10000
+newdef HPP:AlphaS  /Herwig/Shower/AlphaQCD
+newdef HPP:GenerateIntermediates 0
+
+#
 create Herwig::SemiLeptonicScalarDecayer  HQET
 newdef HQET:Iteration 1
 newdef HQET:Ntry 500
 newdef HQET:Points 10000
-newdef HQET:GenerateIntermediates 1 
+newdef HQET:GenerateIntermediates 0
 insert HQET:MaximumWeight 0 0.0762401
 insert HQET:MaximumWeight 1 0.0723751
 insert HQET:MaximumWeight 2 0.0189018

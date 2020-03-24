@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // FILightKinematics.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -66,7 +66,7 @@ pair<double,double> FILightKinematics::zBoundaries(Energy pt,
 						   const DipoleSplittingKernel&) const {
   Energy hard=dInfo.hardPt();
   if(openZBoundaries()==1)
-    hard=dInfo.scale()*sqrt((1.-dInfo.spectatorX())/dInfo.spectatorX())/2.;
+	hard=dInfo.scale()*sqrt((1.-dInfo.spectatorX())/dInfo.spectatorX())/2.;
   if(openZBoundaries()==2)
     hard=dInfo.scale()*min(1.,sqrt((1.-dInfo.spectatorX())/dInfo.spectatorX())/2.);
   if(hard<pt)return {0.5,0.5};
@@ -141,20 +141,21 @@ void FILightKinematics::generateKinematics(const Lorentz5Momentum& pEmitter,
   Energy pt = dInfo.lastPt();
   double z = dInfo.lastZ();
   double x = 1./(1.+sqr(pt/dInfo.scale())/(z*(1.-z)));
-
+  
   Lorentz5Momentum kt =
-    getKt (pSpectator, pEmitter, pt, dInfo.lastPhi(),true);
+    getKt(pEmitter, pSpectator, pt, dInfo.lastPhi(), true);
 
   Lorentz5Momentum em = z*pEmitter + (1.-z)*((1.-x)/x)*pSpectator + kt;
-  em.setMass(0.*GeV);
+  Lorentz5Momentum emm = (1.-z)*pEmitter + z*((1.-x)/x)*pSpectator - kt;
+  Lorentz5Momentum spe = (1./x)*pSpectator;
+  
+  em.setMass(ZERO);
   em.rescaleEnergy();
 
-  Lorentz5Momentum emm = (1.-z)*pEmitter + z*((1.-x)/x)*pSpectator - kt;
-  emm.setMass(0.*GeV);
+  emm.setMass(ZERO);
   emm.rescaleEnergy();
-
-  Lorentz5Momentum spe = (1./x)*pSpectator;
-  spe.setMass(0.*GeV);
+  
+  spe.setMass(ZERO);
   spe.rescaleEnergy();
 
   emitterMomentum(em);

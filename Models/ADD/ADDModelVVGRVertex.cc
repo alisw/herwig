@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ADDModelVVGRVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "ADDModelVVGRVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -27,8 +28,10 @@ void ADDModelVVGRVertex::persistentInput(PersistentIStream & is, int) {
   is >> iunit(kappa_,InvGeV) >> iunit(r_,GeV);
 }
 
-ClassDescription<ADDModelVVGRVertex> ADDModelVVGRVertex::initADDModelVVGRVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<ADDModelVVGRVertex,VVTVertex>
+describeHerwigADDModelVVGRVertex("Herwig::ADDModelVVGRVertex", "HwADDModel.so");
 
 void ADDModelVVGRVertex::Init() {
  static ClassDocumentation<ADDModelVVGRVertex> documentation
@@ -44,6 +47,7 @@ void ADDModelVVGRVertex::setCoupling(Energy2,tcPDPtr,tcPDPtr, tcPDPtr) {
 ADDModelVVGRVertex::ADDModelVVGRVertex() : kappa_(ZERO), r_(ZERO) {
   orderInGem(1);
   orderInGs (0);
+  colourStructure(ColourStructure::DELTA);
 }
 
 void ADDModelVVGRVertex::doinit() {

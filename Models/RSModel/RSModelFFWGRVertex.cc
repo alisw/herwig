@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // RSModelFFWGRVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "RSModelFFWGRVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -26,6 +27,7 @@ RSModelFFWGRVertex::RSModelFFWGRVertex()
     couplast_(0.), q2last_(ZERO), kappa_(ZERO) {
   orderInGem(2);
   orderInGs (0);
+  colourStructure(ColourStructure::DELTA);
 }
 
 void RSModelFFWGRVertex::doinit() {
@@ -110,8 +112,10 @@ void RSModelFFWGRVertex::persistentInput(PersistentIStream & is, int) {
   is >> charge_ >> gl_ >> gr_ >> iunit(kappa_,InvGeV) >> ckm_;
 }
 
-ClassDescription<RSModelFFWGRVertex> RSModelFFWGRVertex::initRSModelFFWGRVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<RSModelFFWGRVertex,FFVTVertex>
+describeHerwigRSModelFFWGRVertex("Herwig::RSModelFFWGRVertex", "HwRSModel.so");
 
 void RSModelFFWGRVertex::Init() {
   static ClassDocumentation<RSModelFFWGRVertex> documentation

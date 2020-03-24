@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxInsertionOperator.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -59,11 +59,6 @@ public:
    * Return the factory which produced this matrix element
    */
   Ptr<MatchboxFactory>::tptr factory() const;
-
-  /**
-   * Set the factory which produced this matrix element
-   */
-  void factory(Ptr<MatchboxFactory>::tptr f);
 
   /** @name Process and phasespace information */
   //@{
@@ -231,14 +226,6 @@ public:
 
 // If needed, insert declarations of virtual function defined in the
 // InterfacedBase class here (using ThePEG-interfaced-decl in Emacs).
-
-private:
-
-  /**
-   * The factory which produced this matrix element
-   */
-  Ptr<MatchboxFactory>::tptr theFactory;
-
 
 private:
 

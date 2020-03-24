@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEee2Higgs2SM.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -203,12 +203,6 @@ private:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEee2Higgs2SM> initMEee2Higgs2SM;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
@@ -236,41 +230,6 @@ private:
    */
   PDPtr h0_;
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEee2Higgs2SM. */
-template <>
-struct BaseClassTrait<Herwig::MEee2Higgs2SM,1> {
-  /** Typedef of the first base class of MEee2Higgs2SM. */
-  typedef ME2to2Base NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEee2Higgs2SM class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEee2Higgs2SM>
-  : public ClassTraitsBase<Herwig::MEee2Higgs2SM> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEee2Higgs2SM"; }
-  /**
-   * The name of a file containing the dynamic library where the class
-   * MEee2Higgs2SM is implemented. It may also include several, space-separated,
-   * libraries if the class MEee2Higgs2SM depends on other classes (base classes
-   * excepted). In this case the listed libraries will be dynamically
-   * linked in the order they are specified.
-   */
-  static string library() { return "HwMELepton.so"; }
-};
-
-/** @endcond */
 
 }
 

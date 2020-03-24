@@ -141,17 +141,27 @@ am_HwShower_la_OBJECTS = Couplings/ShowerAlphaQCD.lo \
 	Couplings/ShowerAlphaQED.lo QTildeShowerHandler.lo \
 	SplittingFunctions/HalfHalfOneSplitFn.lo \
 	SplittingFunctions/OneOneOneSplitFn.lo \
+	SplittingFunctions/OneOneOneMassiveSplitFn.lo \
 	SplittingFunctions/ZeroZeroOneSplitFn.lo \
 	SplittingFunctions/OneHalfHalfSplitFn.lo \
 	SplittingFunctions/HalfOneHalfSplitFn.lo \
-	Default/QTildeSudakov.lo Default/QTildeModel.lo \
-	Default/Decay_QTildeShowerKinematics1to2.lo \
-	Default/IS_QTildeShowerKinematics1to2.lo \
-	Default/FS_QTildeShowerKinematics1to2.lo \
-	Default/QTildeFinder.lo Default/QTildeReconstructor.lo \
-	Base/KinematicsReconstructor.lo Base/ShowerModel.lo \
-	Base/PartnerFinder.lo Base/ShowerVeto.lo \
-	Base/FullShowerVeto.lo
+	SplittingFunctions/CMWOneOneOneSplitFn.lo \
+	SplittingFunctions/CMWHalfHalfOneSplitFn.lo \
+	Kinematics/Decay_QTildeShowerKinematics1to2.lo \
+	Kinematics/IS_QTildeShowerKinematics1to2.lo \
+	Kinematics/FS_QTildeShowerKinematics1to2.lo \
+	Kinematics/KinematicsReconstructor.lo Base/HardTree.lo \
+	Base/HardBranching.lo Base/PartnerFinder.lo Base/ShowerVeto.lo \
+	Base/FullShowerVeto.lo \
+	SplittingFunctions/SplittingGenerator.lo Base/ShowerTree.lo \
+	ShowerConfig.lo Base/ShowerParticle.lo \
+	Kinematics/ShowerKinematics.lo Kinematics/ShowerBasis.lo \
+	SplittingFunctions/SudakovFormFactor.lo \
+	SplittingFunctions/SudakovCutOff.lo \
+	SplittingFunctions/PTCutOff.lo \
+	SplittingFunctions/MassCutOff.lo \
+	SplittingFunctions/VariableMassCutOff.lo \
+	SplittingFunctions/SplittingFunction.lo Base/ShowerVertex.lo
 HwShower_la_OBJECTS = $(am_HwShower_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -298,14 +308,8 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
-BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
-BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
 BOOST_LDPATH = @BOOST_LDPATH@
 BOOST_ROOT = @BOOST_ROOT@
-BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
-BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
-BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS = @BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS@
 BOOST_UNIT_TEST_FRAMEWORK_LDPATH = @BOOST_UNIT_TEST_FRAMEWORK_LDPATH@
 BOOST_UNIT_TEST_FRAMEWORK_LIBS = @BOOST_UNIT_TEST_FRAMEWORK_LIBS@
@@ -507,31 +511,50 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = Matching
 pkglib_LTLIBRARIES = HwShower.la
-HwShower_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 26:0:0
+HwShower_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 27:0:0
 HwShower_la_SOURCES = \
 Couplings/ShowerAlphaQCD.h Couplings/ShowerAlphaQCD.cc \
 Couplings/ShowerAlphaQED.h Couplings/ShowerAlphaQED.cc\
 QTildeShowerHandler.h QTildeShowerHandler.fh QTildeShowerHandler.cc \
 SplittingFunctions/HalfHalfOneSplitFn.h SplittingFunctions/HalfHalfOneSplitFn.cc\
 SplittingFunctions/OneOneOneSplitFn.h SplittingFunctions/OneOneOneSplitFn.cc\
+SplittingFunctions/OneOneOneMassiveSplitFn.h SplittingFunctions/OneOneOneMassiveSplitFn.cc\
 SplittingFunctions/ZeroZeroOneSplitFn.h SplittingFunctions/ZeroZeroOneSplitFn.cc\
 SplittingFunctions/OneHalfHalfSplitFn.h SplittingFunctions/OneHalfHalfSplitFn.cc\
 SplittingFunctions/HalfOneHalfSplitFn.h SplittingFunctions/HalfOneHalfSplitFn.cc\
-Default/QTildeSudakov.cc Default/QTildeSudakov.h\
-Default/QTildeModel.cc Default/QTildeModel.h\
-Default/Decay_QTildeShowerKinematics1to2.cc \
-Default/Decay_QTildeShowerKinematics1to2.h  \
-Default/IS_QTildeShowerKinematics1to2.cc    Default/IS_QTildeShowerKinematics1to2.h  \
-Default/FS_QTildeShowerKinematics1to2.cc    Default/FS_QTildeShowerKinematics1to2.h  \
-Default/QTildeFinder.cc Default/QTildeFinder.h\
-Default/QTildeReconstructor.cc Default/QTildeReconstructor.h Default/QTildeReconstructor.tcc \
-Base/KinematicsReconstructor.cc \
-Base/KinematicsReconstructor.h \
-Base/KinematicsReconstructor.fh \
-Base/ShowerModel.cc Base/ShowerModel.h Base/ShowerModel.fh \
+SplittingFunctions/CMWOneOneOneSplitFn.h SplittingFunctions/CMWOneOneOneSplitFn.cc\
+SplittingFunctions/CMWHalfHalfOneSplitFn.h SplittingFunctions/CMWHalfHalfOneSplitFn.cc\
+Kinematics/Decay_QTildeShowerKinematics1to2.cc \
+Kinematics/Decay_QTildeShowerKinematics1to2.h  \
+Kinematics/IS_QTildeShowerKinematics1to2.cc    Kinematics/IS_QTildeShowerKinematics1to2.h  \
+Kinematics/FS_QTildeShowerKinematics1to2.cc    Kinematics/FS_QTildeShowerKinematics1to2.h  \
+Kinematics/KinematicHelpers.h \
+Kinematics/KinematicsReconstructor.cc \
+Kinematics/KinematicsReconstructor.tcc \
+Kinematics/KinematicsReconstructor.h \
+Kinematics/KinematicsReconstructor.fh \
+Base/HardTree.cc Base/HardTree.h Base/HardTree.fh \
+Base/HardBranching.h Base/HardBranching.fh Base/HardBranching.cc\
 Base/PartnerFinder.h Base/PartnerFinder.fh Base/PartnerFinder.cc \
 Base/ShowerVeto.h Base/ShowerVeto.fh Base/ShowerVeto.cc \
-Base/FullShowerVeto.h Base/FullShowerVeto.fh Base/FullShowerVeto.cc
+Base/FullShowerVeto.h Base/FullShowerVeto.fh Base/FullShowerVeto.cc \
+SplittingFunctions/SplittingGenerator.cc SplittingFunctions/SplittingGenerator.h\
+SplittingFunctions/SplittingGenerator.fh \
+Base/ShowerTree.h Base/ShowerTree.fh Base/ShowerTree.cc \
+ShowerConfig.h ShowerConfig.cc \
+Base/Branching.h \
+Base/ShowerParticle.cc  Base/ShowerParticle.fh  Base/ShowerParticle.h \
+Kinematics/ShowerKinematics.fh  Kinematics/ShowerKinematics.h Kinematics/ShowerKinematics.cc \
+Kinematics/ShowerBasis.fh  Kinematics/ShowerBasis.h Kinematics/ShowerBasis.cc \
+Base/ShowerProgenitor.fh Base/ShowerProgenitor.h \
+SplittingFunctions/SudakovFormFactor.cc SplittingFunctions/SudakovFormFactor.h SplittingFunctions/SudakovFormFactor.fh \
+SplittingFunctions/SudakovCutOff.cc SplittingFunctions/SudakovCutOff.h SplittingFunctions/SudakovCutOff.fh \
+SplittingFunctions/PTCutOff.cc SplittingFunctions/PTCutOff.h \
+SplittingFunctions/MassCutOff.cc SplittingFunctions/MassCutOff.h \
+SplittingFunctions/VariableMassCutOff.cc SplittingFunctions/VariableMassCutOff.h \
+SplittingFunctions/SplittingFunction.h SplittingFunctions/SplittingFunction.fh \
+SplittingFunctions/SplittingFunction.cc  \
+Base/ShowerVertex.cc Base/ShowerVertex.fh Base/ShowerVertex.h
 
 all: all-recursive
 
@@ -623,6 +646,9 @@ SplittingFunctions/HalfHalfOneSplitFn.lo:  \
 SplittingFunctions/OneOneOneSplitFn.lo:  \
 	SplittingFunctions/$(am__dirstamp) \
 	SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
+SplittingFunctions/OneOneOneMassiveSplitFn.lo:  \
+	SplittingFunctions/$(am__dirstamp) \
+	SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
 SplittingFunctions/ZeroZeroOneSplitFn.lo:  \
 	SplittingFunctions/$(am__dirstamp) \
 	SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
@@ -632,41 +658,72 @@ SplittingFunctions/OneHalfHalfSplitFn.lo:  \
 SplittingFunctions/HalfOneHalfSplitFn.lo:  \
 	SplittingFunctions/$(am__dirstamp) \
 	SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
-Default/$(am__dirstamp):
-	@$(MKDIR_P) Default
-	@: > Default/$(am__dirstamp)
-Default/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) Default/$(DEPDIR)
-	@: > Default/$(DEPDIR)/$(am__dirstamp)
-Default/QTildeSudakov.lo: Default/$(am__dirstamp) \
-	Default/$(DEPDIR)/$(am__dirstamp)
-Default/QTildeModel.lo: Default/$(am__dirstamp) \
-	Default/$(DEPDIR)/$(am__dirstamp)
-Default/Decay_QTildeShowerKinematics1to2.lo: Default/$(am__dirstamp) \
-	Default/$(DEPDIR)/$(am__dirstamp)
-Default/IS_QTildeShowerKinematics1to2.lo: Default/$(am__dirstamp) \
-	Default/$(DEPDIR)/$(am__dirstamp)
-Default/FS_QTildeShowerKinematics1to2.lo: Default/$(am__dirstamp) \
-	Default/$(DEPDIR)/$(am__dirstamp)
-Default/QTildeFinder.lo: Default/$(am__dirstamp) \
-	Default/$(DEPDIR)/$(am__dirstamp)
-Default/QTildeReconstructor.lo: Default/$(am__dirstamp) \
-	Default/$(DEPDIR)/$(am__dirstamp)
+SplittingFunctions/CMWOneOneOneSplitFn.lo:  \
+	SplittingFunctions/$(am__dirstamp) \
+	SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
+SplittingFunctions/CMWHalfHalfOneSplitFn.lo:  \
+	SplittingFunctions/$(am__dirstamp) \
+	SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
+Kinematics/$(am__dirstamp):
+	@$(MKDIR_P) Kinematics
+	@: > Kinematics/$(am__dirstamp)
+Kinematics/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) Kinematics/$(DEPDIR)
+	@: > Kinematics/$(DEPDIR)/$(am__dirstamp)
+Kinematics/Decay_QTildeShowerKinematics1to2.lo:  \
+	Kinematics/$(am__dirstamp) \
+	Kinematics/$(DEPDIR)/$(am__dirstamp)
+Kinematics/IS_QTildeShowerKinematics1to2.lo:  \
+	Kinematics/$(am__dirstamp) \
+	Kinematics/$(DEPDIR)/$(am__dirstamp)
+Kinematics/FS_QTildeShowerKinematics1to2.lo:  \
+	Kinematics/$(am__dirstamp) \
+	Kinematics/$(DEPDIR)/$(am__dirstamp)
+Kinematics/KinematicsReconstructor.lo: Kinematics/$(am__dirstamp) \
+	Kinematics/$(DEPDIR)/$(am__dirstamp)
 Base/$(am__dirstamp):
 	@$(MKDIR_P) Base
 	@: > Base/$(am__dirstamp)
 Base/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) Base/$(DEPDIR)
 	@: > Base/$(DEPDIR)/$(am__dirstamp)
-Base/KinematicsReconstructor.lo: Base/$(am__dirstamp) \
-	Base/$(DEPDIR)/$(am__dirstamp)
-Base/ShowerModel.lo: Base/$(am__dirstamp) \
+Base/HardTree.lo: Base/$(am__dirstamp) Base/$(DEPDIR)/$(am__dirstamp)
+Base/HardBranching.lo: Base/$(am__dirstamp) \
 	Base/$(DEPDIR)/$(am__dirstamp)
 Base/PartnerFinder.lo: Base/$(am__dirstamp) \
 	Base/$(DEPDIR)/$(am__dirstamp)
 Base/ShowerVeto.lo: Base/$(am__dirstamp) \
 	Base/$(DEPDIR)/$(am__dirstamp)
 Base/FullShowerVeto.lo: Base/$(am__dirstamp) \
+	Base/$(DEPDIR)/$(am__dirstamp)
+SplittingFunctions/SplittingGenerator.lo:  \
+	SplittingFunctions/$(am__dirstamp) \
+	SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
+Base/ShowerTree.lo: Base/$(am__dirstamp) \
+	Base/$(DEPDIR)/$(am__dirstamp)
+Base/ShowerParticle.lo: Base/$(am__dirstamp) \
+	Base/$(DEPDIR)/$(am__dirstamp)
+Kinematics/ShowerKinematics.lo: Kinematics/$(am__dirstamp) \
+	Kinematics/$(DEPDIR)/$(am__dirstamp)
+Kinematics/ShowerBasis.lo: Kinematics/$(am__dirstamp) \
+	Kinematics/$(DEPDIR)/$(am__dirstamp)
+SplittingFunctions/SudakovFormFactor.lo:  \
+	SplittingFunctions/$(am__dirstamp) \
+	SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
+SplittingFunctions/SudakovCutOff.lo:  \
+	SplittingFunctions/$(am__dirstamp) \
+	SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
+SplittingFunctions/PTCutOff.lo: SplittingFunctions/$(am__dirstamp) \
+	SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
+SplittingFunctions/MassCutOff.lo: SplittingFunctions/$(am__dirstamp) \
+	SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
+SplittingFunctions/VariableMassCutOff.lo:  \
+	SplittingFunctions/$(am__dirstamp) \
+	SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
+SplittingFunctions/SplittingFunction.lo:  \
+	SplittingFunctions/$(am__dirstamp) \
+	SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
+Base/ShowerVertex.lo: Base/$(am__dirstamp) \
 	Base/$(DEPDIR)/$(am__dirstamp)
 
 HwShower.la: $(HwShower_la_OBJECTS) $(HwShower_la_DEPENDENCIES) $(EXTRA_HwShower_la_DEPENDENCIES) 
@@ -678,8 +735,8 @@ mostlyclean-compile:
 	-rm -f Base/*.lo
 	-rm -f Couplings/*.$(OBJEXT)
 	-rm -f Couplings/*.lo
-	-rm -f Default/*.$(OBJEXT)
-	-rm -f Default/*.lo
+	-rm -f Kinematics/*.$(OBJEXT)
+	-rm -f Kinematics/*.lo
 	-rm -f SplittingFunctions/*.$(OBJEXT)
 	-rm -f SplittingFunctions/*.lo
 
@@ -687,24 +744,37 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/QTildeShowerHandler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShowerConfig.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Base/$(DEPDIR)/FullShowerVeto.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Base/$(DEPDIR)/KinematicsReconstructor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Base/$(DEPDIR)/HardBranching.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Base/$(DEPDIR)/HardTree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Base/$(DEPDIR)/PartnerFinder.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Base/$(DEPDIR)/ShowerModel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Base/$(DEPDIR)/ShowerParticle.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Base/$(DEPDIR)/ShowerTree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Base/$(DEPDIR)/ShowerVertex.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Base/$(DEPDIR)/ShowerVeto.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Couplings/$(DEPDIR)/ShowerAlphaQCD.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Couplings/$(DEPDIR)/ShowerAlphaQED.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Default/$(DEPDIR)/Decay_QTildeShowerKinematics1to2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Default/$(DEPDIR)/FS_QTildeShowerKinematics1to2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Default/$(DEPDIR)/IS_QTildeShowerKinematics1to2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Default/$(DEPDIR)/QTildeFinder.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Default/$(DEPDIR)/QTildeModel.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Default/$(DEPDIR)/QTildeReconstructor.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Default/$(DEPDIR)/QTildeSudakov.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Kinematics/$(DEPDIR)/Decay_QTildeShowerKinematics1to2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Kinematics/$(DEPDIR)/FS_QTildeShowerKinematics1to2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Kinematics/$(DEPDIR)/IS_QTildeShowerKinematics1to2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Kinematics/$(DEPDIR)/KinematicsReconstructor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Kinematics/$(DEPDIR)/ShowerBasis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Kinematics/$(DEPDIR)/ShowerKinematics.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/CMWHalfHalfOneSplitFn.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/CMWOneOneOneSplitFn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/HalfHalfOneSplitFn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/HalfOneHalfSplitFn.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/MassCutOff.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/OneHalfHalfSplitFn.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/OneOneOneMassiveSplitFn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/OneOneOneSplitFn.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/PTCutOff.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/SplittingFunction.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/SplittingGenerator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/SudakovCutOff.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/SudakovFormFactor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/VariableMassCutOff.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@SplittingFunctions/$(DEPDIR)/ZeroZeroOneSplitFn.Plo@am__quote@
 
 .cc.o:
@@ -738,7 +808,7 @@ clean-libtool:
 	-rm -rf .libs _libs
 	-rm -rf Base/.libs Base/_libs
 	-rm -rf Couplings/.libs Couplings/_libs
-	-rm -rf Default/.libs Default/_libs
+	-rm -rf Kinematics/.libs Kinematics/_libs
 	-rm -rf SplittingFunctions/.libs SplittingFunctions/_libs
 
 # This directory's subdirectories are mostly independent; you can cd
@@ -933,8 +1003,8 @@ distclean-generic:
 	-rm -f Base/$(am__dirstamp)
 	-rm -f Couplings/$(DEPDIR)/$(am__dirstamp)
 	-rm -f Couplings/$(am__dirstamp)
-	-rm -f Default/$(DEPDIR)/$(am__dirstamp)
-	-rm -f Default/$(am__dirstamp)
+	-rm -f Kinematics/$(DEPDIR)/$(am__dirstamp)
+	-rm -f Kinematics/$(am__dirstamp)
 	-rm -f SplittingFunctions/$(DEPDIR)/$(am__dirstamp)
 	-rm -f SplittingFunctions/$(am__dirstamp)
 
@@ -947,7 +1017,7 @@ clean-am: clean-generic clean-libtool clean-pkglibLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -rf ./$(DEPDIR) Base/$(DEPDIR) Couplings/$(DEPDIR) Default/$(DEPDIR) SplittingFunctions/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) Base/$(DEPDIR) Couplings/$(DEPDIR) Kinematics/$(DEPDIR) SplittingFunctions/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -993,7 +1063,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -rf ./$(DEPDIR) Base/$(DEPDIR) Couplings/$(DEPDIR) Default/$(DEPDIR) SplittingFunctions/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) Base/$(DEPDIR) Couplings/$(DEPDIR) Kinematics/$(DEPDIR) SplittingFunctions/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

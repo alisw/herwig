@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SSGSSVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -24,6 +24,7 @@ using namespace Herwig;
 SSGSSVertex::SSGSSVertex() : _couplast(0.),_q2last(ZERO) {
   orderInGs(1);
   orderInGem(0);
+  colourStructure(ColourStructure::SU3TFUND);
 }
 
 void SSGSSVertex::doinit() {
@@ -49,10 +50,22 @@ void SSGSSVertex::Init() {
 
 }
 
-void SSGSSVertex::setCoupling(Energy2 q2, tcPDPtr part1,
-			      tcPDPtr part2, tcPDPtr part3) {
+void SSGSSVertex::setCoupling(Energy2 q2,
+#ifndef NDEBUG
+			      tcPDPtr part1,
+#else
+			      tcPDPtr,
+#endif
+			      tcPDPtr part2,
+#ifndef NDEBUG
+				tcPDPtr part3) {
+#else
+				tcPDPtr ) {
+#endif
   assert(part1->id()==ParticleID::g);
+#ifndef NDEBUG
   long isf = abs(part2->id());
+#endif
   assert( (isf >= 1000001 && isf <= 1000006) || 
 	  (isf >= 2000001 && isf <= 2000006) );
   assert(part2->id()==-part3->id());
@@ -60,7 +73,7 @@ void SSGSSVertex::setCoupling(Energy2 q2, tcPDPtr part1,
     _couplast = strongCoupling(q2);
     _q2last = q2;
   }
-  if(part2->id()>0) 
+  if(part2->id()>0)
     norm(-_couplast);
   else
     norm( _couplast);

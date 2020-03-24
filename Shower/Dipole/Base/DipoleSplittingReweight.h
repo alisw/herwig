@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // DipoleSplittingReweight.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -76,6 +76,36 @@ public:
    * Return the reweighting factor for the given splitting type.
    */
   virtual double evaluate(const DipoleSplittingInfo&) const = 0;
+
+  /**
+   * Return an enhancement hint for the sampling of the un-reweighted
+   * splitting kernel
+   */
+  virtual double hint(const DipoleSplittingInfo&) const {
+    return 1.;
+  }
+
+  /**
+   * Return true, if the reweight can be entirely absorbed into the hint. A
+   * possible detuning will be switched off.
+   */
+  virtual bool hintOnly(const DipoleSplittingInfo&) const {
+    return false;
+  }
+
+  /**
+   * Set the factor in front of enhance used by the veto algorithm.
+   */
+  virtual void reweightFactor(const double) {
+    return;
+  }
+
+  /**
+   * Scaling factor for negative reweights.
+   */
+  virtual void negativeScaling(const double) {
+    return;
+  }
 
 public:
 

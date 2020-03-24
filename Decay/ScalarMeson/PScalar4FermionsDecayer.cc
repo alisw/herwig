@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // PScalar4FermionsDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "PScalar4FermionsDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/StandardModel/StandardModelBase.h"
 #include "ThePEG/PDT/DecayMode.h"
@@ -172,9 +173,10 @@ void PScalar4FermionsDecayer::persistentInput(PersistentIStream & is, int) {
      >> iunit(_VMDmass,MeV) >> iunit(_VMDwidth,MeV);
 }
 
-ClassDescription<PScalar4FermionsDecayer> 
-PScalar4FermionsDecayer::initPScalar4FermionsDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<PScalar4FermionsDecayer,DecayIntegrator>
+describeHerwigPScalar4FermionsDecayer("Herwig::PScalar4FermionsDecayer", "HwSMDecay.so");
 
 void PScalar4FermionsDecayer::Init() {
 

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MinBiasPDF.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "MinBiasPDF.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 
 #ifdef ThePEG_TEMPLATES_IN_CC_FILE
@@ -61,8 +62,10 @@ void MinBiasPDF::persistentInput(PersistentIStream & is, int) {
   is >> thePDF;
 }
 
-ClassDescription<MinBiasPDF> MinBiasPDF::initMinBiasPDF;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MinBiasPDF,PDFBase>
+describeHerwigMinBiasPDF("Herwig::MinBiasPDF", "HwShower.so");
 
 void MinBiasPDF::Init() {
 

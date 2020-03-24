@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // GSLIntegrator.tcc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -40,25 +40,23 @@ using namespace ThePEG;
 
 
 template <class T>
-inline typename BinaryOpTraits<typename T::ValType,
-			       typename T::ArgType>::MulT
+inline GSLIntegrator::ValT<T>
 GSLIntegrator::value(const T & fn, 
 		     const typename T::ArgType lower, 
-		     const typename T::ArgType upper) const {
-  typename BinaryOpTraits<typename T::ValType,
-			       typename T::ArgType>::MulT error;
+		     const typename T::ArgType upper) const
+{
+  GSLIntegrator::ValT<T> error;
   return value(fn,lower,upper,error);
 }
 
 
 template <class T>
-inline typename BinaryOpTraits<typename T::ValType,
-			       typename T::ArgType>::MulT
+inline GSLIntegrator::ValT<T>
 GSLIntegrator::value(const T & fn, 
 		     const typename T::ArgType lower, 
 		     const typename T::ArgType upper,
-		     typename BinaryOpTraits<typename T::ValType,
-		     typename T::ArgType>::MulT & error) const {
+		     GSLIntegrator::ValT<T> & error) const 
+{
   typedef typename T::ValType ValType;
   typedef typename T::ArgType ArgType;
   const ValType ValUnit = TypeTraits<ValType>::baseunit();

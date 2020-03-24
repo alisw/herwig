@@ -90,23 +90,12 @@ protected:
 
 protected:
 
-  /** @name Standard Interfaced functions. */
-  //@{
   /**
-   * Initialize this object after the setup phase before saving an
-   * EventGenerator to disk.
-   * @throws InitException if object could not be initialized properly.
+   *   Set up the diagrams etc
    */
-  virtual void doinit();
-  //@}
+  virtual void setupDiagrams(bool checkKinematics);
 
 private:
-
-  /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<FtoFVVDecayer> initFtoFVVDecayer;
 
   /**
    * The assignment operator is private and must never be called.
@@ -119,72 +108,44 @@ private:
   /**
    * Store the vector of scalar intermediates
    */
-  vector<pair<AbstractFFSVertexPtr, AbstractVVSVertexPtr> > _sca;
+  vector<pair<AbstractFFSVertexPtr, AbstractVVSVertexPtr> > sca_;
 
   /**
    * Store the vector for fermion intermediates
    */
-  vector<pair<AbstractFFVVertexPtr, AbstractFFVVertexPtr> > _fer;
+  vector<pair<AbstractFFVVertexPtr, AbstractFFVVertexPtr> > fer_;
 
   /**
    * Store the vector for gauge boson intermediates
    */
-  vector<pair<AbstractFFVVertexPtr, AbstractVVVVertexPtr> > _vec;
+  vector<pair<AbstractFFVVertexPtr, AbstractVVVVertexPtr> > vec_;
 
   /**
    * Store the vector of tensor intermediates
    */
-  vector<pair<AbstractFFTVertexPtr, AbstractVVTVertexPtr> > _ten;
+  vector<pair<AbstractFFTVertexPtr, AbstractVVTVertexPtr> > ten_;
 
   /**
    *  Spin density matrix
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 
   /**
    *  Spinor wavefunctions
    */
-  mutable vector<SpinorWaveFunction> _fwave;
+  mutable vector<SpinorWaveFunction> fwave_;
 
   /**
    *  Barred spinor wavefunctions
    */
-  mutable vector<SpinorBarWaveFunction> _fbwave;
+  mutable vector<SpinorBarWaveFunction> fbwave_;
 
   /**
    *  Vector wavefunctions
    */
-  mutable pair<vector<VectorWaveFunction>, vector<VectorWaveFunction> > _vwave;
+  mutable pair<vector<VectorWaveFunction>, vector<VectorWaveFunction> > vwave_;
 };
 
 }
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of FtoFVVDecayer. */
-template <>
-struct BaseClassTrait<Herwig::FtoFVVDecayer,1> {
-  /** Typedef of the first base class of FtoFVVDecayer. */
-  typedef Herwig::GeneralThreeBodyDecayer NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the FtoFVVDecayer class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::FtoFVVDecayer>
-  : public ClassTraitsBase<Herwig::FtoFVVDecayer> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::FtoFVVDecayer"; }
-};
-
-/** @endcond */
-
-}
-
 
 #endif /* HERWIG_FtoFVVDecayer_H */

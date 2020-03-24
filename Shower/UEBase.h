@@ -116,6 +116,21 @@ public:
   virtual unsigned int softMultiplicity() const {return 0;} 
   //@}
 
+  /**
+   * Return the inelastic cross section ( sigmaND + sigmaDiff )
+   */
+  virtual CrossSection  inelasticXSec() const =0;
+  
+  /**
+   * Return the diffractiv cross section (sigmaDiff) assumed by the model.
+   */
+  virtual CrossSection diffractiveXSec() const =0;
+  
+  /**
+   * Return the non-diffractiv cross section (sigmaND) assumed by the model.
+   */
+  virtual CrossSection nonDiffractiveXSec() const =0;
+
 private:
 
   /**

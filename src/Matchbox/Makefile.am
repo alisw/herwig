@@ -3,6 +3,7 @@ BUILT_SOURCES = done-all-links
 Matchboxdir = ${pkgdatadir}/Matchbox
 
 INPUTFILES = \
+CMEC.in \
 DefaultEEJets.in \
 DefaultEPJets.in \
 DefaultPPJets.in \
@@ -31,6 +32,7 @@ MCatNLO-DefaultShower.in \
 MCatNLO-Dipole-HardAlphaSTune.in \
 MCatNLO-DipoleShower.in \
 MMHT2014.in \
+CT14.in \
 MuDown.in \
 MuQDown.in \
 MuQUp.in \
@@ -48,6 +50,7 @@ Powheg-DipoleShower.in \
 Powheg.in \
 PQCDLevel.in \
 StandardModelLike.in \
+ShowerBenchmarks.in \
 VBFDiagramsOnly.in \
 VBFNLO.in \
 VBFNLOPhasespace.in

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxFactory.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -53,6 +53,23 @@ public:
    */
   virtual ~MatchboxFactory();
   //@}
+
+public:
+
+  /**
+   * Pointer to the current factory object
+   */
+  static const Ptr<MatchboxFactory>::tptr currentFactory() {
+    assert(theCurrentFactory);
+    return theCurrentFactory;
+  }
+
+private:
+
+  /**
+   * Pointer to the current factory object
+   */
+  static Ptr<MatchboxFactory>::tptr theCurrentFactory;
 
 public:
 

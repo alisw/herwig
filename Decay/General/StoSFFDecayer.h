@@ -8,10 +8,12 @@
 #include "GeneralThreeBodyDecayer.h"
 #include "ThePEG/Helicity/Vertex/AbstractSSSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFSVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractRFSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractVSSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFVVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractSSTVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFTVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractFFSSVertex.h"
 
 namespace Herwig {
   using namespace ThePEG;
@@ -90,23 +92,12 @@ protected:
 
 protected:
 
-  /** @name Standard Interfaced functions. */
-  //@{
   /**
-   * Initialize this object after the setup phase before saving an
-   * EventGenerator to disk.
-   * @throws InitException if object could not be initialized properly.
+   *   Set up the diagrams etc
    */
-  virtual void doinit();
-  //@}
+  virtual void setupDiagrams(bool checkKinematics);
 
 private:
-
-  /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<StoSFFDecayer> initStoSFFDecayer;
 
   /**
    * The assignment operator is private and must never be called.
@@ -117,69 +108,51 @@ private:
 private:
   
   /**
-   * Store the vertices for scalar intrermediate
+   * Store the vertices for scalar intermediate
    */
-  vector<pair<AbstractSSSVertexPtr, AbstractFFSVertexPtr> > _sca;
+  vector<pair<AbstractSSSVertexPtr, AbstractFFSVertexPtr> > sca_;
 
   /**
-   * Store the vertices for fermion intrermediate
+   * Store the vertices for spin-\f$\frac12\f$ fermion intermediate
    */
-  vector<pair<AbstractFFSVertexPtr, AbstractFFSVertexPtr> > _fer;
+  vector<pair<AbstractFFSVertexPtr, AbstractFFSVertexPtr> > fer_;
 
   /**
-   * Store the vertices for vector intrermediate
+   * Store the vertices for spin-\f$\frac32\f$  fermion intermediate
    */
-  vector<pair<AbstractVSSVertexPtr, AbstractFFVVertexPtr> > _vec;
+  vector<pair<AbstractRFSVertexPtr, AbstractRFSVertexPtr> > RSfer_;
 
   /**
-   * Store the vertices for tensor intrermediate
+   * Store the vertices for vector intermediate
    */
-  vector<pair<AbstractSSTVertexPtr, AbstractFFTVertexPtr> > _ten;
+  vector<pair<AbstractVSSVertexPtr, AbstractFFVVertexPtr> > vec_;
+
+  /**
+   * Store the vertices for tensor intermediate
+   */
+  vector<pair<AbstractSSTVertexPtr, AbstractFFTVertexPtr> > ten_;
+
+  /**
+   * Store the vertices for four point diagrams
+   */
+  vector<AbstractFFSSVertexPtr> four_;
 
   /**
    *  Spin density matrix
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 
   /**
    *  Scalar wavefunction
    */
-  mutable ScalarWaveFunction _swave;
+  mutable ScalarWaveFunction swave_;
 
   /**
    *  Spinor wavefunctions
    */
-  mutable pair<vector<SpinorWaveFunction>,vector<SpinorBarWaveFunction> > _outspin[3];
+  mutable pair<vector<SpinorWaveFunction>,vector<SpinorBarWaveFunction> > outspin_[3];
 };
 
 }
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of Herwig::StoSFFDecayer. */
-template <>
-struct BaseClassTrait<Herwig::StoSFFDecayer,1> {
-  /** Typedef of the first base class of Herwig::StoSFFDecayer. */
-  typedef Herwig::GeneralThreeBodyDecayer NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the Herwig::StoSFFDecayer class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::StoSFFDecayer>
-  : public ClassTraitsBase<Herwig::StoSFFDecayer> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::StoSFFDecayer"; }
-};
-
-/** @endcond */
-
-}
-
 
 #endif /* THEPEG_StoSFFDecayer_H */

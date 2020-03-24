@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // FIMassiveDecayKinematics.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -95,7 +95,16 @@ namespace Herwig {
 			 double emX, double specX,
 			 const DipoleSplittingInfo& dInfo,
 			 const DipoleSplittingKernel& split) const;
-
+    
+    /**
+     * Return the maximum pt for the given dipole scale.
+     */
+    virtual Energy ptMax(Energy dScale, 
+			 double, double,
+			 const DipoleIndex& dIndex,
+			 const DipoleSplittingKernel& split,
+			 tPPtr emitter, tPPtr spectator) const;
+      
     /**
      * Return the maximum virtuality for the given dipole scale.
      */
@@ -164,7 +173,12 @@ namespace Herwig {
     virtual void generateKinematics(const Lorentz5Momentum& pEmitter,
 				    const Lorentz5Momentum& pSpectator,
 				    const DipoleSplittingInfo& dInfo);
-
+    
+    /**
+     * Return the nVector as required for spin correlations.
+     */
+    virtual Lorentz5Momentum nVector(const Lorentz5Momentum& pEmitter, const Lorentz5Momentum& pSpectator, const DipoleSplittingInfo& dInfo) const;
+    
     /*
      * Return true if this splitting is of a dipole which contains
      * a decayed parton and requires the remnant to absorb the recoil.
@@ -177,8 +191,23 @@ namespace Herwig {
     virtual void decayRecoil ( PList& recoilSystem ) {
       PList::iterator beginRecoil = recoilSystem.begin();
       PList::iterator endRecoil = recoilSystem.end();
-      const ThreeVector<Energy> transformMom = splitRecoilMomentum().vect();
-      ThePEG::UtilityBase::setMomentum(beginRecoil, endRecoil, transformMom );
+
+      // This is the final momentum that we must transform the system to
+      const Momentum3 transformMom = splitRecoilMomentum().vect();
+
+      // Calculate required Lorentz rotation
+      Lorentz5Momentum sum = ThePEG::UtilityBase::sumMomentum(beginRecoil, endRecoil);
+      LorentzRotation rot = ThePEG::UtilityBase::transformToCMS(sum);
+      rot = ThePEG::UtilityBase::transformFromCMS
+        (Lorentz5Momentum(transformMom, sqrt(transformMom.mag2() + sum.m2()))) * rot;
+      
+      // Transform the particle spinInfo if required
+      for ( const auto& p : recoilSystem ) {
+        if ( p->spinInfo() )
+          p->spinInfo()->transform(p->momentum(),rot);
+      }
+      
+      ThePEG::UtilityBase::transform(beginRecoil, endRecoil, rot );
     }
     
  
@@ -187,11 +216,13 @@ namespace Herwig {
     /**
      * Triangular / Kallen function
      */
-    template <class T>
-    inline double rootOfKallen (T a, T b, T c) const {
-      double sres=a*a + b*b + c*c - 2.*( a*b+a*c+b*c );
-      return sres>0.?sqrt( sres ):0.; }
-  
+  template <class T>
+  inline T rootOfKallen (T a, T b, T c) const {
+    if ( a*a + b*b + c*c - 2.*(a*b + a*c + b*c) > ZERO )
+      return sqrt(a*a + b*b + c*c - 2.*(a*b + a*c + b*c) ) ;
+    else 
+      return ZERO; }
+      
   public:
 
     /** @name Functions used by the persistent I/O system. */
@@ -253,11 +284,7 @@ namespace Herwig {
      * In fact, it should not even be implemented.
      */
     FIMassiveDecayKinematics & operator=(const FIMassiveDecayKinematics &) = delete;
-
-    /**
-     * Option to use the full jacobian, including the z->zprime jacobian.
-     **/
-    bool  theFullJacobian;
+    
   };
 
 }

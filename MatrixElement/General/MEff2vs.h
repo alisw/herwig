@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEff2vs.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -17,6 +17,7 @@
 #include "ThePEG/Helicity/Vertex/AbstractFFVVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractVSSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractVVSVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractFFVSVertex.h"
 #include "ThePEG/Helicity/WaveFunction/SpinorWaveFunction.h"
 #include "ThePEG/Helicity/WaveFunction/SpinorBarWaveFunction.h"
 #include "ThePEG/Helicity/WaveFunction/VectorWaveFunction.h"
@@ -192,6 +193,11 @@ private:
    * fermion
    */
   vector<pair<AbstractFFVVertexPtr, AbstractFFSVertexPtr> > fermion_;
+
+  /**
+   *  Four point vertices
+   */
+  vector<AbstractFFVSVertexPtr> four_;
 };
 
 }

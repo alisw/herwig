@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // FFDipole.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -215,12 +215,6 @@ protected:
   //@}
 
 private:
-
-  /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<FFDipole> initFFDipole;
 
   /**
    * The assignment operator is private and must never be called.
@@ -466,37 +460,6 @@ private:
   bool _weightOutput;
   //@}
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of FFDipole. */
-template <>
-struct BaseClassTrait<Herwig::FFDipole,1> {
-  /** Typedef of the first base class of FFDipole. */
-  typedef Interfaced NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the FFDipole class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::FFDipole>
-  : public ClassTraitsBase<Herwig::FFDipole> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::FFDipole"; }
-  /** Return the name of the shared library be loaded to get
-   *  access to the DecayRadiationGenerator class and every other class it uses
-   *  (except the base class). */
-  static string library() { return "HwSOPHTY.so"; }
-};
-
-/** @endcond */
 
 }
 

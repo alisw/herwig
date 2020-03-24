@@ -5,6 +5,7 @@
 //
 
 #include "ChengHeavyBaryonFormFactor.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/ParVector.h"
 #include "ThePEG/Interface/ClassDocumentation.h" 
@@ -150,7 +151,7 @@ void ChengHeavyBaryonFormFactor::doinit() {
       tcPDPtr part0=getParticleData(id0); Energy m0=part0->mass();
       tcPDPtr part1=getParticleData(id1); Energy m1=part1->mass();
       if ( part1->iSpin() == 2 ) {
-	Complex f1v,f2v,f3v,f4v,f1a,f2a,f3a,f4a; // dummy variables
+	Complex f1v,f2v,f3v,f1a,f2a,f3a; // dummy variables
 	SpinHalfSpinHalfFormFactor(ZERO,ix,id0,id1,m0,m1,f1v,f2v,f3v,f1a,f2a,f3a);
       }
       else {
@@ -178,8 +179,10 @@ void ChengHeavyBaryonFormFactor::persistentInput(PersistentIStream & is, int) {
      >> iunit(_mAbs,MeV) >> iunit(_mAcs,MeV) >> iunit(_mAbd,MeV) >> iunit(_mAcu,MeV);
 }
 
-ClassDescription<ChengHeavyBaryonFormFactor> ChengHeavyBaryonFormFactor::initChengHeavyBaryonFormFactor;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<ChengHeavyBaryonFormFactor,BaryonFormFactor>
+describeHerwigChengHeavyBaryonFormFactor("Herwig::ChengHeavyBaryonFormFactor", "HwFormFactors.so");
 
 void ChengHeavyBaryonFormFactor::Init() {
 

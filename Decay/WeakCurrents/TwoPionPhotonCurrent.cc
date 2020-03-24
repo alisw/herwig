@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // TwoPionPhotonCurrent.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -14,6 +14,7 @@
 //
 
 #include "TwoPionPhotonCurrent.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/StandardModel/StandardModelBase.h"
 #include "ThePEG/Interface/ParVector.h"
@@ -90,8 +91,10 @@ void TwoPionPhotonCurrent::persistentInput(PersistentIStream & is, int) {
      >> iunit(_intwidth,GeV);
 }
 
-ClassDescription<TwoPionPhotonCurrent> TwoPionPhotonCurrent::initTwoPionPhotonCurrent;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<TwoPionPhotonCurrent,WeakDecayCurrent>
+describeHerwigTwoPionPhotonCurrent("Herwig::TwoPionPhotonCurrent", "HwWeakCurrents.so");
 
 void TwoPionPhotonCurrent::Init() {
 

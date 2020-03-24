@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ShowerHandler.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -71,6 +71,13 @@ public:
    */
   static const tShowerHandlerPtr currentHandler() {
     assert(currentHandler_);
+    return currentHandler_;
+  }
+
+  /**
+   *  pointer to "this", the current ShowerHandler.
+   */
+  static bool currentHandlerIsSet() {
     return currentHandler_;
   }
 
@@ -169,7 +176,7 @@ public:
   
   struct ParticleOrdering {
 
-    bool operator() (tcPDPtr p1, tcPDPtr p2);
+    bool operator() (tcPDPtr p1, tcPDPtr p2) const;
 
   };
   
@@ -316,6 +323,27 @@ public:
   double reweight() const {
     return reweight_;
   }
+
+public :
+  
+  /**
+   *   Access to switches for spin correlations
+   */
+  //@{
+  /**
+   *   Spin Correlations
+   */
+  unsigned int spinCorrelations() const {
+    return spinOpt_;
+  }
+  
+  /**
+   *  Any correlations
+   */
+  virtual bool correlations() const {
+    return spinOpt_!=0;
+  }
+  //@}
 
 public:
 
@@ -535,6 +563,23 @@ protected:
   unsigned int maxtry() const { return maxtry_; }
 
 protected:
+  
+  /**
+   *  Parameters for the space-time model
+   */
+  //@{
+  /**
+   *   Whether or not to include spa-cetime distances in the shower
+   */
+  bool includeSpaceTime() const {return includeSpaceTime_;}
+
+  /**
+   *  The minimum virtuality for the space-time model
+   */
+  Energy2 vMin() const {return vMin_;}
+  //@}
+
+protected:
 
   /** @name Clone Methods. */
   //@{
@@ -668,6 +713,11 @@ private:
    */
   Ptr<HardScaleProfile>::ptr hardScaleProfile_;
   //@}
+
+  /**
+   *  Option to include spin correlations
+   */
+  unsigned int spinOpt_;
 
 private:
 

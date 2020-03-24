@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // LeptoquarkModelSLQFFVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "LeptoquarkModelSLQFFVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -30,6 +31,7 @@ IBPtr LeptoquarkModelSLQFFVertex::fullclone() const {
 LeptoquarkModelSLQFFVertex::LeptoquarkModelSLQFFVertex() {
   orderInGem(1);
   orderInGs(0);
+  colourStructure(ColourStructure::DELTA);
 }
 
 void LeptoquarkModelSLQFFVertex::doinit() {
@@ -164,9 +166,10 @@ void LeptoquarkModelSLQFFVertex::persistentInput(PersistentIStream & is, int) {
      >> iunit(_derivscale,GeV);
 }
 
-ClassDescription<LeptoquarkModelSLQFFVertex> 
-LeptoquarkModelSLQFFVertex::initLeptoquarkModelSLQFFVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<LeptoquarkModelSLQFFVertex,FFSVertex>
+describeHerwigLeptoquarkModelSLQFFVertex("Herwig::LeptoquarkModelSLQFFVertex", "Herwig.so");
 
 
 void LeptoquarkModelSLQFFVertex::Init() {

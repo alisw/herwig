@@ -16,8 +16,7 @@ if sys.version_info[:3] < (2,4,0):
 if __name__ == "__main__":
     import logging
     from optparse import OptionParser, OptionGroup
-    parser = OptionParser(usage="%prog aidafile aidafile2 [...]")
-    parser.add_option("-o", "--out", dest="OUTFILE", default="-")
+    parser = OptionParser(usage="%prog base")
     verbgroup = OptionGroup(parser, "Verbosity control")
     verbgroup.add_option("-v", "--verbose", action="store_const", const=logging.DEBUG, dest="LOGLEVEL",
                          default=logging.INFO, help="print debug (very verbose) messages")
@@ -39,17 +38,18 @@ files=["-Run-II-PromptPhoton.yoda",
 inhistos = {}
 outhistos={}
 for f in files:
-    file=args[0]+f
+    file='Rivet-'+args[0]+f
     if not os.access(file, os.R_OK):
         logging.error("%s can not be read" % file)
         continue
     try:
         aos = yoda.read(file)
     except:
-        logging.error("%s can not be parsed as XML" % file)
-        break
+        logging.error("%s can not be parsed as yoda" % file)
+        continue
     ## Get histos from this YODA file
     for aopath, ao in aos.iteritems() :
+        if("RAW" in aopath) :continue
         if(aopath.find("XSEC")>=0 or aopath.find("EVTCOUNT")>=0) : continue
         if ( aopath in outhistos ) :
             aotype = type(ao)
@@ -61,5 +61,6 @@ for f in files:
             outhistos[aopath] = ao
 
 # Choose output file
-yoda.writeYODA(outhistos,opts.OUTFILE)
+name = args[0]+"-Photon.yoda"
+yoda.writeYODA(outhistos,name)
 sys.exit(0)

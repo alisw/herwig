@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // METRP2to2.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2009-2017 The Herwig Collaboration
+// Copyright (C) 2009-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -309,7 +309,7 @@ double METRP2to2::me2() const {
 InvEnergy METRP2to2::bccalc(Energy2 s) const {  
   static const double fourpi = 4.0*Constants::pi; 
   return 1/_planckmass  *  sqrt(fourpi) * 
-    pow( (0.5 * s / (sqr(_planckmass) *  fourpi)) * Math::gamma(_ndim/2.0), 
+    pow( (0.5 * s / (sqr(_planckmass) *  fourpi)) * tgamma(_ndim/2.0), 
        1.0/_ndim);
 }
   

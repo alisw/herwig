@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // HiggsJetAnalysis.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "HiggsJetAnalysis.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Repository/EventGenerator.h"
 #include "ThePEG/EventRecord/Particle.h"
 #include "ThePEG/EventRecord/Event.h"
@@ -87,8 +88,10 @@ void HiggsJetAnalysis::analyze(tEventPtr event, long, int, int) {
   (_phih)+=ph.phi();
 }
 
-NoPIOClassDescription<HiggsJetAnalysis> HiggsJetAnalysis::initHiggsJetAnalysis;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeNoPIOClass<HiggsJetAnalysis,AnalysisHandler>
+describeHerwigHiggsJetAnalysis("Herwig::HiggsJetAnalysis", "HwAnalysis.so");
 
 void HiggsJetAnalysis::Init() {
 

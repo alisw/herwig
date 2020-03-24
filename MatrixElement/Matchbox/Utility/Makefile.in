@@ -108,11 +108,11 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libHwMatchboxUtility_la_LIBADD =
-am_libHwMatchboxUtility_la_OBJECTS = ColourBasis.lo DiagramDrawer.lo \
-	MatchboxScaleChoice.lo ProcessData.lo SimpleColourBasis.lo \
-	SimpleColourBasis2.lo SU2Helper.lo Tree2toNGenerator.lo \
-	MatchboxXComb.lo MatchboxXCombGroup.lo MatchboxXCombData.lo \
-	MatchboxFactoryMatcher.lo
+am_libHwMatchboxUtility_la_OBJECTS = ColourBasis.lo DensityOperator.lo \
+	DiagramDrawer.lo MatchboxScaleChoice.lo ProcessData.lo \
+	SimpleColourBasis.lo SimpleColourBasis2.lo SU2Helper.lo \
+	Tree2toNGenerator.lo MatchboxXComb.lo MatchboxXCombGroup.lo \
+	MatchboxXCombData.lo MatchboxFactoryMatcher.lo
 libHwMatchboxUtility_la_OBJECTS =  \
 	$(am_libHwMatchboxUtility_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -215,14 +215,8 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
-BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
-BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
 BOOST_LDPATH = @BOOST_LDPATH@
 BOOST_ROOT = @BOOST_ROOT@
-BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
-BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
-BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS = @BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS@
 BOOST_UNIT_TEST_FRAMEWORK_LDPATH = @BOOST_UNIT_TEST_FRAMEWORK_LDPATH@
 BOOST_UNIT_TEST_FRAMEWORK_LIBS = @BOOST_UNIT_TEST_FRAMEWORK_LIBS@
@@ -428,6 +422,8 @@ AmplitudeCache.h \
 AmplitudeCache.tcc \
 ColourBasis.cc \
 ColourBasis.h \
+DensityOperator.cc \
+DensityOperator.h \
 DiagramDrawer.cc \
 DiagramDrawer.h \
 MatchboxScaleChoice.cc \
@@ -510,6 +506,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ColourBasis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DensityOperator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DiagramDrawer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MatchboxFactoryMatcher.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MatchboxScaleChoice.Plo@am__quote@
