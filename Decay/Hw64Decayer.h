@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // Hw64Decayer.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -133,14 +133,9 @@ private:
 private:
 
   /**
-   *  Describe a concrete class with persistant data.
-   */
-  static ClassDescription<Hw64Decayer> initHw64Decayer;
-
-  /**
    *  Private and non-existent assignment operator.
    */
-  const Hw64Decayer & operator=(const Hw64Decayer &);
+  const Hw64Decayer & operator=(const Hw64Decayer &) = delete;
 
 private:
 
@@ -154,39 +149,6 @@ private:
    */
   unsigned int _masstry;
 };
-
-}
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/**
- * This template specialization informs ThePEG about the base class of
- * Hw64Decayer.
- */
-template <>
-struct BaseClassTrait<Herwig::Hw64Decayer,1> {
-  /** Typedef of the base class of Hw64Decayer. */
-  typedef Herwig::HwDecayerBase NthBase;
-};
-
-/**
- * This template specialization informs ThePEG about the name of the
- * Hw64Decayer class.
- */
-template <>
-struct ClassTraits<Herwig::Hw64Decayer>: public ClassTraitsBase<Herwig::Hw64Decayer> {
-  /** Return the class name. */
-  static string className() { return "Herwig::Hw64Decayer"; }
-  /** Return the name of the shared library to be loaded to get
-   * access to this class and every other class it uses
-   * (except the base class).
-   */
-  static string library() { return "Hw64Decay.so"; }
-};
-
-/** @endcond */
 
 }
 

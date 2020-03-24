@@ -1,7 +1,7 @@
   // -*- C++ -*-
   //
   // MergingReweight.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-  // Copyright (C) 2002-2017 The Herwig Collaboration
+  // Copyright (C) 2002-2019 The Herwig Collaboration
   //
   // Herwig is licenced under version 3 of the GPL, see COPYING for details.
   // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -23,10 +23,12 @@ double MergingReweight::weight() const {
   Energy maxpt = ZERO;
   Energy ht = ZERO;
   Energy maxmjj = ZERO;
-  
-  for (auto const & out : subProcess()->outgoing())
+ 
+  const auto sub=subProcess()->head()?subProcess()->head():subProcess();
+
+  for (auto const & out : sub->outgoing())
     if ( !onlyColoured || out->coloured() ){
-      for (auto const & out2 : subProcess()->outgoing())
+      for (auto const & out2 : sub->outgoing())
         if (!onlyColoured || out2->coloured() )
           maxmjj=max(maxmjj,(out->momentum()+out2->momentum()).m());
       maxpt = max(maxpt, out->momentum().perp());

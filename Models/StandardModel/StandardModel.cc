@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // StandardModel.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "StandardModel.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Reference.h"
 #include "ThePEG/Interface/RefVector.h"
@@ -39,7 +40,8 @@ StandardModel::StandardModel(const StandardModel & x)
     HPPVertex_ (x.HPPVertex_) , HHHVertex_ (x.HHHVertex_) ,
     WWHHVertex_ (x.WWHHVertex_) ,
     vertexList_(x.vertexList_), extraVertices_(x.extraVertices_),
-    runningMass_(x.runningMass_),modelGenerator_(x.modelGenerator_) 
+    runningMass_(x.runningMass_),modelGenerator_(x.modelGenerator_),
+    couplings_(x.couplings_)
 {}
 
 IBPtr StandardModel::clone() const {
@@ -71,6 +73,12 @@ void StandardModel::doinit() {
     if(HHHVertex_ ) addVertex(HHHVertex_);
     if(WWHHVertex_) addVertex(WWHHVertex_);
   }
+  if(couplings_.find("QED")==couplings_.end()) {
+    couplings_["QED"] = make_pair(1,99);
+  }
+  if(couplings_.find("QCD")==couplings_.end()) {
+    couplings_["QCD"] = make_pair(2,99);
+  }
   StandardModelBase::doinit();
 }
 
@@ -90,8 +98,10 @@ void StandardModel::persistentInput(PersistentIStream & is, int) {
      >> runningMass_ >> vertexList_ >> extraVertices_ >> modelGenerator_;
 }
 
-ClassDescription<StandardModel> StandardModel::initStandardModel;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<StandardModel,StandardModelBase>
+describeHerwigStandardModel("Herwig::StandardModel", "Herwig.so");
 
 void StandardModel::Init() {
 

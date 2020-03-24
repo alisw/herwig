@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEvv2ss.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "MEvv2ss.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -29,12 +30,13 @@ void MEvv2ss::doinit() {
   scalar3_.resize(numberOfDiags());
   vector_ .resize(numberOfDiags()); 
   tensor_ .resize(numberOfDiags());
+  contact_.resize(numberOfDiags());
   initializeMatrixElements(PDT::Spin1, PDT::Spin1, 
 			   PDT::Spin0, PDT::Spin0);
   for(size_t i = 0; i < numberOfDiags(); ++i ) {
     HPDiagram dg = getProcessInfo()[i];
     if( !dg.intermediate ) {
-      contact_ = dynamic_ptr_cast<AbstractVVSSVertexPtr>(dg.vertices.first);
+      contact_[i] = dynamic_ptr_cast<AbstractVVSSVertexPtr>(dg.vertices.first);
     }
     else if(dg.channelType == HPDiagram::tChannel) {
       if (dg.intermediate->iSpin() == PDT::Spin0 ) {
@@ -123,7 +125,7 @@ MEvv2ss::vv2ssME(const VBVector & v1, const VBVector & v2,
 	const HPDiagram & current = getProcessInfo()[ix];
 	// do four-point diag first
 	if(current.channelType == HPDiagram::fourPoint) {
-	  diag = contact_->evaluate(m2, v1[iv1], v2[iv2], sca1, sca2);
+	  diag = contact_[ix]->evaluate(m2, v1[iv1], v2[iv2], sca1, sca2);
 	}
 	else {
 	  tcPDPtr offshell = current.intermediate;
@@ -211,8 +213,10 @@ void MEvv2ss::persistentInput(PersistentIStream & is, int) {
 			   PDT::Spin0, PDT::Spin0);
 }
 
-ClassDescription<MEvv2ss> MEvv2ss::initMEvv2ss;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEvv2ss,GeneralHardME>
+describeHerwigMEvv2ss("Herwig::MEvv2ss", "Herwig.so");
 
 void MEvv2ss::Init() {
 

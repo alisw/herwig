@@ -1,7 +1,7 @@
   /// -*- C++ -*-
   //
   /// MergingFactory.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-  /// Copyright (C) 2002-2017 The Herwig Collaboration
+  /// Copyright (C) 2002-2019 The Herwig Collaboration
   //
   /// Herwig is licenced under version 3 of the GPL, see COPYING for details.
   /// Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -55,7 +55,7 @@ namespace Herwig {
       /// Debugging: push only multiplicities to the ME vector
       /// in range of specified mulltiplicity.
     int onlymulti()const {
-       return theonlymulti==-1?-1:(theonlymulti+processMap.find(0)->second.size());
+      return theonlymulti==-1?-1:(theonlymulti+int(processMap.find(0)->second.size()));
     }
       /// pointer to the merging helper.
     MergerPtr MH() {return theMergingHelper;}
@@ -153,7 +153,18 @@ namespace Herwig {
       /// the merging helper
     MergerPtr theMergingHelper;
       /// Cut on non-QCD modified observables. 
-    Ptr<Cuts>::ptr theNonQCDCuts;  
+    Ptr<Cuts>::ptr theNonQCDCuts;
+    
+      /// For more complicated processes the number of subprocesses is large.
+      /// This parameter allows to chunk the suprocesses into same sized cunks.
+      /// It is in the responsibility of the user to add all chunk parts afterwards.
+      /// The user also needs to take care that, e.g. output can be compined.
+    int theChunk=0;
+      /// This parameter selects a part chunkpart of the chunked subprocesses.
+      /// The user needs to take care to sum all chunkparts afterwards.
+    int theChunkPart=0;
+    
+    
     /**
      * The assignment operator is private and must never be called.
      * In fact, it should not even be implemented.

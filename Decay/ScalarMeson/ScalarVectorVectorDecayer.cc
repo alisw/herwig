@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ScalarVectorVectorDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "ScalarVectorVectorDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/PDT/DecayMode.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/ParVector.h"
@@ -130,9 +131,10 @@ void ScalarVectorVectorDecayer::persistentInput(PersistentIStream & is, int) {
   is >> iunit(_coupling,1/GeV) >> _incoming >> _outgoing1 >> _outgoing2 >> _maxweight;
 }
 
-ClassDescription<ScalarVectorVectorDecayer> 
-ScalarVectorVectorDecayer::initScalarVectorVectorDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<ScalarVectorVectorDecayer,DecayIntegrator>
+describeHerwigScalarVectorVectorDecayer("Herwig::ScalarVectorVectorDecayer", "HwSMDecay.so");
 
 void ScalarVectorVectorDecayer::Init() {
 
@@ -203,9 +205,9 @@ double ScalarVectorVectorDecayer::me2(const int,
   unsigned int ix,iy;
   for(ix=0;ix<3;++ix) {
     for(iy=0;iy<3;++iy) {
-      (*ME())(0,ix,iy)=fact*(p1p2*_vectors[0][ix].dot(_vectors[1][iy])-
-			  (_vectors[1][iy]*decay[0]->momentum())*
-			  (_vectors[0][ix]*decay[1]->momentum()));
+      (*ME())(0,ix,iy)=Complex(fact*(p1p2*_vectors[0][ix].dot(_vectors[1][iy])-
+				     (_vectors[1][iy]*decay[0]->momentum())*
+				     (_vectors[0][ix]*decay[1]->momentum())));
     }
   }
   // test of the matrix element

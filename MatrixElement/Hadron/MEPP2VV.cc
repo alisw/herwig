@@ -5,6 +5,7 @@
 //
 
 #include "MEPP2VV.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
@@ -29,8 +30,10 @@ unsigned int MEPP2VV::orderInAlphaEW() const {
   return 2;
 }
 
-ClassDescription<MEPP2VV> MEPP2VV::initMEPP2VV;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEPP2VV,HwMEBase>
+describeHerwigMEPP2VV("Herwig::MEPP2VV", "HwMEHadron.so");
 
 void MEPP2VV::Init() {
 
@@ -242,17 +245,21 @@ void MEPP2VV::getDiagrams() const {
 				     getParticleData(ParticleID::cbar)));
       parentpair.push_back(make_pair(getParticleData(ParticleID::b), 
 				     getParticleData(ParticleID::ubar)));
+      [[fallthrough]];
     case 4:
       parentpair.push_back(make_pair(getParticleData(ParticleID::s),
 				     getParticleData(ParticleID::cbar)));
       parentpair.push_back(make_pair(getParticleData(ParticleID::d),
 				     getParticleData(ParticleID::cbar)));
+      [[fallthrough]];
     case 3:
       parentpair.push_back(make_pair(getParticleData(ParticleID::s),
 				     getParticleData(ParticleID::ubar)));
+      [[fallthrough]];
     case 2:
       parentpair.push_back(make_pair(getParticleData(ParticleID::d),
 				     getParticleData(ParticleID::ubar)));
+      [[fallthrough]];
     default:
       ;
     }

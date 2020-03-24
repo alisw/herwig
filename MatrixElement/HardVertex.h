@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // HardVertex.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -82,14 +82,9 @@ public:
 private:
   
   /**
-   * Describe a concrete class without persistent data.
-   */
-  static NoPIOClassDescription<HardVertex> initHardVertex;
-  
-  /**
    * Private and non-existent assignment operator.
    */
-  HardVertex & operator=(const HardVertex &);
+  HardVertex & operator=(const HardVertex &) = delete;
   
 private:
   
@@ -99,40 +94,6 @@ private:
   ProductionMatrixElement _matrixelement;
   
 };
-}
-
-
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-  
-/**
- * The following template specialization informs ThePEG about the
- * base class of HardVertex.
- */
-template <>
-struct BaseClassTrait<Herwig::HardVertex,1> {
-  /** Typedef of the base class of HardVertex. */
-  typedef ThePEG::HelicityVertex NthBase;
-};
-  
-/**  
- * The following template specialization informs ThePEG about the
- * name of this class and the shared object where it is defined.
- */
-template <>
-struct ClassTraits<Herwig::HardVertex>
-  : public ClassTraitsBase<Herwig::HardVertex> {
-  
-  /**
-   * Return the class name.
-   */
-  static string className() { return "Herwig::HardVertex"; }
-};
-
-/** @endcond */
-  
 }
 
 #endif /* HERWIG_HardVertex_H */

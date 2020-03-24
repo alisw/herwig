@@ -1,16 +1,18 @@
 class ${ModelName}${classname}: public ${lorentztag}Vertex {
  public:
   ${ModelName}${classname}() {
-    kinematics(${kinematics});
+    ${header}
+    colourStructure(ColourStructure::${colourStructure});
     ${addToPlist}
   }
   void setCoupling(Energy2 ${couplingptrs}) {
     ${symbolrefs}
+    ${prepend}
     //    getParams(q2);
     ${norm}
     ${left}
     ${right}
-    ${ordering}
+    ${append}
   }
   void persistentOutput(PersistentOStream & os) const { os << model_; }
   void persistentInput(PersistentIStream & is, int) { is >> model_; }
@@ -24,9 +26,7 @@ class ${ModelName}${classname}: public ${lorentztag}Vertex {
     assert(model_);
     //    getParams(q2);
     ${parameters}
-    ${setCouplings}
-    orderInGem(${qedorder});
-    orderInGs(${qcdorder});
+    ${couplingOrders}
     ${lorentztag}Vertex::doinit();
   }
   //    void getParams(Energy2);

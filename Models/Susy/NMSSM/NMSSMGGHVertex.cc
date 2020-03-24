@@ -5,6 +5,7 @@
 //
 
 #include "NMSSMGGHVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -21,6 +22,7 @@ NMSSMGGHVertex::NMSSMGGHVertex() : _sw(0.), _cw(0.), _mw(0.*MeV),
     _hlast(0), _recalc(true) {
   orderInGem(1);
   orderInGs(2);
+  colourStructure(ColourStructure::DELTA);
 }
 
 void NMSSMGGHVertex::doinit()  {
@@ -99,8 +101,10 @@ void NMSSMGGHVertex::persistentInput(PersistentIStream & is, int) {
      >> _top >> _bt >> _mixS >> _mixP >> _mixQt >> _mixQb >> _sb >> _cb; 
 }
 
-ClassDescription<NMSSMGGHVertex> NMSSMGGHVertex::initNMSSMGGHVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<NMSSMGGHVertex,VVSLoopVertex>
+describeHerwigNMSSMGGHVertex("Herwig::NMSSMGGHVertex", "HwSusy.so HwNMSSM.so");
 
 void NMSSMGGHVertex::Init() {
 
@@ -158,7 +162,8 @@ void NMSSMGGHVertex::setCoupling(Energy2 q2, tcPDPtr p1, tcPDPtr p2,
 		    +  _triBt*(*_mixS)(iloc,0))*((*_mixQb)(ix, 1)*(*_mixQb)(ix, 0)
 						 + (*_mixQb)(ix, 0)*(*_mixQb)(ix, 1));
 
-	couplings[2+ix] = make_pair(0.5*cpl*UnitRemoval::InvE,0.5*cpl*UnitRemoval::InvE); 
+	couplings[2+ix] = make_pair(Complex(0.5*cpl*UnitRemoval::InvE),
+				    Complex(0.5*cpl*UnitRemoval::InvE)); 
       }
       // stop
       f1 = mt/_mw/_sb;
@@ -172,7 +177,8 @@ void NMSSMGGHVertex::setCoupling(Energy2 q2, tcPDPtr p1, tcPDPtr p2,
 		     + _triTp*(*_mixS)(iloc,1))*((*_mixQt)(ix, 1)*(*_mixQt)(ix, 0)
 						 + (*_mixQt)(ix, 0)*(*_mixQt)(ix, 1));
 
-	couplings[4+ix] = make_pair(0.5*cpl*UnitRemoval::InvE,0.5*cpl*UnitRemoval::InvE);
+	couplings[4+ix] = make_pair(Complex(0.5*cpl*UnitRemoval::InvE),
+				    Complex(0.5*cpl*UnitRemoval::InvE));
       }
     }
     // pseudoscalar higgs bosons	

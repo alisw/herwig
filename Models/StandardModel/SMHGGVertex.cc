@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SMHGGVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "SMHGGVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/Switch.h"
@@ -27,6 +28,7 @@ SMHGGVertex::SMHGGVertex()
    _maxloop(6),_CoefRepresentation(1) {
   orderInGs(2);
   orderInGem(1);
+  colourStructure(ColourStructure::DELTA);
 }
 
 void SMHGGVertex::doinit() {
@@ -72,8 +74,10 @@ void SMHGGVertex::persistentInput(PersistentIStream & is, int) {
      >> _minloop >> _maxloop >> _CoefRepresentation;
 }
 
-ClassDescription<SMHGGVertex> SMHGGVertex::initSMHGGVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<SMHGGVertex,VVSLoopVertex>
+describeHerwigSMHGGVertex("Herwig::SMHGGVertex", "Herwig.so");
 
 void SMHGGVertex::Init() {
   
@@ -164,7 +168,7 @@ void SMHGGVertex::setCoupling(Energy2 q2, tcPDPtr part2, tcPDPtr part3, tcPDPtr 
     for ( int i = Qminloop; i <= Qmaxloop; ++i ) {
       tcPDPtr qrk = getParticleData(i);
       Energy mass = (2 == massopt) ? _theSM->mass(q2,qrk) : qrk->mass();
-      loop += Af(sqr(mass)/q2);
+      loop += Af(sqr(mass)/invariant(0,0));
     }
     a00(loop);
     a11(0.0);

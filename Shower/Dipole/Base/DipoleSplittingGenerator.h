@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // DipoleSplittingGenerator.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -18,6 +18,8 @@
 #include "DipoleSplittingReweight.h"
 #include "Herwig/Shower/Dipole/Utility/DipoleMCCheck.h"
 #include "Herwig/Sampling/exsample/exponential_generator.h"
+
+#include <tuple>
 
 namespace Herwig {
 
@@ -145,6 +147,13 @@ public:
     /// wrapper for sudakovExpansion
   double wrappedSudakovExpansion(DipoleSplittingInfo& split,Energy down,Energy fixedScale);
 
+  /**
+   * Turn on partial unweighting and set the reference weight.
+   */
+  void doPartialUnweighting(double wref) {
+    partialUnweighting = true;
+    theReferenceWeight = wref;
+  }
 
 public:
 
@@ -285,6 +294,15 @@ public:
    * True, if sampler should apply compensation
    */
   void doCompensate(bool yes = true) { theDoCompensate = yes; }
+
+  /**
+   * Return the weight vector associated to the currently generated splitting
+   */
+  vector<std::tuple<Energy,double,bool> > splittingWeightVector() const {
+    if ( wrapping() )
+      return theOtherGenerator->splittingWeightVector();
+    return theSplittingWeightVector;
+  }
 
 public:
 
@@ -456,6 +474,23 @@ private:
    */
   double theSudakovAccuracy=0.05;
 
+  /**
+   * Reference weight to improve convergence for subleading Nc
+   * corrections (by reducing time spent on events with very
+   * small weights)
+   */
+  double theReferenceWeight;
+
+  /**
+   * Flag for partial unweighting.
+   */
+  bool partialUnweighting = false;
+
+  /**
+   * The scale, weight and a bool for all veto steps and the accept step.
+   * The bool is false for a veto step and true for an accept step.
+   */
+  vector<std::tuple<Energy,double,bool> > theSplittingWeightVector;
 
 private:
 
@@ -469,7 +504,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  DipoleSplittingGenerator & operator=(const DipoleSplittingGenerator &);
+  DipoleSplittingGenerator & operator=(const DipoleSplittingGenerator &) = delete;
 
 };
 

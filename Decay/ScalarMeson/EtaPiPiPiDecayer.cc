@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // EtaPiPiPiDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -11,6 +11,7 @@
 // functions of the EtaPiPiPiDecayer class.
 //
 #include "EtaPiPiPiDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/ParVector.h"
 #include "ThePEG/PDT/DecayMode.h"
@@ -153,8 +154,10 @@ void EtaPiPiPiDecayer::persistentInput(PersistentIStream & is, int) {
      >> _maxweight;
 }
 
-ClassDescription<EtaPiPiPiDecayer> EtaPiPiPiDecayer::initEtaPiPiPiDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<EtaPiPiPiDecayer,DecayIntegrator>
+describeHerwigEtaPiPiPiDecayer("Herwig::EtaPiPiPiDecayer", "HwSMDecay.so");
 
 void EtaPiPiPiDecayer::Init() {
 

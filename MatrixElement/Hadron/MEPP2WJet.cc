@@ -5,6 +5,7 @@
 //
 
 #include "MEPP2WJet.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/Switch.h"
@@ -43,8 +44,10 @@ void MEPP2WJet::doinit() {
   _theQQGVertex = hwsm->vertexFFG();
 }
 
-ClassDescription<MEPP2WJet> MEPP2WJet::initMEPP2WJet;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEPP2WJet,HwMEBase>
+describeHerwigMEPP2WJet("Herwig::MEPP2WJet", "HwMEHadron.so");
 
 void MEPP2WJet::Init() {
 
@@ -200,13 +203,17 @@ void MEPP2WJet::getDiagrams() const {
   case 5:
     parentpair.push_back(make_pair(ParticleID::b, ParticleID::cbar));
     parentpair.push_back(make_pair(ParticleID::b, ParticleID::ubar));
+    [[fallthrough]];
   case 4:
     parentpair.push_back(make_pair(ParticleID::s, ParticleID::cbar));
     parentpair.push_back(make_pair(ParticleID::d, ParticleID::cbar));
+    [[fallthrough]];
   case 3:
     parentpair.push_back(make_pair(ParticleID::s, ParticleID::ubar));
+    [[fallthrough]];
   case 2:
     parentpair.push_back(make_pair(ParticleID::d, ParticleID::ubar));
+    [[fallthrough]];
   default:
     ;
   }
@@ -435,7 +442,7 @@ bool MEPP2WJet::generateKinematics(const double * r) {
   try {
     q = SimplePhaseSpace::getMagnitude(sHat(), meMomenta()[2].mass(),mw);
   }
-  catch ( ImpossibleKinematics ) {
+  catch ( ImpossibleKinematics & e ) {
     return false;
   }
   Energy2 pq = sqrt(sHat())*q;
@@ -463,7 +470,7 @@ bool MEPP2WJet::generateKinematics(const double * r) {
   try {
     q2 = SimplePhaseSpace::getMagnitude(_mw2, meMomenta()[3].mass(),
 					meMomenta()[4].mass());
-  } catch ( ImpossibleKinematics ) {
+  } catch ( ImpossibleKinematics & e ) {
     return false;
   }
   double cth2 =-1.+2.*r[3];
@@ -659,7 +666,7 @@ InvEnergy2 MEPP2WJet::qgME(vector<SpinorWaveFunction> & fin,
     for(ihel2=0;ihel2<2;++ihel2) {
       for(ohel1=0;ohel1<2;++ohel1) {
 	// intermediates for the diagrams
-	interb=_theQQGVertex->evaluate(_scale,5,mePartonData()[2],
+	interb=_theQQGVertex->evaluate(_scale,5,mePartonData()[2]->CC(),
 				       fout[ohel1],gin[ihel2]);
 	inters=_theQQGVertex->evaluate(_scale,5,mePartonData()[0],
 				       fin[ihel1],gin[ihel2]);
@@ -729,7 +736,7 @@ InvEnergy2 MEPP2WJet::qbargME(vector<SpinorBarWaveFunction> & fin,
     for(ihel2=0;ihel2<2;++ihel2) {
       for(ohel1=0;ohel1<2;++ohel1) {
 	// intermediates for the diagrams
-	inters=_theQQGVertex->evaluate(_scale,5,mePartonData()[2],
+	inters=_theQQGVertex->evaluate(_scale,5,mePartonData()[2]->CC(),
 				       fout[ohel1],gin[ihel2]);
 	interb=_theQQGVertex->evaluate(_scale,5,mePartonData()[0],
 				       fin[ihel1],gin[ihel2]);

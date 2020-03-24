@@ -5,6 +5,7 @@
 //
 
 #include "MEfftoVH.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/Switch.h"
@@ -34,8 +35,10 @@ void MEfftoVH::persistentInput(PersistentIStream & is, int) {
      >> iunit(_mh,GeV) >> iunit(_wh,GeV) >> _hmass;
 }
 
-AbstractClassDescription<MEfftoVH> MEfftoVH::initMEfftoVH;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeAbstractClass<MEfftoVH,DrellYanBase>
+describeHerwigMEfftoVH("Herwig::MEfftoVH", "Herwig.so");
 
 void MEfftoVH::Init() {
 
@@ -322,7 +325,7 @@ bool MEfftoVH::generateKinematics(const double * r) {
     q = SimplePhaseSpace::
       getMagnitude(sHat(), meMomenta()[2].mass(), mv);
   } 
-  catch ( ImpossibleKinematics ) {
+  catch ( ImpossibleKinematics & e) {
     return false;
   }
 	

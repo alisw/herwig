@@ -1,0 +1,119 @@
+set /Herwig/Shower/AlphaQCD:AlphaIn           0.118
+set /Herwig/Couplings/NLOAlphaS:input_alpha_s 0.118
+set /Herwig/DipoleShower/NLOAlphaS:input_alpha_s 0.118
+cd /Herwig/Particles/
+set g:ConstituentMass                         0.95
+set b:NominalMass                             4.700501
+set b:ConstituentMass                         4.084889
+cd /Herwig/Hadronization/
+set ClusterDecayer:ClSmrBottom                0.085964
+set ClusterDecayer:ClSmrLight                 0.698877
+set ClusterDecayer:ClSmrCharm                 0.246296
+set ClusterFissioner:ClPowBottom              0.591646
+set ClusterFissioner:ClPowLight               0.99945
+set ClusterFissioner:ClPowCharm               3.386187
+set ClusterFissioner:ClMaxBottom              3.771649
+set ClusterFissioner:ClMaxCharm               4.780456
+set ClusterFissioner:ClMaxLight               3.055256
+set ClusterFissioner:PSplitLight              0.7779
+set ClusterFissioner:PSplitCharm              0.628766
+set ClusterFissioner:PSplitBottom             0.662911
+set HadronSelector:SingleHadronLimitBottom    0.000446
+set HadronSelector:SingleHadronLimitCharm     0.000508
+set HadronSelector:SngWt                      0.927141
+set HadronSelector:DecWt                      0.630787
+
+set /Herwig/DipoleShower/Kinematics/FFMassiveKinematics:IRCutoff 1.000896
+set /Herwig/DipoleShower/Kinematics/FFLightKinematics:IRCutoff   1.000896
+set /Herwig/DipoleShower/Kinematics/FIMassiveKinematics:IRCutoff 1.000896
+set /Herwig/DipoleShower/Kinematics/FILightKinematics:IRCutoff   1.000896
+set /Herwig/DipoleShower/Kinematics/IFMassiveKinematics:IRCutoff 1.000896
+set /Herwig/DipoleShower/Kinematics/IFLightKinematics:IRCutoff   1.000896
+set /Herwig/DipoleShower/Kinematics/IILightKinematics:IRCutoff   1.000896
+
+
+#######
+# CMW scheme:
+# Tune was done with CMW for all kernels, as merging currently only is consistent if applied to all.
+#######
+
+cd /Herwig/DipoleShower/Kernels
+set FFgx2ggxDipoleKernel:CMWScheme Factor
+set FFqx2qgxDipoleKernel:CMWScheme Factor
+set FFgx2ddxDipoleKernel:CMWScheme Factor
+set FFgx2uuxDipoleKernel:CMWScheme Factor
+set FFgx2ccxDipoleKernel:CMWScheme Factor
+set FFgx2ssxDipoleKernel:CMWScheme Factor
+set FFgx2bbxDipoleKernel:CMWScheme Factor
+set FFMgx2ggxDipoleKernel:CMWScheme Factor
+set FFMdx2dgxDipoleKernel:CMWScheme Factor
+set FFMux2ugxDipoleKernel:CMWScheme Factor
+set FFMcx2cgxDipoleKernel:CMWScheme Factor
+set FFMsx2sgxDipoleKernel:CMWScheme Factor
+set FFMbx2bgxDipoleKernel:CMWScheme Factor
+set FFMtx2tgxDipoleKernel:CMWScheme Factor
+set FFMgx2ddxDipoleKernel:CMWScheme Factor
+set FFMgx2uuxDipoleKernel:CMWScheme Factor
+set FFMgx2ccxDipoleKernel:CMWScheme Factor
+set FFMgx2ssxDipoleKernel:CMWScheme Factor
+set FFMgx2bbxDipoleKernel:CMWScheme Factor
+set FIgx2ggxDipoleKernel:CMWScheme Factor
+set FIqx2qgxDipoleKernel:CMWScheme Factor
+set FIgx2ddxDipoleKernel:CMWScheme Factor
+set FIgx2uuxDipoleKernel:CMWScheme Factor
+set FIgx2ccxDipoleKernel:CMWScheme Factor
+set FIgx2ssxDipoleKernel:CMWScheme Factor
+set FIgx2bbxDipoleKernel:CMWScheme Factor
+set FIMdx2dgxDipoleKernel:CMWScheme Factor
+set FIMux2ugxDipoleKernel:CMWScheme Factor
+set FIMcx2cgxDipoleKernel:CMWScheme Factor
+set FIMsx2sgxDipoleKernel:CMWScheme Factor
+set FIMbx2bgxDipoleKernel:CMWScheme Factor
+set FIMtx2tgxDipoleKernel:CMWScheme Factor
+set FIMgx2ddxDipoleKernel:CMWScheme Factor
+set FIMgx2uuxDipoleKernel:CMWScheme Factor
+set FIMgx2ccxDipoleKernel:CMWScheme Factor
+set FIMgx2ssxDipoleKernel:CMWScheme Factor
+set FIMgx2bbxDipoleKernel:CMWScheme Factor
+#set FIMgx2ttxDipoleKernel:CMWScheme Factor
+set IFgx2ggxDipoleKernel:CMWScheme Factor
+set IFqx2qgxDipoleKernel:CMWScheme Factor
+set IFqx2gqxDipoleKernel:CMWScheme Factor
+set IFgx2ddbarxDipoleKernel:CMWScheme Factor
+set IFgx2dbardxDipoleKernel:CMWScheme Factor
+set IFgx2uubarxDipoleKernel:CMWScheme Factor
+set IFgx2ubaruxDipoleKernel:CMWScheme Factor
+set IFgx2ccbarxDipoleKernel:CMWScheme Factor
+set IFgx2cbarcxDipoleKernel:CMWScheme Factor
+set IFgx2ssbarxDipoleKernel:CMWScheme Factor
+set IFgx2sbarsxDipoleKernel:CMWScheme Factor
+set IFMgx2ggxDipoleKernel:CMWScheme Factor
+set IFMqx2qgxDipoleKernel:CMWScheme Factor
+set IFMqx2gqxDipoleKernel:CMWScheme Factor
+set IFMgx2ddbarxDipoleKernel:CMWScheme Factor
+set IFMgx2dbardxDipoleKernel:CMWScheme Factor
+set IFMgx2uubarxDipoleKernel:CMWScheme Factor
+set IFMgx2ubaruxDipoleKernel:CMWScheme Factor
+set IFMgx2ccbarxDipoleKernel:CMWScheme Factor
+set IFMgx2cbarcxDipoleKernel:CMWScheme Factor
+set IFMgx2ssbarxDipoleKernel:CMWScheme Factor
+set IFMgx2sbarsxDipoleKernel:CMWScheme Factor
+set IIgx2ggxDipoleKernel:CMWScheme Factor
+set IIqx2qgxDipoleKernel:CMWScheme Factor
+set IIqx2gqxDipoleKernel:CMWScheme Factor
+set IIgx2ddbarxDipoleKernel:CMWScheme Factor
+set IIgx2dbardxDipoleKernel:CMWScheme Factor
+set IIgx2uubarxDipoleKernel:CMWScheme Factor
+set IIgx2ubaruxDipoleKernel:CMWScheme Factor
+set IIgx2ccbarxDipoleKernel:CMWScheme Factor
+set IIgx2cbarcxDipoleKernel:CMWScheme Factor
+set IIgx2ssbarxDipoleKernel:CMWScheme Factor
+set IIgx2sbarsxDipoleKernel:CMWScheme Factor
+set IFgx2bbbarxDipoleKernel:CMWScheme Factor
+set IFgx2bbarbxDipoleKernel:CMWScheme Factor
+set IFMgx2bbbarxDipoleKernel:CMWScheme Factor
+set IFMgx2bbarbxDipoleKernel:CMWScheme Factor
+set IIgx2bbbarxDipoleKernel:CMWScheme Factor
+set IIgx2bbarbxDipoleKernel:CMWScheme Factor
+
+

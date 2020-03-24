@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // TTbAModelSU2XVertex.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -96,14 +96,9 @@ protected:
 private:
   
   /**
-   * Describe a concrete class with persistent data.
-   */
-  static ClassDescription<TTbAModelSU2XVertex> initTTbAModelSU2XVertex;
-  
-  /**
    * Private and non-existent assignment operator.
    */
-  TTbAModelSU2XVertex & operator=(const TTbAModelSU2XVertex &);
+  TTbAModelSU2XVertex & operator=(const TTbAModelSU2XVertex &) = delete;
 
    /**
    * Pointer to the model object.
@@ -145,40 +140,5 @@ private:
 };  
 
 }
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/**
- * The following template specialization informs ThePEG about the
- * base class of TTbAModelSU2XVertex.
- */
-template <>
-struct BaseClassTrait<Herwig::TTbAModelSU2XVertex,1> {
-  /** Typedef of the base class of TTbAModelSU2XVertex. */
-  typedef ThePEG::Helicity::FFVVertex NthBase;
-};
-  
-/**
- * The following template specialization informs ThePEG about the
- * name of this class and the shared object where it is defined.
- */
-  template <>
-  
-struct ClassTraits<Herwig::TTbAModelSU2XVertex>
-  : public ClassTraitsBase<Herwig::TTbAModelSU2XVertex> {
-  
-  /**
-   * Return the class name.
-   */
-  static string className() { return "Herwig::TTbAModelSU2XVertex"; }
-  
-};
-
-/** @endcond */
-  
-}
-
 
 #endif /* HERWIG_TTbAModelSU2XVertex_H */

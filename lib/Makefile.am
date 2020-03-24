@@ -1,7 +1,7 @@
 pkglib_LTLIBRARIES = Herwig.la
 Herwig_la_SOURCES =
 Herwig_la_LIBTOOLFLAGS = --tag=CXX
-Herwig_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 23:0:0
+Herwig_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 27:0:0
 Herwig_la_LDFLAGS += $(THEPEGLDFLAGS) $(BOOST_SYSTEM_LDFLAGS) $(BOOST_FILESYSTEM_LDFLAGS) $(FCLIBS)
 Herwig_la_LIBADD = \
 $(top_builddir)/Hadronization/libHwHadronization.la \
@@ -19,7 +19,7 @@ $(top_builddir)/MatrixElement/Matchbox/libHwMatchbox.la \
 $(top_builddir)/Decay/libHwWeakCurrent.la \
 $(top_builddir)/Looptools/libHwLooptools.la \
 $(top_builddir)/Shower/libHwShower.la \
-$(THEPEGLIB) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) -ldl
+$(THEPEGLIB) -ldl
 
 dist_noinst_SCRIPTS = fix-osx-path
 

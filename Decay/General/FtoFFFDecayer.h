@@ -86,91 +86,52 @@ protected:
 
 protected:
 
-  /** @name Standard Interfaced functions. */
-  //@{
   /**
-   * Initialize this object after the setup phase before saving an
-   * EventGenerator to disk.
-   * @throws InitException if object could not be initialized properly.
+   *   Set up the diagrams etc
    */
-  virtual void doinit();
-  //@}
+  virtual void setupDiagrams(bool checkKinematics);
 
 private:
-
-  /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<FtoFFFDecayer> initFtoFFFDecayer;
 
   /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  FtoFFFDecayer & operator=(const FtoFFFDecayer &);
+  FtoFFFDecayer & operator=(const FtoFFFDecayer &) = delete;
 
 private:
   
   /**
    * Store the vector of FFSVertex pairs
    */
-  vector<pair<AbstractFFSVertexPtr, AbstractFFSVertexPtr> > _sca;
+  vector<pair<AbstractFFSVertexPtr, AbstractFFSVertexPtr> > sca_;
 
   /**
    * Store the vector of FFVVertex pairs
    */
-  vector<pair<AbstractFFVVertexPtr, AbstractFFVVertexPtr> > _vec;
+  vector<pair<AbstractFFVVertexPtr, AbstractFFVVertexPtr> > vec_;
 
   /**
    * Store the vector of FFTVertex pairs
    */
-  vector<pair<AbstractFFTVertexPtr, AbstractFFTVertexPtr> > _ten;
+  vector<pair<AbstractFFTVertexPtr, AbstractFFTVertexPtr> > ten_;
 
   /**
    *  Spin density matrix 
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 
   /**
    *  Spinors for incoming particle
    */
-  mutable pair<vector<SpinorWaveFunction>,vector<SpinorBarWaveFunction> > _inwave;
+  mutable pair<vector<SpinorWaveFunction>,vector<SpinorBarWaveFunction> > inwave_;
 
   /**
    *  Spinors for outgoing particles
    */
-  mutable pair<vector<SpinorWaveFunction>,vector<SpinorBarWaveFunction> > _outwave[3];
+  mutable pair<vector<SpinorWaveFunction>,vector<SpinorBarWaveFunction> > outwave_[3];
 };
 
 }
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of FtoFFFDecayer. */
-template <>
-struct BaseClassTrait<Herwig::FtoFFFDecayer,1> {
-  /** Typedef of the first base class of FtoFFFDecayer. */
-  typedef Herwig::GeneralThreeBodyDecayer NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the FtoFFFDecayer class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::FtoFFFDecayer>
-  : public ClassTraitsBase<Herwig::FtoFFFDecayer> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::FtoFFFDecayer"; }
-};
-
-/** @endcond */
-
-}
-
 
 #endif /* HERWIG_FtoFFFDecayer_H */

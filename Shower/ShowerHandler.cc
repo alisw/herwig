@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ShowerHandler.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -32,7 +32,6 @@
 #include "Herwig/PDF/MPIPDF.h"
 #include "Herwig/PDF/MinBiasPDF.h"
 #include "ThePEG/Handlers/EventHandler.h"
-#include "Herwig/Shower/Core/Base/ShowerTree.h"
 #include "Herwig/PDF/HwRemDecayer.h"
 #include <cassert>
 #include "ThePEG/Utilities/DescribeClass.h"
@@ -56,8 +55,6 @@ void ShowerHandler::doinit() {
     for(unsigned int ix=0;ix<inputparticlesDecayInShower_.size();++ix)
       particlesDecayInShower_.insert(abs(inputparticlesDecayInShower_[ix]));
   }
-  ShowerTree::_vmin2 = vMin_;
-  ShowerTree::_spaceTime = includeSpaceTime_;
   if ( profileScales() ) {
     if ( profileScales()->unrestrictedPhasespace() &&
 	 restrictPhasespace() ) {
@@ -84,7 +81,7 @@ ShowerHandler::ShowerHandler() :
   renormalizationScaleFactor_(1.0),
   hardScaleFactor_(1.0),
   restrictPhasespace_(true), maxPtIsMuF_(false), 
-  pdfFreezingScale_(2.5*GeV),
+  spinOpt_(1), pdfFreezingScale_(2.5*GeV),
   doFSR_(true), doISR_(true),
   splitHardProcess_(true),
   includeSpaceTime_(false), vMin_(0.1*GeV2),
@@ -103,8 +100,6 @@ void ShowerHandler::doinitrun(){
     if(MPIHandler_->softInt())
       remDec_->initSoftInteractions(MPIHandler_->Ptmin(), MPIHandler_->beta());
   }
-  ShowerTree::_vmin2 = vMin_;
-  ShowerTree::_spaceTime = includeSpaceTime_;
 }
 
 void ShowerHandler::dofinish() {
@@ -122,7 +117,8 @@ void ShowerHandler::persistentOutput(PersistentOStream & os) const {
      << factorizationScaleFactor_ << renormalizationScaleFactor_
      << hardScaleFactor_
      << restrictPhasespace_ << maxPtIsMuF_ << hardScaleProfile_
-     << showerVariations_ << doFSR_ << doISR_ << splitHardProcess_;
+     << showerVariations_ << doFSR_ << doISR_ << splitHardProcess_
+     << spinOpt_ << useConstituentMasses_;
 }
 
 void ShowerHandler::persistentInput(PersistentIStream & is, int) {
@@ -135,7 +131,8 @@ void ShowerHandler::persistentInput(PersistentIStream & is, int) {
      >> factorizationScaleFactor_ >> renormalizationScaleFactor_
      >> hardScaleFactor_
      >> restrictPhasespace_ >> maxPtIsMuF_ >> hardScaleProfile_
-     >> showerVariations_ >> doFSR_ >> doISR_ >> splitHardProcess_;
+     >> showerVariations_ >> doFSR_ >> doISR_ >> splitHardProcess_
+     >> spinOpt_ >> useConstituentMasses_;
 }
 
 void ShowerHandler::Init() {
@@ -337,10 +334,42 @@ void ShowerHandler::Init() {
      "No",
      "Don't split the hard process",
      false);
+
+  static Switch<ShowerHandler,unsigned int> interfaceSpinCorrelations
+    ("SpinCorrelations",
+     "Treatment of spin correlations in the parton shower",
+     &ShowerHandler::spinOpt_, 1, false, false);
+  static SwitchOption interfaceSpinCorrelationsNo
+    (interfaceSpinCorrelations,
+     "No",
+     "No spin correlations",
+     0);
+  static SwitchOption interfaceSpinCorrelationsSpin
+    (interfaceSpinCorrelations,
+     "Yes",
+     "Include the azimuthal spin correlations",
+     1);
+  
+  static Switch<ShowerHandler,bool> interfaceUseConstituentMasses
+  ("UseConstituentMasses",
+   "Whether or not to use constituent masses for the reconstruction of the particle after showering.",
+   &ShowerHandler::useConstituentMasses_, true, false, false);
+  static SwitchOption interfaceUseConstituentMassesYes
+  (interfaceUseConstituentMasses,
+   "Yes",
+   "Use constituent masses.",
+   true);
+  static SwitchOption interfaceUseConstituentMassesNo
+  (interfaceUseConstituentMasses,
+   "No",
+   "Don't use constituent masses.",
+   false);
+
 }
 
 Energy ShowerHandler::hardScale() const {
   assert(false);
+  return ZERO;
 }
 
 void ShowerHandler::cascade() {
@@ -654,6 +683,7 @@ string ShowerHandler::doAddVariation(string in) {
 
 tPPair ShowerHandler::cascade(tSubProPtr, XCPtr) {
   assert(false);
+  return tPPair();
 }
 
 ShowerHandler::RemPair 
@@ -1094,7 +1124,7 @@ tDMPtr ShowerHandler::findDecayMode(const string & tag) const {
  * @param p2 The second ParticleData object
  */
 
-bool ShowerHandler::ParticleOrdering::operator() (tcPDPtr p1, tcPDPtr p2) {
+bool ShowerHandler::ParticleOrdering::operator() (tcPDPtr p1, tcPDPtr p2) const {
   return abs(p1->id()) > abs(p2->id()) ||
     ( abs(p1->id()) == abs(p2->id()) && p1->id() > p2->id() ) ||
     ( p1->id() == p2->id() && p1->fullName() > p2->fullName() );

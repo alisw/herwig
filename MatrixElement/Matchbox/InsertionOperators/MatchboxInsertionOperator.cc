@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxInsertionOperator.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -24,9 +24,9 @@
 
 using namespace Herwig;
 
-Ptr<MatchboxFactory>::tptr MatchboxInsertionOperator::factory() const { return theFactory; }
-
-void MatchboxInsertionOperator::factory(Ptr<MatchboxFactory>::tptr f) { theFactory = f; }
+Ptr<MatchboxFactory>::tptr MatchboxInsertionOperator::factory() const {
+  return MatchboxFactory::currentFactory();
+}
 
 MatchboxInsertionOperator::MatchboxInsertionOperator() 
   : HandlerBase() {}
@@ -69,11 +69,11 @@ bool MatchboxInsertionOperator::isExpanded() const { return lastBorn()->isExpand
 
 
 void MatchboxInsertionOperator::persistentOutput(PersistentOStream & os) const {
-  os << theLastXComb << theFactory ;
+  os << theLastXComb;
 }
 
 void MatchboxInsertionOperator::persistentInput(PersistentIStream & is, int) {
-  is >> theLastXComb >> theFactory ;
+  is >> theLastXComb ;
   lastMatchboxXComb(theLastXComb);
 }
 

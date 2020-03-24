@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // VectorMesonCurrent.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -166,14 +166,9 @@ protected:
 private:
 
   /**
-   * Describe a concrete class with persistent data.
-   */
-  static ClassDescription<VectorMesonCurrent> initVectorMesonCurrent;
-
-  /**
    * Private and non-existent assignment operator.
    */
-  VectorMesonCurrent & operator=(const VectorMesonCurrent &);
+  VectorMesonCurrent & operator=(const VectorMesonCurrent &) = delete;
 
 private:
 
@@ -195,43 +190,5 @@ private:
 
 }
 
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/**
- * The following template specialization informs ThePEG about the
- * base class of VectorMesonCurrent.
- */
-template <>
- struct BaseClassTrait<Herwig::VectorMesonCurrent,1> {
-  /** Typedef of the base class of VectorMesonCurrent. */
-   typedef Herwig::WeakDecayCurrent NthBase;
-};
-
-/**
- * The following template specialization informs ThePEG about the
- * name of this class and the shared object where it is defined.
- */
-template <>
- struct ClassTraits<Herwig::VectorMesonCurrent>
-  : public ClassTraitsBase<Herwig::VectorMesonCurrent> {
-   /**  Return the class name.*/
-  static string className() { return "Herwig::VectorMesonCurrent"; }
-  /**
-   * Return the name of the shared library to be loaded to get
-   * access to this class and every other class it uses
-   * (except the base class).
-   */
-  static string library() { return "HwWeakCurrents.so"; }
-
-};
-
-/** @endcond */
-
-}
 
 #endif /* THEPEG_VectorMesonCurrent_H */

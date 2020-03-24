@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // RSModel.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -143,14 +143,9 @@ protected:
 private:
   
   /**
-   * Describe a concrete class with persistent data.
-   */
-  static ClassDescription<RSModel> initRSModel;
-  
-    /**
      * Private and non-existent assignment operator.
      */
-  RSModel & operator=(const RSModel &);
+  RSModel & operator=(const RSModel &) = delete;
 
 private:
   
@@ -196,42 +191,5 @@ private:
   
 };
 }
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/**
- * The following template specialization informs ThePEG about the
- * base class of RSModel.
- */
-template <>
-struct BaseClassTrait<Herwig::RSModel,1> {
-  /** Typedef of the base class of RSModel. */
-  typedef Herwig::BSMModel NthBase;
-};
-
-/**
- * The following template specialization informs ThePEG about the
- * name of this class and the shared object where it is defined.
- */
-template <>
-struct ClassTraits<Herwig::RSModel>
-  : public ClassTraitsBase<Herwig::RSModel> {
-  /** Return the class name.*/
-  static string className() { return "Herwig::RSModel"; }
-  /**
-   * Return the name of the shared library to be loaded to get
-   * access to this class and every other class it uses
-   * (except the base class).
-   */
-  static string library() { return "HwRSModel.so"; }
-  
-};
-
-/** @endcond */
-  
-}
-
 
 #endif /* HERWIG_RSModel_H */

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SVVDecayer.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -14,8 +14,7 @@
 
 #include "GeneralTwoBodyDecayer.h"
 #include "ThePEG/Repository/EventGenerator.h"
-#include "ThePEG/Helicity/Vertex/AbstractVVSVertex.fh"
-#include "ThePEG/Helicity/Vertex/Scalar/VVSVertex.fh"
+#include "ThePEG/Helicity/Vertex/Scalar/VVSVertex.h"
 #include "ThePEG/Helicity/WaveFunction/ScalarWaveFunction.h"
 #include "ThePEG/Helicity/WaveFunction/VectorWaveFunction.h"
 
@@ -63,6 +62,36 @@ public:
    */
   virtual Energy partialWidth(PMPair inpart, PMPair outa, 
 			      PMPair outb) const;
+
+  /**
+   *  Set the information on the decay
+   */
+  virtual void setDecayInfo(PDPtr incoming, PDPair outgoing,
+			    vector<VertexBasePtr>,
+			    map<ShowerInteraction,VertexBasePtr> &,
+			    const vector<map<ShowerInteraction,VertexBasePtr> > &,
+			    map<ShowerInteraction,VertexBasePtr>);
+  
+  /**
+   *  Has a POWHEG style correction
+   */
+  virtual POWHEGType hasPOWHEGCorrection()  {
+    POWHEGType output = FSR;
+    for(auto vertex : vertex_) {
+      if(vertex->orderInAllCouplings()!=1) {
+	output = No;
+	break;
+      }
+    }
+    return output;
+  }
+
+  /**
+   *  Three-body matrix element including additional QCD radiation
+   */
+  virtual double threeBodyME(const int , const Particle & inpart,
+			     const ParticleVector & decay,
+			     ShowerInteraction inter, MEOption meopt);
   //@}
 
 public:
@@ -107,95 +136,95 @@ protected:
    */
   virtual IBPtr fullclone() const;
   //@}
-
+  
 protected:
 
-  /** @name Standard Interfaced functions. */
-  //@{
   /**
-   * Initialize this object after the setup phase before saving and
-   * EventGenerator to disk.
-   * @throws InitException if object could not be initialized properly.
+   *  Find the vertices for the decay
    */
-  virtual void doinit();
-
-  /**
-   * Initialize this object. Called in the run phase just before
-   * a run begins.
-   */
-  virtual void doinitrun();
-  //@}
+  void identifyVertices(const Particle & inpart, const ParticleVector & decay, 
+			AbstractVVVVertexPtr & outgoingVertex1, 
+			AbstractVVVVertexPtr & outgoingVertex2,
+			ShowerInteraction inter);
 
 private:
-
-  /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<SVVDecayer> initSVVDecayer;
 
   /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  SVVDecayer & operator=(const SVVDecayer &);
+  SVVDecayer & operator=(const SVVDecayer &) = delete;
 
 private:
   
   /**
    *  Abstract pointer to general VVS vertex
    */
-  AbstractVVSVertexPtr _abstractVertex;
+  vector<AbstractVVSVertexPtr> vertex_;
 
   /**
    * Pointer to the perturbative form
    */
-  VVSVertexPtr _perturbativeVertex; 
+  vector<VVSVertexPtr> perturbativeVertex_;
+
+  /**
+   *  Abstract pointer to AbstractVSSVertex for QCD radiation from incoming scalar
+   */
+  map<ShowerInteraction,AbstractVSSVertexPtr> incomingVertex_;
+
+  /**
+   *  Abstract pointer to AbstractFFVVertex for QCD radiation from the 1st outgoing vector
+   */
+  map<ShowerInteraction,AbstractVVVVertexPtr> outgoingVertex1_;
+
+  /**
+   *  Abstract pointer to AbstractFFVVertex for QCD radiation from the 2nd outgoing vector
+   */
+  map<ShowerInteraction,AbstractVVVVertexPtr> outgoingVertex2_;
 
   /**
    *  Spin density matrix
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 
   /**
    *  Scalar wavefunction
    */
-  mutable Helicity::ScalarWaveFunction _swave;
+  mutable Helicity::ScalarWaveFunction swave_;
 
   /**
    *  Vector wavefunctions
    */
-  mutable vector<Helicity::VectorWaveFunction> _vectors[2];
+  mutable vector<Helicity::VectorWaveFunction> vectors_[2];
+
+private:
+
+  /**
+   *  Member for the POWHEG correction
+   */
+  //@{
+  /**
+   *  Spin density matrix for 3 body decay
+   */
+  mutable RhoDMatrix rho3_;
+  
+  /**
+   *  Scalar wavefunction for 3 body decay
+   */
+  mutable ScalarWaveFunction swave3_;
+
+  /**
+   *  Vector wavefunctions
+   */
+  mutable vector<Helicity::VectorWaveFunction> vectors3_[2];
+
+    /**
+   *  Vector wavefunction for 3 body decay
+   */
+  mutable vector<Helicity::VectorWaveFunction> gluon_;
+  //@}
 };
 
 }
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of SVVDecayer. */
-template <>
-struct BaseClassTrait<Herwig::SVVDecayer,1> {
-  /** Typedef of the first base class of SVVDecayer. */
-  typedef Herwig::GeneralTwoBodyDecayer NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the SVVDecayer class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::SVVDecayer>
-  : public ClassTraitsBase<Herwig::SVVDecayer> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::SVVDecayer"; }
-};
-
-/** @endcond */
-
-}
-
 
 #endif /* HERWIG_SVVDecayer_H */

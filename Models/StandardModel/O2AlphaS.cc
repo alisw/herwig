@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // O2AlphaS.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "O2AlphaS.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/StandardModel/StandardModelBase.h"
 #include "ThePEG/Repository/EventGenerator.h"
 #include "ThePEG/PDT/ParticleData.h"
@@ -33,8 +34,10 @@ void O2AlphaS::persistentInput(PersistentIStream & is, int) {
      >> iunit(_threshold,GeV) >> _match >> _copt;
 }
 
-ClassDescription<O2AlphaS> O2AlphaS::initO2AlphaS;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<O2AlphaS,AlphaSBase>
+describeHerwigO2AlphaS("Herwig::O2AlphaS", "Herwig.so");
 
 void O2AlphaS::Init() {
 

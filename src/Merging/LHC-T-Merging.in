@@ -145,7 +145,7 @@ set /Herwig/Merging/MergingFactory:ScaleChoice TopPairMassScale
 ##################################################
 ## CMW - Scheme
 ##################################################
-read Merging/Merging-Dipole-FactorCMWSchemeTune.in
+read snippets/Dipole_AutoTunes_gss.in
 
 ### Use factor in alpha_s argument: alpha_s(q) -> alpha_s(fac*q)
 ### with fac=exp(-(67-3pi^2-10/3*Nf)/(33-2Nf))
@@ -161,7 +161,8 @@ read Merging/FactorCMWScheme.in
 ##################################################
 
 read Matchbox/FiveFlavourNoBMassScheme.in
-read Matchbox/MMHT2014.in
+read Matchbox/CT14.in
+# read Matchbox/MMHT2014.in
 
 ##################################################
 ## Analyses

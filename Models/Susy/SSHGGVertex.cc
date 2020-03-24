@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SSHGGVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "SSHGGVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
@@ -37,6 +38,7 @@ SSHGGVertex::SSHGGVertex() : theIncludeTriLinear(true),
 			     theq2last(), theHaveCoeff(false), theLastID(0) {
   orderInGs(2);
   orderInGem(1);
+  colourStructure(ColourStructure::DELTA);
 }
 
 void SSHGGVertex::doinit() {
@@ -107,8 +109,10 @@ void SSHGGVertex::persistentInput(PersistentIStream & is, int) {
      >> iunit(theSqmass, GeV) >> thePseudoScalarTreatment;
 }
 
-ClassDescription<SSHGGVertex> SSHGGVertex::initSSHGGVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<SSHGGVertex,VVSLoopVertex>
+describeHerwigSSHGGVertex("Herwig::SSHGGVertex", "HwSusy.so");
 
 void SSHGGVertex::Init() {
   
@@ -189,25 +193,25 @@ void SSHGGVertex::setCoupling(Energy2 q2, tcPDPtr particle2,
 	// lightest stop
 	trilinear = theIncludeTriLinear ? 
 	 -theQt1LR*0.5*mt/theMw*(Trit*theCosA + theMu*theSinA)/theSinB : Energy();
-	coup = 0.5*UnitRemoval::InvE*
-	  (theQt1L *( - sqr(mt)*theCosA/theMw/theSinB + theSinApB*brac2) +
-	   theQt1R *( - sqr(mt)*theCosA/theMw/theSinB + theSinApB*brac4)+trilinear);
+	coup = Complex(0.5*UnitRemoval::InvE*
+		       (theQt1L *( - sqr(mt)*theCosA/theMw/theSinB + theSinApB*brac2) +
+			theQt1R *( - sqr(mt)*theCosA/theMw/theSinB + theSinApB*brac4)+trilinear));
 
 	couplings[1] = make_pair(coup, coup);
 	// heavier sbottom
 	trilinear = theIncludeTriLinear ? 
 	  theQb2LR*0.5*mb/theMw*(Trib*theSinA + theMu*theCosA)/theCosB : Energy();
-	coup = 0.5*UnitRemoval::InvE*
-	  (theQb2L *(   sqr(mb)*theSinA/theMw/theCosB - theSinApB*brac1) +
-	   theQb2R *(   sqr(mb)*theSinA/theMw/theCosB + theSinApB*brac3)+trilinear);
+	coup = Complex(0.5*UnitRemoval::InvE*
+		       (theQb2L *(   sqr(mb)*theSinA/theMw/theCosB - theSinApB*brac1) +
+			theQb2R *(   sqr(mb)*theSinA/theMw/theCosB + theSinApB*brac3)+trilinear));
 
 	couplings[2] = make_pair(coup, coup);
 	// heavier stop
 	trilinear = theIncludeTriLinear ? 
 	  -theQt2LR*0.5*mt/theMw*(Trit*theCosA + theMu*theSinA)/theSinB : Energy();
-	coup = 0.5*UnitRemoval::InvE*
-	  (theQt2L *( - sqr(mt)*theCosA/theMw/theSinB + theSinApB*brac2) +
-	   theQt2R *( - sqr(mt)*theCosA/theMw/theSinB + theSinApB*brac4)+trilinear);
+	coup = Complex(0.5*UnitRemoval::InvE*
+		       (theQt2L *( - sqr(mt)*theCosA/theMw/theSinB + theSinApB*brac2) +
+			theQt2R *( - sqr(mt)*theCosA/theMw/theSinB + theSinApB*brac4)+trilinear));
 	   		
 	couplings[3] = make_pair(coup, coup);
 	// top
@@ -231,25 +235,25 @@ void SSHGGVertex::setCoupling(Energy2 q2, tcPDPtr particle2,
 	// lightest stop
 	trilinear = theIncludeTriLinear ? 
 	   -theQt1LR*0.5*mt/theMw*(-theMu*theCosA + Trit*theSinA)/theSinB: Energy();
-	coup = 0.5*UnitRemoval::InvE*
-	  (theQt1L *( - sqr(mt)*theSinA/theMw/theSinB - theCosApB*brac2) +
-	   theQt1R *( - sqr(mt)*theSinA/theMw/theSinB - theCosApB*brac4)+trilinear);
+	coup = Complex(0.5*UnitRemoval::InvE*
+		       (theQt1L *( - sqr(mt)*theSinA/theMw/theSinB - theCosApB*brac2) +
+			theQt1R *( - sqr(mt)*theSinA/theMw/theSinB - theCosApB*brac4)+trilinear));
 
 	couplings[1] = make_pair(coup, coup);
 	// heavier sbottom
 	trilinear = theIncludeTriLinear ? 
 	   theQb2LR*0.5*mb/theMw*(theMu*theSinA - Trib*theCosA)/theCosB: Energy();
-	coup = 0.5*UnitRemoval::InvE*
-	  (theQb2L *( - sqr(mb)*theCosA/theMw/theCosB + theCosApB*brac1) +
-	   theQb2R *( - sqr(mb)*theCosA/theMw/theCosB - theCosApB*brac3)+trilinear); 
+	coup =  Complex(0.5*UnitRemoval::InvE*
+			(theQb2L *( - sqr(mb)*theCosA/theMw/theCosB + theCosApB*brac1) +
+			 theQb2R *( - sqr(mb)*theCosA/theMw/theCosB - theCosApB*brac3)+trilinear)); 
 	
 	couplings[2] = make_pair(coup, coup);
 	// heavier stop
 	trilinear = theIncludeTriLinear ? 
 	   -theQt2LR*0.5*mt/theMw*(-theMu*theCosA + Trit*theSinA)/theSinB: Energy();
-	coup = 0.5*UnitRemoval::InvE*
-	  (theQt2L *( - sqr(mt)*theSinA/theMw/theSinB - theCosApB*brac2) +
-	   theQt2R *( - sqr(mt)*theSinA/theMw/theSinB - theCosApB*brac4)+trilinear);
+	coup =  Complex(0.5*UnitRemoval::InvE*
+			(theQt2L *( - sqr(mt)*theSinA/theMw/theSinB - theCosApB*brac2) +
+			 theQt2R *( - sqr(mt)*theSinA/theMw/theSinB - theCosApB*brac4)+trilinear));
 	
 	couplings[3] = make_pair(coup, coup);
 	// top

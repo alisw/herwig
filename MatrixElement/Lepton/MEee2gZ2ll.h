@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEee2gZ2ll.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -18,7 +18,7 @@
 #include "Herwig/MatrixElement/ProductionMatrixElement.h"
 #include "ThePEG/Helicity/WaveFunction/SpinorWaveFunction.h"
 #include "ThePEG/Helicity/WaveFunction/SpinorBarWaveFunction.h"
-#include "Herwig/Shower/Core/Couplings/ShowerAlpha.h"
+#include "Herwig/Shower/ShowerAlpha.h"
 
 namespace Herwig {
 
@@ -292,7 +292,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEee2gZ2ll & operator=(const MEee2gZ2ll &);
+  MEee2gZ2ll & operator=(const MEee2gZ2ll &) = delete;
 
 private:
 
@@ -325,10 +325,7 @@ private:
    * The allowed outgoing
    */
   int allowed_;
-  /**
-   * The initial kappa-tilde values for radiation from the quark
-   */
-  double d_kt1_;
+
   /**
    *  Pointer to the EM coupling
    */
@@ -360,41 +357,6 @@ private:
   //@}
 
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEee2gZ2ll. */
-template <>
-struct BaseClassTrait<Herwig::MEee2gZ2ll,1> {
-  /** Typedef of the first base class of MEee2gZ2ll. */
-  typedef Herwig::HwMEBase NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEee2gZ2ll class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEee2gZ2ll>
-  : public ClassTraitsBase<Herwig::MEee2gZ2ll> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEee2gZ2ll"; }
-  /**
-   * The name of a file containing the dynamic library where the class
-   * MEee2gZ2ll is implemented. It may also include several, space-separated,
-   * libraries if the class MEee2gZ2ll depends on other classes (base classes
-   * excepted). In this case the listed libraries will be dynamically
-   * linked in the order they are specified.
-   */
-  static string library() { return "HwMELepton.so"; }
-};
-
-/** @endcond */
 
 }
 

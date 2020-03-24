@@ -1,7 +1,7 @@
   // -*- C++ -*-
   //
   // DipoleShowerHandler.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-  // Copyright (C) 2002-2017 The Herwig Collaboration
+  // Copyright (C) 2002-2019 The Herwig Collaboration
   //
   // Herwig is licenced under version 3 of the GPL, see COPYING for details.
   // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -17,6 +17,7 @@
 #include "ThePEG/Interface/Reference.h"
 #include "ThePEG/Interface/RefVector.h"
 #include "ThePEG/Interface/Parameter.h"
+#include "ThePEG/Interface/ParVector.h"
 #include "ThePEG/Interface/Switch.h"
 
 #include "ThePEG/Persistency/PersistentOStream.h"
@@ -38,17 +39,25 @@ using namespace Herwig;
 
 bool DipoleShowerHandler::firstWarn = true;
 
-DipoleShowerHandler::DipoleShowerHandler()
-: ShowerHandler(), chainOrderVetoScales(true),
-nEmissions(0), discardNoEmissions(false), firstMCatNLOEmission(false),
-thePowhegDecayEmission(true),
-realignmentScheme(0),
-verbosity(0), printEvent(0), nTries(0),
-didRadiate(false), didRealign(false),
-theRenormalizationScaleFreeze(1.*GeV),
-theFactorizationScaleFreeze(2.*GeV), theDoCompensate(false),
-theFreezeGrid(500000), theDetuning(1.0),
-maxPt(ZERO), muPt(ZERO) {}
+DipoleShowerHandler::DipoleShowerHandler() :
+  ShowerHandler(), chainOrderVetoScales(true),
+  nEmissions(0), discardNoEmissions(false), firstMCatNLOEmission(false),
+  thePowhegDecayEmission(true),
+  //theAnalyseSpinCorrelations(false),
+  realignmentScheme(0),
+  doSubleadingNc(false),subleadingNcEmissionsLimit(0),
+  densityOperatorEvolution(0),densityOperatorCutoff(1.0*GeV2),
+  doPartialUnweightingAtEmission(false),
+  doPartialUnweighting(false),referenceWeight(0.1),
+  cmecReweightFactor(1.0),negCMECScaling(1.0),
+  verbosity(0), printEvent(0), nTries(0),
+  didRadiate(false), didRealign(false),
+  theRenormalizationScaleFreeze(1.*GeV),
+  theFactorizationScaleFreeze(2.*GeV), theDoCompensate(false),
+  theFreezeGrid(500000), theDetuning(1.0),
+  maxPt(ZERO), muPt(ZERO),
+  theInputColouredOffShellInShower(),
+  theZBoundaries(1) {}
 
 DipoleShowerHandler::~DipoleShowerHandler() {}
 
@@ -79,20 +88,51 @@ tPPair DipoleShowerHandler::cascade(tSubProPtr sub, XCombPtr,
   resetWeights();
   
   if ( !doFSR() && ! doISR() )
-  return sub->incoming();
-  
+    return sub->incoming();
+
+  eventRecord().setSubleadingNc(doSubleadingNc,
+				subleadingNcEmissionsLimit);
   eventRecord().clear();
-  eventRecord().prepare(sub, dynamic_ptr_cast<tStdXCombPtr>(lastXCombPtr()), newStep(), pdfs(), 
+  eventRecord().prepare(sub,dynamic_ptr_cast<tStdXCombPtr>(lastXCombPtr()),newStep(),pdfs(),
 			ShowerHandler::currentHandler()->generator()->currentEvent()->incoming(),
-			firstInteraction());
-  if ( eventRecord().outgoing().empty() && !doISR() )
+			firstInteraction(), offShellPartons(),
+                        !doSubleadingNc);
+  if ( doSubleadingNc ) {
+    if ( !theSplittingReweight ) {
+      throw Exception() << "No splitting reweight was found. "
+			<< "A ColourMatrixElementCorrection "
+			<< "splitting reweight is required "
+			<< "for the subleading colour shower."
+			<< Exception::runerror; 
+    }
+    //Set the evolution scheme for the density operator
+    eventRecord().setDensityOperatorEvolution( densityOperatorEvolution, densityOperatorCutoff );
+    //Set the CMEC reweight factor
+    theSplittingReweight->reweightFactor(cmecReweightFactor);
+    theSplittingReweight->negativeScaling(negCMECScaling);
+    theSplittingReweight->updateCurrentHandler();
+  }
+
+  // SW: Removed simple test on doFSR and doISR and moved
+  // here to account for the case of a hard event involving
+  // no coloured particles but with unstable outgoing particles
+  if ( !doFSR() && ! doISR() && eventRecord().decays().empty() )
   return sub->incoming();
-  if ( !eventRecord().incoming().first->coloured() &&
+  if ( !doISR() &&
+       eventRecord().outgoing().empty() &&
+       eventRecord().decays().empty() )
+    return sub->incoming();
+  if ( !doFSR() &&
+       !eventRecord().incoming().first->coloured() &&
       !eventRecord().incoming().second->coloured() &&
-      !doFSR() )
+       eventRecord().decays().empty() )
   return sub->incoming();
   
   nTries = 0;
+  
+  // Clear the vertex record for spin correlations
+  if ( spinCorrelations() ) //|| theAnalyseSpinCorrelations )
+    vertexRecord().clear();
   
   while ( true ) {
     
@@ -149,7 +189,7 @@ tPPair DipoleShowerHandler::cascade(tSubProPtr sub, XCombPtr,
       if ( intrinsicPtGenerator ) {
         if ( eventRecord().incoming().first->coloured() &&
             eventRecord().incoming().second->coloured() ) {
-          SpinOneLorentzRotation rot =
+          LorentzRotation rot =
           intrinsicPtGenerator->kick(eventRecord().incoming(),
                                      eventRecord().intermediates());
           eventRecord().transform(rot);
@@ -157,17 +197,32 @@ tPPair DipoleShowerHandler::cascade(tSubProPtr sub, XCombPtr,
       }
       
       didRealign = realign();
+    
       constituentReshuffle();
+
+      // backup subleading switch if decays fail
+      bool doneSubleadingNc = doSubleadingNc;
+
+      // subleading N can't handle decays
+      doSubleadingNc = false;
+
+      try {
       
         // Decay and shower any particles that require decaying
       while ( !eventRecord().decays().empty() ) {
 	
         map<PPtr,PerturbativeProcessPtr>::const_iterator decayIt = eventRecord().decays().begin();
+        if ( eventRecord().nextDecay() ) {
+          decayIt = eventRecord().decays().find(eventRecord().nextDecay() );
+        }
+        else {
           // find the decay to do, one with greatest width and parent showered
         while(find(eventRecord().outgoing().begin(),eventRecord().outgoing().end(),decayIt->first)==
               eventRecord().outgoing().end() &&
               find(eventRecord().hard().begin(),eventRecord().hard().end(),decayIt->first)==
               eventRecord().hard().end()) ++decayIt;
+        }
+	
         assert(decayIt!=eventRecord().decays().end());
         PPtr incoming = decayIt->first;
         eventRecord().currentDecay(decayIt->second);
@@ -187,7 +242,8 @@ tPPair DipoleShowerHandler::cascade(tSubProPtr sub, XCombPtr,
         assert(eventRecord().currentDecay()->incoming().size()==1);
         
           // Prepare the event record for the showering of the decay
-        bool needToShower = eventRecord().prepareDecay(eventRecord().currentDecay());
+        bool needToShower = eventRecord().prepareDecay(eventRecord().currentDecay(),
+						       offShellPartons());
         
           // Only need to shower if we have coloured outgoing particles
         if ( needToShower ) {
@@ -202,9 +258,17 @@ tPPair DipoleShowerHandler::cascade(tSubProPtr sub, XCombPtr,
               dip.rightScale( showerScale );
             }
           }
+      
+          // Prepare vertex record for spin correlations in decay shower
+          if ( spinCorrelations() )
+            vertexRecord().prepareParticleDecay(incoming);
+      
             // Perform the cascade
           doCascade(nEmitted,optHardPt,optCutoff,true);
           
+          if ( spinCorrelations() )
+            vertexRecord().updateParticleDecay();
+      
             // Do the constituent mass shell reshuffling
           decayConstituentReshuffle(eventRecord().currentDecay());
           
@@ -213,9 +277,19 @@ tPPair DipoleShowerHandler::cascade(tSubProPtr sub, XCombPtr,
           // Update the decays, adding any decays and updating momenta
         eventRecord().updateDecays(eventRecord().currentDecay());
         
-        eventRecord().decays().erase(decayIt);
+	  eventRecord().decays().erase(decayIt);
+
+	}
+
+      } catch(...) {
+
+	// reset flag
+	doSubleadingNc = doneSubleadingNc;
+	throw;
+
       }
-      
+
+      doSubleadingNc = doneSubleadingNc;
       
       break;
       
@@ -229,7 +303,11 @@ tPPair DipoleShowerHandler::cascade(tSubProPtr sub, XCombPtr,
       eventRecord().clear();
       eventRecord().prepare(sub, dynamic_ptr_cast<tStdXCombPtr>(lastXCombPtr()), newStep(), pdfs(),
                             ShowerHandler::currentHandler()->generator()->currentEvent()->incoming(),
-			    firstInteraction());
+			    firstInteraction(), offShellPartons(),
+                            !doSubleadingNc);
+      if ( doSubleadingNc ) {
+	theSplittingReweight->updateCurrentHandler();
+      }
       
       continue;
       
@@ -245,10 +323,11 @@ tPPair DipoleShowerHandler::cascade(tSubProPtr sub, XCombPtr,
 }
 
 
+
   // Reshuffle the outgoing partons from the hard process onto their constituent mass shells
 void DipoleShowerHandler::constituentReshuffle() {
   
-  if ( constituentReshuffler ) {
+  if ( constituentReshuffler &&  ShowerHandler::currentHandler()->retConstituentMasses() ) {
     if ( eventRecord().decays().empty() ) {
       constituentReshuffler->reshuffle(eventRecord().outgoing(),
                                        eventRecord().incoming(),
@@ -341,7 +420,7 @@ void DipoleShowerHandler::decayConstituentReshuffle(PerturbativeProcessPtr decay
     
     
       // decayReshuffle updates both the event record and the decay perturbative process
-    if ( constituentReshuffler ) {
+    if ( constituentReshuffler && ShowerHandler::currentHandler()->retConstituentMasses()) {
       constituentReshuffler->decayReshuffle(decayProc,
                                             eventRecord().outgoing(),
                                             eventRecord().hard(),
@@ -359,14 +438,16 @@ void DipoleShowerHandler::decayConstituentReshuffle(PerturbativeProcessPtr decay
     
     testInvMassAfter = testOutMomAfter.m();
     
+#ifndef NDEBUG
     Energy incomingMass = decayProc->incoming()[0].first->momentum().m();
+#endif
     assert( abs(testInvMassBefore-incomingMass)/GeV < 1e-5 );
     assert( abs(testInvMassBefore-testInvMassAfter)/GeV < 1e-5);
     
     
   }else{
       // decayReshuffle updates both the event record and the decay perturbative process
-    if ( constituentReshuffler ) {
+    if ( constituentReshuffler && ShowerHandler::currentHandler()->retConstituentMasses() ) {
       constituentReshuffler->decayReshuffle(decayProc,
                                             eventRecord().outgoing(),
                                             eventRecord().hard(),
@@ -411,9 +492,12 @@ void DipoleShowerHandler::hardScales(Energy2 muf)  {
   } else {
     muPt = hardScaleFactor()*sqrt(muf);
   }
-  
-  
-  for ( auto  & ch : eventRecord().chains()) {
+
+  if ( doSubleadingNc ) {
+    return;
+  }
+
+ for ( auto  & ch : eventRecord().chains()) {
     
       // Note that minVetoScale is a value for each DipoleChain, not each dipole
       // It will contain the minimum veto scale from all of the dipoles in the chain
@@ -499,6 +583,251 @@ void DipoleShowerHandler::hardScales(Energy2 muf)  {
   
 }
 
+void DipoleShowerHandler::hardScalesSubleading(list<DipoleSplittingInfo> candidates,
+					       Energy hardPt) {
+
+  maxPt = hardPt;//generator()->maximumCMEnergy();
+
+  // Note that minVetoScale is a value for each competing dipole (i.e. all dipoles
+  // for the subleading shower.
+  // It will contain the minimum veto scale from all of the dipoles
+  Energy minVetoScale = -1.*GeV;
+
+  for ( list<DipoleSplittingInfo>::iterator cand = candidates.begin();
+	cand != candidates.end(); ++cand ) {
+
+      // max scale
+      Energy maxScale = ZERO;
+
+      // Loop over kernels
+      for ( vector<Ptr<DipoleSplittingKernel>::ptr>::iterator k =
+	      kernels.begin(); k != kernels.end(); ++k ) {
+	
+	if ( (**k).canHandle(cand->index()) ) {
+	  Energy scale =
+	    evolutionOrdering()->hardScale(cand->emitter(),cand->spectator(),
+					 cand->emitterX(),cand->spectatorX(),
+					 **k,cand->index());
+	  maxScale = max(maxScale,scale);
+	}
+
+      }
+
+      if ( cand->emitter()->vetoScale() >= ZERO ) {
+	maxScale = min(maxScale,sqrt(cand->emitter()->vetoScale()));
+	if ( minVetoScale >= ZERO )
+	  minVetoScale = min(minVetoScale,sqrt(cand->emitter()->vetoScale()));
+	else
+	  minVetoScale = sqrt(cand->emitter()->vetoScale());
+      }
+
+      maxScale = min(maxPt,maxScale);
+      cand->scale(maxScale);
+
+    }
+
+    if ( !evolutionOrdering()->independentDipoles() &&
+	 chainOrderVetoScales &&
+	 minVetoScale >= ZERO ) {
+      for ( list<DipoleSplittingInfo>::iterator cand = candidates.begin();
+	    cand != candidates.end(); ++cand ) {
+	cand->scale(min(cand->scale(),minVetoScale));
+      }
+    }
+
+}
+
+
+
+void DipoleShowerHandler::addCandidates(PPair particles,
+					list<DipoleSplittingInfo>& clist) const {
+
+  DipoleSplittingInfo candidate;
+  Energy2 scale = ZERO;
+  pair<bool,bool> is(particles.first == eventRecord().incoming().first,
+		     particles.second == eventRecord().incoming().second);
+  if ( (is.first && !is.second) ||
+       (!is.first && is.second) ) {
+    scale = -(particles.first->momentum() - particles.second->momentum()).m2();
+  } else {
+    scale = (particles.first->momentum() + particles.second->momentum()).m2();
+  }
+
+  DipoleIndex index(particles.first->dataPtr(),particles.second->dataPtr(),
+		    is.first ? eventRecord().pdfs().first : PDF(),
+		    is.second ? eventRecord().pdfs().second : PDF());
+
+  candidate.scale(sqrt(scale));
+
+  candidate.index(index);
+  candidate.configuration(make_pair(true,false));
+  candidate.emitter(particles.first);
+  candidate.emitterX(is.first ? eventRecord().fractions().first : 1.0);
+  candidate.spectator(particles.second);
+  candidate.spectatorX(is.second ? eventRecord().fractions().second : 1.0);
+
+  clist.push_back(candidate);
+
+  index.swap();
+
+  candidate.index(index);
+  candidate.configuration(make_pair(false,true));
+  candidate.emitter(particles.second);
+  candidate.emitterX(is.second ? eventRecord().fractions().second : 1.0);
+  candidate.spectator(particles.first);
+  candidate.spectatorX(is.first ? eventRecord().fractions().first : 1.0);
+
+  clist.push_back(candidate);
+
+}
+
+void DipoleShowerHandler::getCandidates(list<DipoleSplittingInfo>& clist) const {
+
+  clist.clear();
+
+  for ( PList::const_iterator i = eventRecord().outgoing().begin(); 
+	i != eventRecord().outgoing().end(); ++i ) {
+    PList::const_iterator j = i; ++j;
+    for ( ; j != eventRecord().outgoing().end(); ++j ) {
+      addCandidates(make_pair(*i,*j),clist);
+    }
+    // Changed order of *i and inc().first
+    if ( eventRecord().incoming().first->coloured() )
+      addCandidates(make_pair(eventRecord().incoming().first,*i),clist);
+    if ( eventRecord().incoming().second->coloured() )
+      addCandidates(make_pair(*i,eventRecord().incoming().second),clist);
+  }
+
+  if ( eventRecord().incoming().first->coloured() && eventRecord().incoming().second->coloured() ) {
+    addCandidates(eventRecord().incoming(),clist);
+  }
+
+}
+
+void DipoleShowerHandler::performSplitting(DipoleSplittingInfo& split) const {
+
+  Ptr<DipoleSplittingKinematics>::tptr kinematics = split.splittingKinematics();
+  kinematics->generateKinematics(split.emitter()->momentum(),
+				 split.spectator()->momentum(),
+				 split);
+
+  split.splitEmitter(split.emitterData()->produceParticle(kinematics->lastEmitterMomentum()));
+  split.splitSpectator(split.spectatorData()->produceParticle(kinematics->lastSpectatorMomentum()));
+  split.emission(split.emissionData()->produceParticle(kinematics->lastEmissionMomentum()));
+
+  // Setting resolution scales for the particles
+  split.emission()->scale(sqr(split.lastPt()));
+  split.splitEmitter()->scale(sqr(split.lastPt()));
+  split.splitSpectator()->scale(split.spectator()->scale());
+
+  PVector neighbours;
+  if ( DipolePartonSplitter::colourConnected(split.emitter(),
+					     eventRecord().incoming().first) &&
+       split.emitter() != eventRecord().incoming().first )
+    neighbours.push_back(eventRecord().incoming().first);
+  if ( DipolePartonSplitter::colourConnected(split.emitter(),
+					     eventRecord().incoming().second) &&
+       split.emitter() != eventRecord().incoming().second )
+    neighbours.push_back(eventRecord().incoming().second);
+  for ( PList::const_iterator p = eventRecord().outgoing().begin(); 
+	p != eventRecord().outgoing().end(); ++p ) {
+    if ( *p == split.emitter() )
+      continue;
+    if ( DipolePartonSplitter::colourConnected(split.emitter(),*p) )
+      neighbours.push_back(*p);
+  }
+  assert(neighbours.size() == 1 || neighbours.size() == 2 );
+  if ( neighbours.size() == 2 ) {
+    if ( UseRandom::rnd() < 0.5 )
+      swap(neighbours[0],neighbours[1]);
+  }
+
+  DipolePartonSplitter::split(split.emitter(),split.splitEmitter(),split.emission(),
+			      neighbours.front(),split.index().initialStateEmitter(),false);
+  DipolePartonSplitter::change(split.spectator(),split.splitSpectator(),
+			       split.index().initialStateSpectator(),false);
+}
+
+Energy DipoleShowerHandler::nextSubleadingSplitting(Energy hardPt,
+						    Energy optHardPt, Energy optCutoff,
+						    const bool decay) {
+
+  list<DipoleSplittingInfo> candidates;
+  getCandidates(candidates);
+
+  hardScalesSubleading(candidates,hardPt);
+  for ( list<DipoleSplittingInfo>::iterator cand = candidates.begin();
+   	cand != candidates.end(); cand++ ) {
+    cand->scale(hardPt);
+  }
+
+
+  list<DipoleSplittingInfo>::iterator split = candidates.end();
+
+  // Winner of all dipoles
+  DipoleSplittingInfo winner;
+  // Winner for the current iteration of the for loop
+  DipoleSplittingInfo candWinner;
+  Energy winnerScale = 0.0*GeV;
+
+  Energy nextScale = 0.0*GeV;
+
+  for ( list<DipoleSplittingInfo>::iterator cand = candidates.begin();
+	cand != candidates.end(); cand++ ) {
+    nextScale = getWinner(candWinner,
+			  cand->index(),
+			  cand->emitterX(),cand->spectatorX(),
+			  make_pair(true,false),
+			  cand->emitter(),cand->spectator(),
+			  hardPt,
+			  optHardPt,
+			  optCutoff);
+    if ( nextScale > winnerScale ) {
+      winnerScale = nextScale;
+      winner = candWinner;
+      split = cand;
+      winnerIndex = winningKernelIndex;//check
+    }
+  }
+
+  if ( split == candidates.end() )
+    return ZERO;
+
+  if ( decay )
+    winner.isDecayProc( true );
+  
+  split->fill(winner);
+
+  performSplitting(*split);
+  eventRecord().update(*split);
+
+  for ( list<DipoleSplittingInfo>::iterator dip = candidates.begin();
+	dip != candidates.end(); ++dip ) {
+    if ( dip == split )
+      continue;
+    dip->emission(split->emission());
+    if ( dip->emitter() == split->emitter() ) {
+      dip->splitEmitter(split->splitEmitter());
+    } else {
+      dip->splitEmitter(dip->emitter());
+    }
+    if ( dip->spectator() == split->spectator() ) {
+      dip->splitSpectator(split->splitSpectator());
+    } else {
+      dip->splitSpectator(dip->spectator());
+    }
+  }
+
+  // Update the ShowerHandler of the splitting reweight.
+  if ( doSubleadingNc ) {
+    theSplittingReweight->updateCurrentHandler();
+  }
+
+  return split->lastPt();
+
+}
+
+
 Energy DipoleShowerHandler::getWinner(DipoleSplittingInfo& winner,
                                       const Dipole& dip,
                                       pair<bool,bool> conf,
@@ -542,10 +871,16 @@ Energy DipoleShowerHandler::getWinner(DipoleSplittingInfo& winner,
     winner.didStopEvolving();
     return 0.0*GeV;
   }
+
+  if ( index.incomingDecaySpectator()
+       && !doFSR() ) {
+    winner.didStopEvolving();
+    return 0.0*GeV;
+  }
   
-    // Currently do not split IF dipoles so
-    // don't evaluate them in order to avoid
-    // exceptions in the log
+  // Currently do not split IF dipoles so
+  // don't evaluate them in order to avoid
+  // exceptions in the log
   if ( index.incomingDecayEmitter() ) {
     winner.didStopEvolving();
     return 0.0*GeV;
@@ -556,25 +891,27 @@ Energy DipoleShowerHandler::getWinner(DipoleSplittingInfo& winner,
   candidate.configuration(conf);
   candidate.emitterX(emitterX);
   candidate.spectatorX(spectatorX);
-  
+  candidate.emitter(emitter);
+  candidate.spectator(spectator);
+
   if ( generators().find(candidate.index()) == generators().end() )
   getGenerators(candidate.index(),theSplittingReweight);
   
-    //
-    // NOTE -- needs proper fixing at some point
-    //
-    // For some very strange reason, equal_range gives back
-    // key ranges it hasn't been asked for. This particularly
-    // happens e.g. for FI dipoles of the same kind, but different
-    // PDF (hard vs MPI PDF). I can't see a reason for this,
-    // as DipoleIndex properly implements comparison for equality
-    // and (lexicographic) ordering; for the time being, we
-    // use equal_range, extented by an explicit check for wether
-    // the key is indeed what we wanted. See line after (*) comment
-    // below.
-    //
-    // SW - Update 04/01/2016: Note - This caused a bug for me as I did not
-    // include equality checks on the decay booleans in the == definition
+  //
+  // NOTE -- needs proper fixing at some point
+  //
+  // For some very strange reason, equal_range gives back
+  // key ranges it hasn't been asked for. This particularly
+  // happens e.g. for FI dipoles of the same kind, but different
+  // PDF (hard vs MPI PDF). I can't see a reason for this,
+  // as DipoleIndex properly implements comparison for equality
+  // and (lexicographic) ordering; for the time being, we
+  // use equal_range, extented by an explicit check for wether
+  // the key is indeed what we wanted. See line after (*) comment
+  // below.
+  //
+  // SW - Update 04/01/2016: Note - This caused a bug for me as I did not
+  // include equality checks on the decay booleans in the == definition
   
   pair<GeneratorMap::iterator,GeneratorMap::iterator> gens
   = generators().equal_range(candidate.index());
@@ -583,8 +920,11 @@ Energy DipoleShowerHandler::getWinner(DipoleSplittingInfo& winner,
   GeneratorMap::iterator winnerGen = generators().end();
   
   for ( GeneratorMap::iterator gen = gens.first; gen != gens.second; ++gen ) {
-    
-      // (*) see NOTE above
+
+    if ( doPartialUnweighting )
+      gen->second->doPartialUnweighting(referenceWeight);
+
+    // (*) see NOTE above
     if ( !(gen->first == candidate.index()) )
     continue;
     
@@ -594,8 +934,8 @@ Energy DipoleShowerHandler::getWinner(DipoleSplittingInfo& winner,
     Energy dScale =
     gen->second->splittingKinematics()->dipoleScale(emitter->momentum(),
                                                     spectator->momentum());
-    
-      // in very exceptional cases happening in DIS
+
+    // in very exceptional cases happening in DIS
     if ( std::isnan( double(dScale/MeV) ) )
     throw RedoShower();
     
@@ -603,11 +943,27 @@ Energy DipoleShowerHandler::getWinner(DipoleSplittingInfo& winner,
     
       // Calculate the mass of the recoil system
       // for decay dipoles
-    if (candidate.index().incomingDecayEmitter() || candidate.index().incomingDecaySpectator() ) {
+    if ( candidate.index().incomingDecaySpectator() || candidate.index().incomingDecayEmitter() ) {
       Energy recoilMass = gen->second->splittingKinematics()->recoilMassKin(emitter->momentum(),
                                                                             spectator->momentum());
       candidate.recoilMass(recoilMass);
     }
+
+    // Store emitter and spectator masses, needed in kinematics
+    if ( candidate.index().emitterData()->mass() != ZERO ) {
+      if ( !candidate.index().offShellEmitter() )
+	candidate.emitterMass( emitter->nominalMass() );  
+      else
+	candidate.emitterMass( emitter->mass() );  
+    }
+    
+    if ( candidate.index().spectatorData()->mass() != ZERO ) {
+      if ( !candidate.index().offShellSpectator() )
+	candidate.spectatorMass( spectator->nominalMass() );  
+      else
+	candidate.spectatorMass( spectator->mass() );  
+    }
+    
     
     candidate.continuesEvolving();
     Energy hardScale = evolutionOrdering()->maxPt(startScale,candidate,*(gen->second->splittingKernel()));
@@ -633,7 +989,7 @@ Energy DipoleShowerHandler::getWinner(DipoleSplittingInfo& winner,
       hardScale = maxPossible;
       candidate.hardPt(maxPossible);
     }
-    
+
     gen->second->generate(candidate,currentWeights(),optHardPt,optCutoff);
     Energy nextScale = evolutionOrdering()->evolutionScale(
                       gen->second->lastSplitting(),*(gen->second->splittingKernel()));
@@ -643,8 +999,16 @@ Energy DipoleShowerHandler::getWinner(DipoleSplittingInfo& winner,
       gen->second->completeSplitting(winner);
       winnerGen = gen;
       winnerScale = nextScale;
+      if ( continueSubleadingNc() )
+	winningKernelIndex = kernelIndex+1;//check
     }
     
+    if ( continueSubleadingNc() ) {
+      kernelIndex++;//check
+      scales.push_back(nextScale);//check
+      theWeightsVector.push_back(gen->second->splittingWeightVector());
+    }
+
     reweight(reweight() * gen->second->splittingWeight());
     
   }
@@ -669,13 +1033,98 @@ void DipoleShowerHandler::doCascade(unsigned int& emDone,
   if ( nEmissions )
     if ( emDone == nEmissions )
       return;
-  
+
+  if ( doSubleadingNc ) {
+    unsigned int subEmDone = 0;
+    // Set the starting scale
+    Energy hardPt = muPt;
+
+    double wref = referenceWeight;
+    while ( subEmDone < subleadingNcEmissionsLimit && hardPt != ZERO && continueSubleadingNc() ) {
+      // Clear out the weights from the earlier step
+      theWeightsVector.clear();
+      kernelIndex = 0;//check
+      scales.clear();//check
+
+      hardPt = nextSubleadingSplitting( hardPt, optHardPt, optCutoff, decay );
+
+      // Partial unweighting
+      if ( doPartialUnweightingAtEmission ) {
+	const double w = reweight();
+	if ( abs(w) < wref ) {
+	  if ( abs(w)/wref < UseRandom::rnd() ) {
+	    // Set weight to zero and end this event
+	    reweight(0.0);
+	    return;
+	  } else
+	    reweight( wref*w/abs(w) );
+	}
+	// Update the reference weight after emission
+	wref *= referenceWeight;
+      }
+
+      // When the winning scale is larger than the cutoff
+      // remove the added weights that are under the winning scale
+      if ( hardPt != ZERO ) {
+        Energy maxq = 0.0*GeV;
+#ifndef NDEBUG
+	size_t iwinner = theWeightsVector.size();//check
+#endif
+	for ( size_t i = 0; i < theWeightsVector.size(); i++ ) {
+	  if ( theWeightsVector[i].size() > 0 ) {
+	    // get<2> is true for an accept step.
+	    if ( std::get<2>(theWeightsVector[i].back()) 
+		 && std::get<0>(theWeightsVector[i].back()) > maxq) {
+	      maxq = std::get<0>(theWeightsVector[i].back());
+#ifndef NDEBUG
+	      iwinner = i;//check
+#endif
+	    }
+	  }
+	}
+
+        assert(winnerIndex-1 == iwinner);//check
+
+	double correctionWeight = 1.0;
+	for ( size_t i = 0; i < theWeightsVector.size(); i++ ) {
+	  for ( size_t j = 0; j < theWeightsVector[i].size(); j++ ) {
+	    if ( std::get<0>(theWeightsVector[i][j]) < maxq )
+	      correctionWeight *= std::get<1>(theWeightsVector[i][j]);
+	  }
+	}
+	reweight(reweight()/correctionWeight);
+      }
+
+      // Increment the number of subleading Nc emissions done
+      subEmDone++;
+      // Stop if the limit of emissions is reached
+      if ( nEmissions )
+	if ( ++emDone == nEmissions )
+	  return;
+    }
+
+    // Subleading shower done, prepare chains for the standard
+    // dipole shower
+    eventRecord().prepareChainsSubleading( decay );
+    // Set scales
+    for ( list<DipoleChain>::iterator ch = eventRecord().chains().begin();
+	  ch != eventRecord().chains().end(); ch++ ) {
+      for ( list<Dipole>::iterator dp = ch->dipoles().begin();
+	    dp != ch->dipoles().end(); dp++ ) {
+	dp->emitterScale(make_pair(true,false),hardPt);
+	dp->emitterScale(make_pair(false,true),hardPt);
+      }
+    }
+    
+  }
+
+
   DipoleSplittingInfo winner;
   DipoleSplittingInfo dipoleWinner;
   
   
   while ( eventRecord().haveChain() ) {
-    
+
     if ( verbosity > 2 ) {
       generator()->log() << "DipoleShowerHandler selecting splittings for the chain:\n"
       << eventRecord().currentChain() << flush;
@@ -792,14 +1241,26 @@ void DipoleShowerHandler::doCascade(unsigned int& emDone,
     DipoleChain* firstChain = nullptr;
     DipoleChain* secondChain = nullptr;
     
+    // Generate the azimuthal angle 
+    if ( spinCorrelations() ) 
+      vertexRecord().generatePhi(winner,*winnerDip);
+
+    if ( decay )
+      winner.isDecayProc( true );
+    
       // Note: the dipoles are updated in eventRecord().split(....) after the splitting,
       // hence the entire cascade is handled in doCascade
       // The dipole scales are updated in dip->split(....)
     
     if ( decay )
     winner.isDecayProc( true );
-    
+
     eventRecord().split(winnerDip,winner,children,firstChain,secondChain);
+
+    // Update the vertex record following the splitting
+    if ( spinCorrelations() )
+      vertexRecord().update(winner);
+
     assert(firstChain && secondChain);
     evolutionOrdering()->setEvolutionScale(winnerScale,winner,*firstChain,children);
     if ( !secondChain->dipoles().empty() )
@@ -848,7 +1309,7 @@ bool DipoleShowerHandler::realign() {
     (eventRecord().incoming().first->momentum(),
      eventRecord().incoming().second->momentum());
     
-    SpinOneLorentzRotation transform((inMomenta.first+inMomenta.second).findBoostToCM());
+    LorentzRotation transform((inMomenta.first+inMomenta.second).findBoostToCM());
     
     Axis dir = (transform * inMomenta.first).vect().unit();
     Axis rot (-dir.y(),dir.x(),0);
@@ -1031,6 +1492,34 @@ void DipoleShowerHandler::doinit() {
   ShowerHandler::doinit();
   if ( theGlobalAlphaS )
   resetAlphaS(theGlobalAlphaS);
+  // copy off-shell particle ids before showering from input vector to the 
+  // set used in the simulation
+  if ( theColouredOffShellInShower.empty() ) {
+    for(unsigned int ix=0;ix<theInputColouredOffShellInShower.size();++ix)
+      theColouredOffShellInShower.insert(abs(theInputColouredOffShellInShower[ix]));
+  }
+  // work out which shower phase space to use for the matching
+  bool zChoice0 = false;
+  bool zChoice1 = false;
+  size_t zChoiceOther = false;
+  for ( auto & k : kernels) {
+    if ( k->splittingKinematics()->openZBoundaries() == 0 )
+      zChoice0 = true;
+    else if ( k->splittingKinematics()->openZBoundaries() == 1 )
+      zChoice1 = true;
+    else
+      zChoiceOther = true;
+    // either inconsistent or other option which cannot be handled by the matching
+    if ( zChoice0 && zChoice1 ) {
+      zChoiceOther = true; break;
+    }
+  }
+  if ( zChoiceOther )
+    theZBoundaries = 2;
+  else if ( zChoice1 )
+    theZBoundaries = 1;
+  else if ( zChoice0 )
+    theZBoundaries = 0;
 }
 
 void DipoleShowerHandler::dofinish() {
@@ -1043,32 +1532,48 @@ void DipoleShowerHandler::doinitrun() {
 
 void DipoleShowerHandler::persistentOutput(PersistentOStream & os) const {
   os << kernels << theEvolutionOrdering
-  << constituentReshuffler << intrinsicPtGenerator
-  << theGlobalAlphaS << chainOrderVetoScales
-  << nEmissions << discardNoEmissions << firstMCatNLOEmission
-  << thePowhegDecayEmission
-  << realignmentScheme << verbosity << printEvent
-  << ounit(theRenormalizationScaleFreeze,GeV)
-  << ounit(theFactorizationScaleFreeze,GeV)
-  << theShowerApproximation
-  << theDoCompensate << theFreezeGrid << theDetuning
-  << theEventReweight << theSplittingReweight << ounit(maxPt,GeV)
-  << ounit(muPt,GeV)<< theMergingHelper;
+     << constituentReshuffler << intrinsicPtGenerator
+     << theGlobalAlphaS << chainOrderVetoScales
+     << nEmissions << discardNoEmissions << firstMCatNLOEmission
+     << thePowhegDecayEmission
+    //<< theAnalyseSpinCorrelations
+     << doSubleadingNc << subleadingNcEmissionsLimit
+     << densityOperatorEvolution << ounit(densityOperatorCutoff,GeV2)
+     << doPartialUnweightingAtEmission
+     << doPartialUnweighting << referenceWeight
+     << cmecReweightFactor << negCMECScaling
+     << realignmentScheme << verbosity << printEvent
+     << ounit(theRenormalizationScaleFreeze,GeV)
+     << ounit(theFactorizationScaleFreeze,GeV)
+     << theShowerApproximation
+     << theDoCompensate << theFreezeGrid << theDetuning
+     << theEventReweight << theSplittingReweight << ounit(maxPt,GeV)
+     << ounit(muPt,GeV)<< theMergingHelper << theColouredOffShellInShower
+     << theInputColouredOffShellInShower
+      << theZBoundaries;
 }
 
 void DipoleShowerHandler::persistentInput(PersistentIStream & is, int) {
   is >> kernels >> theEvolutionOrdering
-  >> constituentReshuffler >> intrinsicPtGenerator
-  >> theGlobalAlphaS >> chainOrderVetoScales
-  >> nEmissions >> discardNoEmissions >> firstMCatNLOEmission
-  >> thePowhegDecayEmission
-  >> realignmentScheme >> verbosity >> printEvent
-  >> iunit(theRenormalizationScaleFreeze,GeV)
-  >> iunit(theFactorizationScaleFreeze,GeV)
-  >> theShowerApproximation
-  >> theDoCompensate >> theFreezeGrid >> theDetuning
-  >> theEventReweight >> theSplittingReweight >> iunit(maxPt,GeV)
-  >> iunit(muPt,GeV)>>theMergingHelper;
+     >> constituentReshuffler >> intrinsicPtGenerator
+     >> theGlobalAlphaS >> chainOrderVetoScales
+     >> nEmissions >> discardNoEmissions >> firstMCatNLOEmission
+     >> thePowhegDecayEmission
+    //>> theAnalyseSpinCorrelations
+     >> doSubleadingNc >> subleadingNcEmissionsLimit
+     >> densityOperatorEvolution >> iunit(densityOperatorCutoff,GeV2)
+     >> doPartialUnweightingAtEmission
+     >> doPartialUnweighting >> referenceWeight
+     >> cmecReweightFactor >> negCMECScaling
+     >> realignmentScheme >> verbosity >> printEvent
+     >> iunit(theRenormalizationScaleFreeze,GeV)
+     >> iunit(theFactorizationScaleFreeze,GeV)
+     >> theShowerApproximation
+     >> theDoCompensate >> theFreezeGrid >> theDetuning
+     >> theEventReweight >> theSplittingReweight >> iunit(maxPt,GeV)
+     >> iunit(muPt,GeV)>>theMergingHelper >> theColouredOffShellInShower
+     >> theInputColouredOffShellInShower
+      >> theZBoundaries;
 }
 
 ClassDescription<DipoleShowerHandler> DipoleShowerHandler::initDipoleShowerHandler;
@@ -1119,10 +1624,83 @@ void DipoleShowerHandler::Init() {
    &DipoleShowerHandler::intrinsicPtGenerator, false, false, true, true, false);
   
   static Reference<DipoleShowerHandler,AlphaSBase> interfaceGlobalAlphaS
-  ("GlobalAlphaS",
-   "Set a global strong coupling for all splitting kernels.",
-   &DipoleShowerHandler::theGlobalAlphaS, false, false, true, true, false);
-  
+    ("GlobalAlphaS",
+     "Set a global strong coupling for all splitting kernels.",
+     &DipoleShowerHandler::theGlobalAlphaS, false, false, true, true, false);
+// Start: Trying to add interface for the subleading Nc
+  static Switch<DipoleShowerHandler,bool> interfaceDoSubleadingNc
+    ("DoSubleadingNc",
+     "Switch on or off subleading Nc corrections.",
+     &DipoleShowerHandler::doSubleadingNc, true, false, false);
+  static SwitchOption interfaceDoSubleadingNcOn
+    (interfaceDoSubleadingNc,
+     "On",
+     "Switch on subleading Nc corrections.",
+     true);
+  static SwitchOption interfaceDoSubleadingNcOff
+    (interfaceDoSubleadingNc,
+     "Off",
+     "Switch off subleading Nc corrections.",
+     false);
+  // Limit for how many subleading Nc emissions should be calculated
+  static Parameter<DipoleShowerHandler,size_t> interfaceSubleadingNcEmissionsLimit
+    ("SubleadingNcEmissionsLimit",
+     "Number of emissions to calculate subleading Nc corrections for.",
+     &DipoleShowerHandler::subleadingNcEmissionsLimit,0,0,0,
+     false, false, Interface::lowerlim);
+  static Parameter<DipoleShowerHandler,int> interfaceDensityOperatorEvolution
+    ("DensityOperatorEvolution",
+     "Scheme for evolving the density operator.",
+     &DipoleShowerHandler::densityOperatorEvolution,0,0,0,
+     false, false, Interface::lowerlim);
+  static Parameter<DipoleShowerHandler,Energy2> interfaceDensityOperatorCutoff
+    ("DensityOperatorCutoff",
+     "Cutoff for momentum invariants for the density operator evolution.",
+     &DipoleShowerHandler::densityOperatorCutoff,GeV2,1.0*GeV2,0.0*GeV2,0*GeV2,
+     false, false, Interface::lowerlim);
+  static Switch<DipoleShowerHandler,bool> interfaceDoPartialUnweightingAtEmission
+    ("DoPartialUnweightingAtEmission",
+     "Switch on or off partial unweighting at the emission level.",
+     &DipoleShowerHandler::doPartialUnweightingAtEmission,true,false,false);
+  static SwitchOption interfaceDoPartialUnweightingAtEmissionOn
+    (interfaceDoPartialUnweightingAtEmission,
+     "On",
+     "Switch on partial unweighting.",
+     true);
+  static SwitchOption interfaceDoPartialUnweightingAtEmissionOff
+    (interfaceDoPartialUnweightingAtEmission,
+     "Off",
+     "Switch off partial unweighting.",
+     false);
+  static Switch<DipoleShowerHandler,bool> interfaceDoPartialUnweighting
+    ("DoPartialUnweighting",
+     "Switch on or off partial unweighting at the dipole splitting level.",
+     &DipoleShowerHandler::doPartialUnweighting,true,false,false);
+  static SwitchOption interfaceDoPartialUnweightingOn
+    (interfaceDoPartialUnweighting,
+     "On",
+     "Switch on partial unweighting.",
+     true);
+  static SwitchOption interfaceDoPartialUnweightingOff
+    (interfaceDoPartialUnweighting,
+     "Off",
+     "Switch off partial unweighting.",
+     false);
+  static Parameter<DipoleShowerHandler,double> interfaceReferenceWeight
+    ("ReferenceWeight",
+     "Reference weight for the partial unweighting.",
+     &DipoleShowerHandler::referenceWeight,0.1,0.0,0,
+     false, false, Interface::lowerlim);
+  static Parameter<DipoleShowerHandler,double> interfaceCMECReweightFactor
+    ("CMECReweightFactor",
+     "Factor used in the reweighting algorithm.",
+     &DipoleShowerHandler::cmecReweightFactor,1.0,0.0,0,
+     false, false, Interface::lowerlim);
+  static Parameter<DipoleShowerHandler,double> interfaceNegCMECScaling
+    ("NegCMECScaling",
+     "Scaling factor for the negative colour matrix element corrections (CMECs).",
+     &DipoleShowerHandler::negCMECScaling,0.0,0.0,0,
+     false, false, Interface::lowerlim);
   static Switch<DipoleShowerHandler,int> interfaceRealignmentScheme
   ("RealignmentScheme",
    "The realignment scheme to use.",
@@ -1283,5 +1861,28 @@ void DipoleShowerHandler::Init() {
   
   static SwitchOption interfacePowhegDecayEmissionNo
   (interfacePowhegDecayEmission,"No","Powheg decay emission off", false);
+
+  static ParVector<DipoleShowerHandler,long> interfaceOffShellInShower
+    ("OffShellInShower",
+     "PDG codes of the coloured particles that can be off-shell in the process.",
+     &DipoleShowerHandler::theInputColouredOffShellInShower, -1, 0l, -10000000l, 10000000l,
+     false, false, Interface::limited);
+
+  /*
+    static Switch<DipoleShowerHandler, bool> interfaceAnalyseSpinCorrelations
+    ("AnalyseSpinCorrelations",
+    "Record the information required for the spin correlation analyis.",
+    &DipoleShowerHandler::theAnalyseSpinCorrelations, false, false, false);
+  
+    static SwitchOption interfaceAnalyseSpinCorrelationsYes
+    (interfaceAnalyseSpinCorrelations,"Yes","Record the information for analysing the spin correlations.", true);
+  
+    static SwitchOption interfaceAnalyseSpinCorrelationsNo
+    (interfaceAnalyseSpinCorrelations,"No","Do not record extra information.", false);
+  */
+
+  
+
   
 }
+

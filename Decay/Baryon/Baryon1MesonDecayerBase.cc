@@ -5,6 +5,7 @@
 //
 
 #include "Baryon1MesonDecayerBase.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/PDT/DecayMode.h"
 #include "Herwig/Utilities/Kinematics.h"
@@ -20,9 +21,10 @@
 using namespace Herwig;
 using namespace ThePEG::Helicity;
 
-AbstractNoPIOClassDescription<Baryon1MesonDecayerBase> 
-Baryon1MesonDecayerBase::initBaryon1MesonDecayerBase;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeAbstractNoPIOClass<Baryon1MesonDecayerBase,DecayIntegrator>
+describeHerwigBaryon1MesonDecayerBase("Herwig::Baryon1MesonDecayerBase", "HwBaryonDecay.so");
 
 void Baryon1MesonDecayerBase::Init() {
 
@@ -159,7 +161,7 @@ halfHalfScalar(const int,const Particle & inpart,
   // get the couplings
   Complex A,B;
   halfHalfScalarCoupling(imode(),inpart.mass(),decay[0]->mass(),decay[1]->mass(),A,B);
-  Complex left,right,meout;
+  Complex left,right;
   // coupling for an incoming particle
   if(inpart.id()>0) {
     left  = (A-B);
@@ -178,7 +180,7 @@ halfHalfScalar(const int,const Particle & inpart,
     for(iy=0;iy<2;++iy) {
       if(decay[0]->id()>0){ispin[0]=iy;ispin[1]=ix;}
       else{ispin[0]=ix;ispin[1]=iy;}
-      (*ME())(ispin)=_inHalf[iy].generalScalar(_inHalfBar[ix],left,right)/inpart.mass();
+      (*ME())(ispin)=Complex(_inHalf[iy].generalScalar(_inHalfBar[ix],left,right)/inpart.mass());
 //       output += norm(ME()(ispin));
     }
   }
@@ -526,7 +528,7 @@ halfThreeHalfVector(const int,const Particle & inpart,
 	ispin[0]=ixa;
 	if(decay[0]->id()>0) stemp  = _inHalf[ixa];
 	else                 sbtemp = _inHalfBar[ixa];
-	(*ME())(ispin) += stemp.generalScalar(sbtemp,left,right)/inpart.mass();
+	(*ME())(ispin) += Complex(stemp.generalScalar(sbtemp,left,right)/inpart.mass());
       }
     }
   }
@@ -636,8 +638,8 @@ threeHalfHalfScalar(const int,const Particle & inpart,
       if(decay[0]->id()<0) swap(ix,iy);
       ispin[0]=iya;
       ispin[1]=ixa;
-      (*ME())(ispin) = _inHalf[iy].generalScalar(_inHalfBar[ix],left,right)*
-	UnitRemoval::E/msum/inpart.mass();
+      (*ME())(ispin) = Complex(_inHalf[iy].generalScalar(_inHalfBar[ix],left,right)*
+			       UnitRemoval::E/msum/inpart.mass());
     }
   }
   double output = (ME()->contract(_rho)).real();
@@ -737,9 +739,9 @@ double Baryon1MesonDecayerBase::threeHalfThreeHalfScalar(const int,
       if(decay[0]->id()<0) swap(ix,iy);
       ispin[0]=iya;
       ispin[1]=ixa;
-      (*ME())(ispin)=(_inThreeHalf[iy].generalScalar(_inThreeHalfBar[ix],left1,right1)
-		   +_inHalf[iy].generalScalar( _inHalfBar[ix],left2,right2)
-		   *UnitRemoval::E2/sqr(msum))/inpart.mass();
+      (*ME())(ispin)=Complex((_inThreeHalf[iy].generalScalar(_inThreeHalfBar[ix],left1,right1)
+			      +_inHalf[iy].generalScalar( _inHalfBar[ix],left2,right2)
+			      *UnitRemoval::E2/sqr(msum))/inpart.mass());
     }
   }
   // return the answer
@@ -810,7 +812,7 @@ threeHalfHalfVector(const int,const Particle & inpart,
   ME()->zero();
   VectorWaveFunction::calculateWaveFunctions(_inVec,decay[1],outgoing,photon);
   // get the couplings
-  Complex A1,A2,A3,B1,B2,B3,prod,meout;
+  Complex A1,A2,A3,B1,B2,B3,prod;
   threeHalfHalfVectorCoupling(imode(),inpart.mass(),decay[0]->mass(),decay[1]->mass(),
 			      A1,A2,A3,B1,B2,B3);
   Energy msum(inpart.mass()+decay[0]->mass());
@@ -857,7 +859,7 @@ threeHalfHalfVector(const int,const Particle & inpart,
 	ispin[1]=ixa;
 	if(decay[0]->id()>0) sbtemp = _inHalfBar[ixa];
 	else                 stemp  = _inHalf[ixa];
-	(*ME())(ispin) += stemp.generalScalar(sbtemp,left,right)/inpart.mass();
+	(*ME())(ispin) += Complex(stemp.generalScalar(sbtemp,left,right)/inpart.mass());
       }
     }
   }

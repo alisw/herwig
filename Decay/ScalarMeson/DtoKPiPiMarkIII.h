@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // DtoKPiPiMarkIII.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -145,16 +145,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<DtoKPiPiMarkIII> initDtoKPiPiMarkIII;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  DtoKPiPiMarkIII & operator=(const DtoKPiPiMarkIII &);
+  DtoKPiPiMarkIII & operator=(const DtoKPiPiMarkIII &) = delete;
 
 private:
 
@@ -443,41 +437,6 @@ private:
    */
   mutable RhoDMatrix _rho;
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of DtoKPiPiMarkIII. */
-template <>
-struct BaseClassTrait<Herwig::DtoKPiPiMarkIII,1> {
-  /** Typedef of the first base class of DtoKPiPiMarkIII. */
-  typedef Herwig::DecayIntegrator NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the DtoKPiPiMarkIII class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::DtoKPiPiMarkIII>
-  : public ClassTraitsBase<Herwig::DtoKPiPiMarkIII> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::DtoKPiPiMarkIII"; }
-  /**
-   * The name of a file containing the dynamic library where the class
-   * DtoKPiPiMarkIII is implemented. It may also include several, space-separated,
-   * libraries if the class DtoKPiPiMarkIII depends on other classes (base classes
-   * excepted). In this case the listed libraries will be dynamically
-   * linked in the order they are specified.
-   */
-  static string library() { return "HwSMDecay.so"; }
-};
-
-/** @endcond */
 
 }
 

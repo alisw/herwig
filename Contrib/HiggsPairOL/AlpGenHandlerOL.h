@@ -8,7 +8,7 @@
 #include "Herwig/Shower/ShowerHandler.h"
 #include "Herwig/Shower/QTilde/QTildeShowerHandler.h"
 #include "ThePEG/Config/Pointers.h"
-#include "Herwig/Shower/Core/Couplings/ShowerAlpha.h"
+#include "Herwig/Shower/ShowerAlpha.h"
 #include "fastjet/PseudoJet.hh"
 #include "fastjet/ClusterSequence.hh"
 #include "HiggsPair.h"
@@ -245,7 +245,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  AlpGenHandlerOL & operator=(const AlpGenHandlerOL &);
+  AlpGenHandlerOL & operator=(const AlpGenHandlerOL &) = delete;
 
 private:
 

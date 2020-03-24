@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // IFDipole.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -46,7 +46,7 @@ public:
     _map(2,0), _m(3), _chrg1(), _chrg2(), _qprf(2), _qnewprf(2),
     _lprf(), _bigLprf(), _qlab(2), _qnewlab(2), _llab(), _bigLlab(),
     _dipolewgt(), _yfswgt(), _jacobianwgt(), _mewgt(), _maxwgt(2.0),
-    _mode(1), _maxtry(500), _energyopt(1), _betaopt(1), _dipoleopt()
+    _mode(1), _maxtry(500), _energyopt(1), _betaopt(1)
   {}
   //@}
 
@@ -207,16 +207,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<IFDipole> initIFDipole;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  IFDipole & operator=(const IFDipole &);
+  IFDipole & operator=(const IFDipole &) = delete;
 
 private:
 
@@ -380,38 +374,7 @@ private:
    */
   unsigned int _betaopt;
 
-  /**
-   *  Option for the form of the primary distribution
-   */
-  unsigned int _dipoleopt;
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of IFDipole. */
-template <>
-struct BaseClassTrait<Herwig::IFDipole,1> {
-  /** Typedef of the first base class of IFDipole. */
-  typedef Interfaced NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the IFDipole class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::IFDipole>
-  : public ClassTraitsBase<Herwig::IFDipole> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::IFDipole"; }
-};
-
-/** @endcond */
 
 }
 

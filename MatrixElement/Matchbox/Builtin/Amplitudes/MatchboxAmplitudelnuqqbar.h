@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxAmplitudelnuqqbar.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -176,7 +176,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MatchboxAmplitudelnuqqbar & operator=(const MatchboxAmplitudelnuqqbar &);
+  MatchboxAmplitudelnuqqbar & operator=(const MatchboxAmplitudelnuqqbar &) = delete;
 
 };
 

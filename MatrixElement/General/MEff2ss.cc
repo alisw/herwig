@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEff2ss.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "MEff2ss.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -25,9 +26,11 @@ using ThePEG::Helicity::outgoing;
 void MEff2ss::doinit() {
   GeneralHardME::doinit();
   fermion_.resize(numberOfDiags());
+  RSfermion_.resize(numberOfDiags());
   scalar_ .resize(numberOfDiags());
   vector_ .resize(numberOfDiags());
   tensor_ .resize(numberOfDiags());
+  fourPoint_.resize(numberOfDiags());
   initializeMatrixElements(PDT::Spin1Half, PDT::Spin1Half, 
 			   PDT::Spin0    , PDT::Spin0    );
   for(HPCount i = 0; i < numberOfDiags(); ++i) {
@@ -37,6 +40,10 @@ void MEff2ss::doinit() {
 	fermion_[i] = 
 	  make_pair(dynamic_ptr_cast<AbstractFFSVertexPtr>(current.vertices.first), 
 		    dynamic_ptr_cast<AbstractFFSVertexPtr>(current.vertices.second));
+      else if(current.intermediate->iSpin() == PDT::Spin3Half)
+	RSfermion_[i] = 
+	  make_pair(dynamic_ptr_cast<AbstractRFSVertexPtr>(current.vertices.first), 
+		    dynamic_ptr_cast<AbstractRFSVertexPtr>(current.vertices.second));
       else
 	throw InitException() << "MEFF2ss:doinit() - t-channel"
 			      << " intermediate must be a fermion "
@@ -59,6 +66,9 @@ void MEff2ss::doinit() {
 	throw InitException() << "MEFF2ss:doinit() - s-channel"
 			      << " intermediate must be a vector or tensor "
 			      << Exception::runerror;
+    }
+    else if(current.channelType == HPDiagram::fourPoint) {
+      fourPoint_[i] = dynamic_ptr_cast<AbstractFFSSVertexPtr>(current.vertices.first);
     }
     else 
       throw InitException() << "MEFF2ss:doinit() - Cannot find correct "
@@ -111,34 +121,36 @@ MEff2ss::ff2ssME(const SpinorVector & sp, const SpinorBarVector & sbar,
 	Complex diag(0.);
 	const HPDiagram & current = getProcessInfo()[ix];
 	tcPDPtr internal(current.intermediate);	
-	if(current.channelType == HPDiagram::tChannel &&
-	   internal->iSpin() == PDT::Spin1Half) {
+	if(current.channelType == HPDiagram::tChannel) {
 	  if(internal->CC()) internal=internal->CC();
-	  unsigned int iopt = ( abs(sbar[if2].particle()->id()) == abs(internal->id()) ||
-	  			abs(sp[if1]  .particle()->id()) == abs(internal->id())) ? 5 : 3;
-	  SpinorBarWaveFunction interFB;
-	  if(current.ordered.second) {
-	    if(iopt==3) { 
+	  if(internal->iSpin() == PDT::Spin1Half) {
+	    SpinorBarWaveFunction interFB;
+	    if(current.ordered.second) {
 	      interFB = fermion_[ix].second->
-		evaluate(q2, iopt, internal, sbar[if2], sca2);
+		evaluate(q2, 3, internal, sbar[if2], sca2);
+	      diag = fermion_[ix].first->evaluate(q2, sp[if1], interFB, sca1);
 	    }
 	    else {
 	      interFB = fermion_[ix].second->
-		evaluate(q2, iopt, internal, sbar[if2], sca2, 0.*GeV, 0.*GeV);
+		evaluate(q2, 3, internal, sbar[if2], sca1);
+	      diag = fermion_[ix].first->evaluate(q2, sp[if1], interFB, sca2);
 	    }
-	    diag = fermion_[ix].first->evaluate(q2, sp[if1], interFB, sca1);
 	  }
-	  else {
-	    if(iopt==3) { 
-	      interFB = fermion_[ix].second->
-		evaluate(q2, iopt, internal, sbar[if2], sca1);
+	  else if (internal->iSpin() == PDT::Spin3Half) {
+	    RSSpinorBarWaveFunction interFB;
+	    if(current.ordered.second) {
+	      interFB = RSfermion_[ix].second->
+		evaluate(q2, 3, internal, sbar[if2], sca2);
+	      diag = RSfermion_[ix].first->evaluate(q2, sp[if1], interFB, sca1);
 	    }
-	    else {
-	      interFB = fermion_[ix].second->
-		evaluate(q2, iopt, internal, sbar[if2], sca1, 0.*GeV, 0.*GeV);
+	    else { 
+	      interFB = RSfermion_[ix].second->
+		evaluate(q2, 3, internal, sbar[if2], sca1);
+	      diag = RSfermion_[ix].first->evaluate(q2, sp[if1], interFB, sca2);
 	    }
-	    diag = fermion_[ix].first->evaluate(q2, sp[if1], interFB, sca2);
 	  }
+	  else
+	    assert(false);
 	}
 	else if(current.channelType == HPDiagram::sChannel) {
 	  if(internal->iSpin() == PDT::Spin0) {
@@ -156,6 +168,9 @@ MEff2ss::ff2ssME(const SpinorVector & sp, const SpinorBarVector & sbar,
 	      evaluate(q2, 1, internal, sp[if1], sbar[if2]);
 	    diag = tensor_[ix].second ->evaluate(q2, sca2, sca1, interT);
 	  }
+	}
+	else if(current.channelType == HPDiagram::fourPoint) {
+	  diag = fourPoint_[ix]->evaluate(q2,sp[if1], sbar[if2],sca1,sca2);
 	}
 	// diagram
 	me[ix] += norm(diag);
@@ -188,17 +203,19 @@ MEff2ss::ff2ssME(const SpinorVector & sp, const SpinorBarVector & sbar,
 
 
 void MEff2ss::persistentOutput(PersistentOStream & os) const {
-  os << fermion_ << scalar_ << vector_ << tensor_;
+  os << fermion_ << scalar_ << vector_ << tensor_ << fourPoint_ << RSfermion_;
 }
 
 void MEff2ss::persistentInput(PersistentIStream & is, int) {
-  is >> fermion_ >> scalar_ >> vector_ >> tensor_;
+  is >> fermion_ >> scalar_ >> vector_ >> tensor_ >> fourPoint_ >> RSfermion_;
   initializeMatrixElements(PDT::Spin1Half, PDT::Spin1Half, 
 			   PDT::Spin0    , PDT::Spin0    );
 }
 
-ClassDescription<MEff2ss> MEff2ss::initMEff2ss;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEff2ss,GeneralHardME>
+describeHerwigMEff2ss("Herwig::MEff2ss", "Herwig.so");
 
 void MEff2ss::Init() {
 

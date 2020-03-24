@@ -129,6 +129,7 @@ else
   AC_MSG_RESULT([found])
 fi
 
+AM_CONDITIONAL(HAVE_RIVET,[test x$THEPEGHASRIVET = xyes])
 AC_SUBST([CREATE_RIVET])
 ])
 
@@ -662,7 +663,7 @@ AS_IF([test "x$with_evtgen" != "xno"  -a "x$have_evtgen" = "xno"],
 
 AC_SUBST([EVTGENINCLUDE],[-I$EVTGENPREFIX/include])
 
-AM_CONDITIONAL(HAVE_EVTGEN,[test "x$have_evtgen" = "xlib" ])
+AM_CONDITIONAL(HAVE_EVTGEN,[test "x$have_evtgen" = "xlib" -o "x$have_evtgen" = "xlib64"])
 
 if test "x$have_evtgen" = "xlib"  ; then
      	LOAD_EVTGEN_DECAYS="read EvtGenBDecays.in"

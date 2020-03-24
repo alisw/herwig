@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SOPHTY.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "SOPHTY.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/EventRecord/Particle.h"
 #include "ThePEG/Repository/EventGenerator.h"
 #include "ThePEG/Interface/Switch.h"
@@ -33,8 +34,10 @@ void SOPHTY::persistentInput(PersistentIStream & is, int) {
   is >> FFDipole_ >> IFDipole_ >> colouredOption_;
 }
 
-ClassDescription<SOPHTY> SOPHTY::initSOPHTY;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<SOPHTY,DecayRadiationGenerator>
+describeHerwigSOPHTY("Herwig::SOPHTY", "HwSOPHTY.so");
 
 void SOPHTY::Init() {
   

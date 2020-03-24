@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEvv2ff.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -16,9 +16,11 @@
 #include "ThePEG/Helicity/Vertex/AbstractFFSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractVVSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFVVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractRFVVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractVVVVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractVVTVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFTVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractFFVVVertex.h"
 #include "ThePEG/Helicity/WaveFunction/SpinorWaveFunction.h"
 #include "ThePEG/Helicity/WaveFunction/SpinorBarWaveFunction.h"
 #include "ThePEG/Helicity/WaveFunction/VectorWaveFunction.h"
@@ -35,8 +37,6 @@ using ThePEG::Helicity::VectorWaveFunction;
  * \f$2 \rightarrow 2\f$ process vector-vector to fermion-antifermion pair. It
  * inherits from GeneralHardME and implements the me2() virtual function.
  *
- * @see \ref MEvv2ffInterfaces "The Interfaces"
- * defined for MEvv2ff.
  * @see GeneralHardME
  * 
  */
@@ -152,16 +152,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEvv2ff> initMEvv2ff;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEvv2ff & operator=(const MEvv2ff &);
+  MEvv2ff & operator=(const MEvv2ff &) = delete;
 
 private:
   
@@ -171,6 +165,7 @@ private:
    *  Intermediate scalar
    */
   vector<pair<AbstractVVSVertexPtr, AbstractFFSVertexPtr > > scalar_;
+  
   /**
    * Intermediate fermion 
    */
@@ -182,38 +177,21 @@ private:
   vector<pair<AbstractVVVVertexPtr, AbstractFFVVertexPtr> > vector_;
   
   /**
+   * Intermediate RS fermion 
+   */
+  vector<pair<AbstractRFVVertexPtr, AbstractRFVVertexPtr> > RSfermion_;
+  
+  /**
    * Intermediate tensor
    */
   vector<pair<AbstractVVTVertexPtr, AbstractFFTVertexPtr> > tensor_;
+
+  /**
+   *  Four point vertices
+   */
+  vector<AbstractFFVVVertexPtr> four_;
   //@}
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEvv2ff. */
-template <>
-struct BaseClassTrait<Herwig::MEvv2ff,1> {
-  /** Typedef of the first base class of MEvv2ff. */
-  typedef Herwig::GeneralHardME NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEvv2ff class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEvv2ff>
-  : public ClassTraitsBase<Herwig::MEvv2ff> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEvv2ff"; }
-};
-
-/** @endcond */
 
 }
 

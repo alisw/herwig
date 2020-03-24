@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // WSBFormFactor.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -143,14 +143,9 @@ protected:
 private:
 
   /**
-   * Describe a concrete class with persistent data.
-   */
-  static ClassDescription<WSBFormFactor> initWSBFormFactor;
-
-  /**
    * Private and non-existent assignment operator.
    */
-  WSBFormFactor & operator=(const WSBFormFactor &);
+  WSBFormFactor & operator=(const WSBFormFactor &) = delete;
 
 private:
 
@@ -207,41 +202,6 @@ private:
    */
   double _thetaeta;
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/**
- * This template specialization informs ThePEG about the base class of
- * WSBFormFactor.
- */
-template <>
- struct BaseClassTrait<Herwig::WSBFormFactor,1> {
-  /** Typedef of the base class of WSBFormFactor. */
-  typedef Herwig::ScalarFormFactor NthBase;
-};
-/**
- * This template specialization informs ThePEG about the name of the
- * WSBFormFactor class.
- */
-template <>
- struct ClassTraits<Herwig::WSBFormFactor>
-  : public ClassTraitsBase<Herwig::WSBFormFactor> {
-  /** Return the class name. */
-  static string className() { return "Herwig::WSBFormFactor"; }
-  /** Return the name of the shared library to be loaded to get
-   * access to this class and every other class it uses
-   * (except the base class).
-   */
-  static string library() { return "HwFormFactors.so"; }
-};
-
-/** @endcond */
 
 }
 

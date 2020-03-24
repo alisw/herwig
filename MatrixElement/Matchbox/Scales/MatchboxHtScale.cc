@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxHtScale.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -64,11 +64,11 @@ Energy2 MatchboxHtScale::renormalizationScale() const {
   vector<LorentzMomentum>::const_iterator mom = p.begin();
   for ( ; mom != p.end(); ++pdata, ++mom ) {
     
-    if ( theJetFinder->unresolvedMatcher()->check(**pdata)&&  
-        mom->perp()>theScalePtCut){
-      //abs(mom->rapidity()+(!lastXCombPtr()->head()?lastXCombPtr()->lastY():lastXCombPtr()->head()->lastY()))<5.01
-      gotone = true;
-      ptJetSum += jetPtWeight(*mom)*mom->perp();
+    if ( theJetFinder->unresolvedMatcher()->check(**pdata) ){
+      if( mom->perp() > theScalePtCut ){
+        gotone    = true;
+        ptJetSum += jetPtWeight(*mom)*mom->perp();
+      }
     } else if ( theIncludeMT ) {
       nonJetMomentum += *mom;
     }

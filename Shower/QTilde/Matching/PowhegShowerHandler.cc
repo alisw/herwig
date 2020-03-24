@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // PowhegShowerHandler.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -24,17 +24,17 @@
 #include "ThePEG/Utilities/DescribeClass.h"
 
 // include theses to have complete types
-#include "Herwig/Shower/Core/Base/ShowerParticle.h"
+#include "Herwig/Shower/QTilde/Base/ShowerParticle.h"
 #include "Herwig/PDF/MPIPDF.h"
 #include "Herwig/PDF/MinBiasPDF.h"
-#include "Herwig/Shower/Core/Base/ShowerTree.h"
-#include "Herwig/Shower/QTilde/Base/KinematicsReconstructor.h"
+#include "Herwig/Shower/QTilde/Base/ShowerTree.h"
+#include "Herwig/Shower/QTilde/Kinematics/KinematicsReconstructor.h"
 #include "Herwig/Shower/QTilde/Base/PartnerFinder.h"
 #include "Herwig/PDF/HwRemDecayer.h"
 
-#include "Herwig/Shower/Core/Base/ShowerProgenitor.h"
-#include "Herwig/Shower/Core/Base/HardBranching.h"
-#include "Herwig/Shower/Core/Base/HardTree.h"
+#include "Herwig/Shower/QTilde/Base/ShowerProgenitor.h"
+#include "Herwig/Shower/QTilde/Base/HardBranching.h"
+#include "Herwig/Shower/QTilde/Base/HardTree.h"
 #include "Herwig/MatrixElement/HwMEBase.h"
 #include "ThePEG/MatrixElement/MEBase.h"
 #include "ThePEG/MatrixElement/DiagramBase.fh"
@@ -444,7 +444,7 @@ PotentialTree PowhegShowerHandler::doClustering(tSubProPtr real,ShowerTreePtr sh
     if(!matched) continue;
     // find the colour partners
     try {
-      showerModel()->partnerFinder()
+      partnerFinder()
 	->setInitialEvolutionScales(branchingParticles,false,
 				    ShowerInteraction::QCD,true);
     }
@@ -501,7 +501,7 @@ PotentialTree PowhegShowerHandler::doClustering(tSubProPtr real,ShowerTreePtr sh
     // check the emitter and the spectator some how
     if(iemitter!=emitter_) continue;
     //do inverse momentum reconstruction
-    if( !showerModel()->kinematicsReconstructor()
+    if( !kinematicsReconstructor()
 	->deconstructHardJets( newTree.tree(), ShowerInteraction::QCD ) ) continue;
     newTree.tree()->findNodes();
     newTree.weight(1.);
@@ -1028,13 +1028,13 @@ void PowhegShowerHandler::doinit() {
 }
 
 void PowhegShowerHandler::persistentOutput(PersistentOStream & os) const {
-  os << theFactory << allowedInitial_ << allowedFinal_
+  os << allowedInitial_ << allowedFinal_
      << subtractionIntegral_ << enforceColourConsistency_ << forcePartners_
      << decayRadiation_;
 }
 
 void PowhegShowerHandler::persistentInput(PersistentIStream & is, int) {
-  is >> theFactory >> allowedInitial_ >> allowedFinal_
+  is >> allowedInitial_ >> allowedFinal_
      >> subtractionIntegral_ >> enforceColourConsistency_ >> forcePartners_
      >> decayRadiation_;
 }
@@ -1049,11 +1049,6 @@ void PowhegShowerHandler::Init() {
 
   static ClassDocumentation<PowhegShowerHandler> documentation
     ("The PowhegShowerHandler class");
-
-  static Reference<PowhegShowerHandler,MatchboxFactory> interfaceFactory
-    ("Factory",
-     "The factory object to use.",
-     &PowhegShowerHandler::theFactory, false, false, true, false, false);
 
   static Switch<PowhegShowerHandler,bool> interfaceEnforceColourConsistency
     ("EnforceColourConsistency",

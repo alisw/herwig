@@ -145,6 +145,11 @@ protected:
   bool duplicate(const HPDiagram & diagram, 
 		 const HPDVector & group) const;
 
+  /**
+   *  check the order of a diagram
+   */
+  bool checkOrder(const HPDiagram & diag) const;
+
 protected:
 
   /** @name Standard Interfaced functions. */
@@ -160,16 +165,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is an abstract class with persistent data.
-   */
-  static AbstractClassDescription<HardProcessConstructor> initHardProcessConstructor;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  HardProcessConstructor & operator=(const HardProcessConstructor &);
+  HardProcessConstructor & operator=(const HardProcessConstructor &) = delete;
 
 private:
 
@@ -211,33 +210,6 @@ namespace HPC_helper {
     return it != incPairs.end(); 
   }
 }
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of HardProcessConstructor. */
-template <>
-struct BaseClassTrait<Herwig::HardProcessConstructor,1> {
-  /** Typedef of the first base class of HardProcessConstructor. */
-  typedef Interfaced NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the HardProcessConstructor class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::HardProcessConstructor>
-  : public ClassTraitsBase<Herwig::HardProcessConstructor> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::HardProcessConstructor"; }
-};
-
-/** @endcond */
 
 }
 

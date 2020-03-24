@@ -34,15 +34,15 @@ newdef MPIPDF:RemnantHandler HadronRemnants
 create ThePEG::LHAPDF RemnantPDF
 newdef RemnantPDF:RemnantHandler HadronRemnants
 
-newdef HardLOPDF:PDFName MMHT2014lo68cl
-newdef HardNLOPDF:PDFName MMHT2014nlo68cl
+newdef HardLOPDF:PDFName CT14lo
+newdef HardNLOPDF:PDFName CT14nlo
 
-newdef ShowerLOPDF:PDFName MMHT2014lo68cl
-newdef ShowerNLOPDF:PDFName MMHT2014nlo68cl
+newdef ShowerLOPDF:PDFName CT14lo
+newdef ShowerNLOPDF:PDFName CT14nlo
 
-newdef MPIPDF:PDFName MMHT2014lo68cl
-newdef RemnantPDF:PDFName MMHT2014lo68cl
-
+newdef MPIPDF:PDFName CT14lo
+newdef RemnantPDF:PDFName CT14lo
+ 
 # set LO PDFS for hard process and can be changed later
 
 newdef /Herwig/Particles/p+:PDF HardLOPDF
@@ -57,6 +57,10 @@ newdef /Herwig/Partons/WWPDF:RemnantHandler /Herwig/Partons/LeptonGammaRemnants
 create ThePEG::BudnevPDF BudnevPDF BudnevPDF.so
 create ThePEG::UnResolvedRemnant /Herwig/Partons/HadronGammaRemnants 
 newdef /Herwig/Partons/BudnevPDF:RemnantHandler /Herwig/Partons/HadronGammaRemnants
+
+# partons inside photons
+create Herwig::SaSPhotonPDF /Herwig/Partons/SaSPDF HwSaSPhotonPDF.so
+set /Herwig/Partons/SaSPDF:RemnantHandler /Herwig/Partons/HadronRemnants
 
 # pomerons
 create Herwig::PomeronFlux PomeronFlux HwPomeronFlux.so

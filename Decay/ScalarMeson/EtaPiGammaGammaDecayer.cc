@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // EtaPiGammaGammaDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -11,6 +11,7 @@
 // functions of the EtaPiGammaGammaDecayer class.
 //
 #include "EtaPiGammaGammaDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/Interface/Parameter.h"
@@ -129,9 +130,10 @@ void EtaPiGammaGammaDecayer::persistentInput(PersistentIStream & is, int) {
      >> iunit(_econst,1/GeV2);
 }
 
-ClassDescription<EtaPiGammaGammaDecayer> 
-EtaPiGammaGammaDecayer::initEtaPiGammaGammaDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<EtaPiGammaGammaDecayer,DecayIntegrator>
+describeHerwigEtaPiGammaGammaDecayer("Herwig::EtaPiGammaGammaDecayer", "HwSMDecay.so");
 
 void EtaPiGammaGammaDecayer::Init() {
 
@@ -283,12 +285,12 @@ double EtaPiGammaGammaDecayer::me2(const int,const Particle & inpart,
       else {
 	e1dote2=_vectors[0][ix].dot(_vectors[1][iy]);
 	(*ME())(0,0,ix,iy) = 
-	  Dfact*complex<Energy2>(e1dote2*q1dotq2-
-				 e1dotq2[ix]*e2dotq1[iy])
-	  -Efact*complex<Energy4>(-e1dote2*pdotq1*pdotq2
-				  -e1dotp[ix]*e2dotp[iy]*q1dotq2
-				  +e1dotq2[ix]*e2dotp[iy]*pdotq1
-				  +e1dotp[ix]*e2dotq1[iy]*pdotq2);
+	  Complex(Dfact*complex<Energy2>(e1dote2*q1dotq2-
+					 e1dotq2[ix]*e2dotq1[iy])
+		  -Efact*complex<Energy4>(-e1dote2*pdotq1*pdotq2
+					  -e1dotp[ix]*e2dotp[iy]*q1dotq2
+					  +e1dotq2[ix]*e2dotp[iy]*pdotq1
+					  +e1dotp[ix]*e2dotq1[iy]*pdotq2));
       }
     }
   }

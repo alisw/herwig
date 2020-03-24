@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEPP2GammaGamma.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "MEPP2GammaGamma.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
@@ -111,8 +112,10 @@ void MEPP2GammaGamma::persistentInput(PersistentIStream & is, int) {
   is >> _photonvertex >> _maxflavour >> _process >> scalePreFactor_;
 }
 
-ClassDescription<MEPP2GammaGamma> MEPP2GammaGamma::initMEPP2GammaGamma;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEPP2GammaGamma,HwMEBase>
+describeHerwigMEPP2GammaGamma("Herwig::MEPP2GammaGamma", "HwMEHadron.so");
 
 void MEPP2GammaGamma::Init() {
 

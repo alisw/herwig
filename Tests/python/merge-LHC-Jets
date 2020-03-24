@@ -11,6 +11,9 @@ import os, yoda
 
 # #############################################
 
+def rescale(path,scale) :
+    if(path not in outhistos) : return
+    outhistos[path].scaleW(scale)
 
 def fillAbove(scale,desthisto, sourcehistosbyptmin) :
     pthigh= 1e100
@@ -18,21 +21,23 @@ def fillAbove(scale,desthisto, sourcehistosbyptmin) :
     for pt, h in sorted(sourcehistosbyptmin.iteritems(),reverse=True):
         ptlow=pt
         if(type(desthisto)==yoda.core.Scatter2D) :
-            for i in range(0,h.numPoints) :
-                xMin = h.points[i].x-h.points[i].xErrs.minus
+            for i in range(0,h.numPoints()) :
+                xMin = h.points()[i].x()-h.points()[i].xErrs().minus
                 if( xMin*scale >= ptlow and 
                     xMin*scale <  pthigh ) :
-                    desthisto.addPoint(h.points[i])
+                    desthisto.addPoint(h.points()[i])
         elif(type(desthisto)==yoda.core.Profile1D) :
-            for i in range(0,h.numBins) :
-                if(h.bins[i].xMin*scale  >= ptlow and 
-                   h.bins[i].xMin*scale  <  pthigh ) :
-                    desthisto.bins[i] += h.bins[i]
+            for i in range(0,h.numBins()) :
+                if(h.bins()[i].xMin()*scale  >= ptlow and 
+                   h.bins()[i].xMin()*scale  <  pthigh ) :
+                    desthisto.bins()[i] += h.bins()[i]
         elif(type(desthisto)==yoda.core.Histo1D) :
-            for i in range(0,h.numBins) :
-                if(h.bins[i].xMin*scale  >= ptlow and 
-                   h.bins[i].xMin*scale  <  pthigh ) :
-                    desthisto.bins[i] += h.bins[i]
+            for i in range(0,h.numBins()) :
+                if(h.bins()[i].xMin()*scale  >= ptlow and 
+                   h.bins()[i].xMin()*scale  <  pthigh ) :
+                    desthisto.bins()[i] += h.bins()[i]
+        elif(type(desthisto)==yoda.core.Counter) :
+                    desthisto += h
         else :
             logging.error("Can't merge %s, unknown type" % desthisto.path)
             sys.exit(1)
@@ -76,16 +81,16 @@ def useOneMass(hpath, sqrts, ptmin):
     global inhistos_pt
     global outhistos
     try:
-       ## Find best pT_min match
+        ## Find best pT_min match
         ptmins = inhistos_mass[hpath][float(sqrts)].keys()
         closest_ptmin = None
         for ptm in ptmins:
             if closest_ptmin is None or \
-                    abs(ptm-float(ptmin)) < abs(closest_ptmin-float(ptmin)):
+               abs(ptm-float(ptmin)) < abs(closest_ptmin-float(ptmin)):
                 closest_ptmin = ptm
         if closest_ptmin != float(ptmin):
             logging.warning("Inexact match for requested mass=%s: " % ptmin + \
-                                "using mass=%e instead" % closest_ptmin)
+                            "using mass=%e instead" % closest_ptmin)
         outhistos[hpath] =  inhistos_mass[hpath][float(sqrts)][closest_ptmin]
     except:
         pass
@@ -122,21 +127,25 @@ if __name__ == "__main__":
         logging.error("Must specify at least the name of the files")
         sys.exit(1)
 yodafiles=["-7-Bottom-0.yoda","-7-Bottom-1.yoda","-7-Bottom-2.yoda",
-           "-7-Bottom-3.yoda","-7-Bottom-4.yoda","-7-Bottom-5.yoda",
+           "-7-Bottom-3.yoda","-7-Bottom-4.yoda","-7-Bottom-5.yoda","-7-Bottom-6.yoda",
            "-7-Charm-1.yoda","-7-Charm-2.yoda",
            "-7-Charm-3.yoda","-7-Charm-4.yoda","-7-Charm-5.yoda",
-           "-7-Top-SL.yoda","-7-Top-L.yoda","-7-Top-All.yoda",
-           "-8-Top-All.yoda","-13-Top-All.yoda"]
+           "-7-Top-SL.yoda","-7-Top-L.yoda",
+           "-8-Top-SL.yoda","-8-Top-L.yoda","-8-Top-All.yoda",
+           "-13-Top-L.yoda","-13-Top-SL.yoda","-13-Top-All.yoda"]
 
-for i in range(1,10) :
+for i in range(1,11) :
     for j in [7,8,13] :
         yodafiles.append("-%1.1i-Jets-%1.1i.yoda" % (j,i))
+        
+for i in range(1,4) :
+    yodafiles.append("-2760-Jets-%1.1i.yoda" % i)
 
 if(opts.ue) :
-    yodafiles += ["-7-Jets-0.yoda"    ,"-8-Jets-0.yoda" ,"-7-Jets-10.yoda",
-                  "-8-Jets-10.yoda"   ,"-900-UE.yoda"   ,"-2360-UE.yoda"    ,
-                  "-2760-UE.yoda"     ,"-7-UE.yoda"     ,"-900-UE-Long.yoda",
-                  "-900-UE-Short.yoda","-8-UE.yoda"     ,
+    yodafiles += ["-7-Jets-0.yoda"    ,"-8-Jets-0.yoda" ,
+                  "-900-UE.yoda"   ,"-2360-UE.yoda"    ,
+                  "-2760-UE.yoda"     ,"-7-UE.yoda"     ,
+                  "-900-UE-Long.yoda" ,"-8-UE.yoda"     ,
                   "-7-UE-Long.yoda","-13-UE.yoda","-13-UE-Long.yoda"]
 ## Get histos
 inhistos_pt   = {}
@@ -144,7 +153,7 @@ inhistos_mass = {}
 outhistos={}
 weights = {}
 for f in yodafiles:
-    file=args[0]+f
+    file='Rivet-'+args[0]+f
     ptmin=0.
     sqrts=7000
     # CMS energy
@@ -193,12 +202,14 @@ for f in yodafiles:
     elif(file.find("Bottom-1")>0 or file.find("Charm-1")>0) :
         ptmin=10.
     elif(file.find("Bottom-2")>0 or file.find("Charm-2")>0) :
-        ptmin=30.
+        ptmin=20.
     elif(file.find("Bottom-3")>0 or file.find("Charm-3")>0) :
-        ptmin=70.
+        ptmin=30.
     elif(file.find("Bottom-4")>0 or file.find("Charm-4")>0) :
-        ptmin=100.
+        ptmin=70.
     elif(file.find("Bottom-5")>0 or file.find("Charm-5")>0) :
+        ptmin=100.
+    elif(file.find("Bottom-6")>0 or file.find("Charm-6")>0) :
         ptmin=130.
     elif(file.find("Top-SL.yoda")>0 or file.find("Top-L.yoda")>0 or \
          file.find("Top-All.yoda")>0):
@@ -213,6 +224,7 @@ for f in yodafiles:
         continue
     ## Get histos from this YODA file
     for aopath, ao in aos.iteritems() :
+        if("RAW" in aopath) :continue
         if(aopath.find("S8924791")>0 or aopath.find("S8971293")>0 or
            aopath.find("S8817804")>0 or aopath.find("I1082936")>0 or
            aopath.find("S8994773")>0 or aopath.find("S8918562")>0 or
@@ -233,8 +245,15 @@ for f in yodafiles:
            aopath.find("I1208923")>0 or aopath.find("I1305624")>0 or
            aopath.find("I1419070")>0 or aopath.find("I1394679")>0 or
            aopath.find("I929691" )>0 or aopath.find("I1393758")>0 or
-           aopath.find("I1459051")>0 or
+           aopath.find("I1459051")>0 or aopath.find("I1487277")>0 or
+           aopath.find("I1421646")>0 or aopath.find("I1111014")>0 or
+           aopath.find("I1605749")>0 or aopath.find("I1682495")>0 or
+           aopath.find("I1609253")>0 or aopath.find("1385107" )>0 or
+           aopath.find("I1486238")>0 or aopath.find("1634970" )>0 or
+           aopath.find("ATLAS_2016_CONF_2016_092")>0 or
            aopath.find("CMS_2012_PAS_QCD_11_010")>0) :
+           if("1419070" in aopath and ("forward" in aopath or "central" in aopath )) :
+               continue
            if not inhistos_pt.has_key(aopath):
                inhistos_pt[aopath] = {}
            tmpE = inhistos_pt[aopath]
@@ -246,7 +265,21 @@ for f in yodafiles:
                tmpE[sqrts][ptmin] += ao
                #raise Exception("A set with ptmin = %s already exists" % ( ptmin))
         else :
-            if(aopath.find("I1243871")>0) :
+            if("1509919" in aopath and "Ctr_cut" in aopath) :
+                continue
+            elif "I1393758" in aopath and ("d02" in aopath or "d04" in aopath or
+                                           "d06" in aopath or "d08" in aopath or
+                                           "d10" in aopath or "d12" in aopath) :
+                continue
+            elif "1387176" in aopath and "y02" in aopath:
+                continue
+            elif "1454211" in aopath and "cutflow" in aopath :
+                continue
+            elif("ATLAS_2016_I1468168" in aopath) :
+                newPath=aopath.replace("Passed_events","d02-x01-y01")
+                outhistos[newPath] = ao
+                ao.setPath(newPath)
+            elif(aopath.find("I1243871")>0) :
                 if(aopath.find("x01")>0 and file.find("-7-Top-L.yoda")>0 ) :
                     outhistos[aopath] = ao
                 elif(aopath.find("x02")>0 and file.find("-7-Top-SL.yoda")>0 ) :
@@ -256,56 +289,96 @@ for f in yodafiles:
                     outhistos[aopath] = ao
                 elif(aopath.find("y02")>0 and file.find("Long")<0 ) :
                     outhistos[aopath] = ao
+            elif("CMS_2017_I1471287" in aopath) :
+                if("CMS_2017_I1471287/d" in aopath) :
+                    outhistos[aopath] = ao
+            elif("ATLAS_2018_I1705857" in aopath ) :
+                ihist = int(aopath.split("/d")[1].split("-")[0])
+                if "-SL" in file :
+                    if ihist in [9,10,11,12,19,20,21,22,23,24,25,26,33,34,35,36,37,38,45,46,47,48,49,50] :
+                        outhistos[aopath] = ao
+                elif "-L" in file :
+                    if ihist in [3,4,5,6,7,8,13,14,15,16,17,18,27,28,29,30,31,32,39,40,41,42,43,44]  :
+                        outhistos[aopath] = ao
+                if ihist in [1,2] :
+                    if aopath not in outhistos :
+                        outhistos[aopath] = ao
+                    else :
+                        title=""
+                        path=""
+                        if hasattr(ao, 'title'):
+                            title=ao.title()
+                        if hasattr(ao, 'path'):
+                            path=ao.path()
+                        temp = yoda.core.Histo1D(path,title)
+                        for i in range(0,ao.numBins()) :
+                            temp.addBin(ao.bins()[i].xMin(),ao.bins()[i].xMax())
+                        if("-SL" in file) :
+                            temp.bins()[0] += outhistos[aopath].bins()[0]
+                            temp.bins()[1] += outhistos[aopath].bins()[1]
+                            temp.bins()[2] += ao.bins()[2]
+                            temp.bins()[3] += ao.bins()[3]
+                            temp.bins()[2] += ao.bins()[2]
+                            temp.bins()[3] += ao.bins()[3]
+                        else :
+                            temp.bins()[0] += ao.bins()[0]
+                            temp.bins()[1] += ao.bins()[1]
+                            temp.bins()[2] += outhistos[aopath].bins()[2]
+                            temp.bins()[3] += outhistos[aopath].bins()[3]
+                            temp.bins()[2] += outhistos[aopath].bins()[2]
+                            temp.bins()[3] += outhistos[aopath].bins()[3]
+                        outhistos[aopath] = temp
             else :
                 outhistos[aopath] = ao
 
 
 
-yodafiles=["-7-Bottom-6.yoda","-7-Bottom-7.yoda","-7-Bottom-8.yoda"]
+yodafiles=["-7-Bottom-7.yoda","-7-Bottom-8.yoda","-7-Bottom-9.yoda"]
 for i in range(1,8) :
     yodafiles.append("-7-DiJets-%1.1i-A.yoda" % i)
     yodafiles.append("-7-DiJets-%1.1i-B.yoda" % i)
     yodafiles.append("-7-DiJets-%1.1i-C.yoda" % i)
+for i in range(1,12) :
+    yodafiles.append("-13-DiJets-%1.1i-A.yoda" % i)
+# for i in range(6,12) :
+#     yodafiles.append("-13-DiJets-%1.1i-B.yoda" % i)
 
 for f in yodafiles:
-    print file
-    file=args[0]+f
-    if(file.find("-7-Jets-1")>0) :
-        sqrts=7000
-        mass=0
-    if(file.find("-7-DiJets-1")>0) :
-        sqrts=7000
-        mass=100
-    elif(file.find("-7-DiJets-2")>0) :
-        sqrts=7000
+    file='Rivet-'+args[0]+f
+    if    "-7-Jets" in file or  "-7-DiJets" in file or "-7-Bottom" in file :
+        sqrts =  7000
+    elif "-13-Jets" in file or "-13-DiJets" in file :
+        sqrts = 13000
+    if(file.find("-DiJets-2")>0) :
         mass=250
-    elif(file.find("-7-DiJets-3")>0) :
-        sqrts=7000
+    elif(file.find("-DiJets-3")>0) :
         mass=500
-    elif(file.find("-7-DiJets-4")>0) :
-        sqrts=7000
+    elif(file.find("-DiJets-4")>0) :
         mass=800
-    elif(file.find("-7-DiJets-5")>0) :
-        sqrts=7000
+    elif(file.find("-DiJets-5")>0) :
         mass=1000
-    elif(file.find("-7-DiJets-6")>0) :
-        sqrts=7000
+    elif(file.find("-DiJets-6")>0) :
         mass=1600
-    elif(file.find("-7-DiJets-7")>0) :
-        sqrts=7000
+    elif(file.find("-DiJets-7")>0) :
         mass=2200
-    elif(file.find("-7-DiJets-8")>0) :
-        sqrts=7000
+    elif(file.find("-DiJets-8")>0) :
         mass=2800
-    elif(file.find("-7-Bottom-6")>0) :
-        sqrts=7000
+    elif(file.find("-DiJets-9")>0) :
+        mass=3900
+    elif(file.find("-DiJets-10")>0) :
+        mass=4900
+    elif(file.find("-DiJets-11")>0) :
+        mass=5900
+    elif(file.find("-DiJets-1")>0) :
+        mass=100
+    elif(file.find("-Bottom-7")>0) :
         mass=110
-    elif(file.find("-7-Bottom-7")>0) :
-        sqrts=7000
+    elif(file.find("-Bottom-8")>0) :
         mass=370
-    elif(file.find("-7-Bottom-8")>0) :
-        sqrts=7000
+    elif(file.find("-Bottom-9")>0) :
         mass=550
+    elif(file.find("-Jets-1")>0) :
+        mass=0
     if not os.access(file, os.R_OK):
         logging.error("%s can not be read" % file)
         continue
@@ -316,13 +389,13 @@ for f in yodafiles:
         continue
     ## Get histos from this YODA file
     for aopath, ao in aos.iteritems() :
-        if(aopath.find("8817804")>0 or
-           aopath.find("8968497")>0 or 
-           aopath.find("1082936")>0 or
-           aopath.find("I930220")>0 or
-           aopath.find("1261026")>0 or
-           aopath.find("1090423")>0 or
-           aopath.find("1268975")>0 or
+        if("RAW" in aopath) :continue
+        if(aopath.find("8817804")>0 or aopath.find("8968497")>0 or 
+           aopath.find("1082936")>0 or aopath.find("I930220")>0 or
+           aopath.find("1261026")>0 or aopath.find("1090423")>0 or
+           aopath.find("1268975")>0 or aopath.find("1519995") >0 or
+           aopath.find("1663452") >0 or
+           aopath.find("1634970" )>0 or
            aopath.find("CMS_2013_I1208923")>0) :
            if not inhistos_mass.has_key(aopath):
                inhistos_mass[aopath] = {}
@@ -334,8 +407,11 @@ for f in yodafiles:
                tmpP[mass] = ao
            else:
                print aopath
+               print sqrts,mass,file
                raise Exception("A set with mass = %s already exists" % ( mass))
 
+
+        
 ## Make empty output histos if needed
 for hpath,hsets in inhistos_pt.iteritems():
     if( hpath.find("8924791")>0  or 
@@ -367,46 +443,62 @@ for hpath,hsets in inhistos_pt.iteritems():
         hpath.find("1307243"   )>0 or
         hpath.find("I1419070")>0 or
         hpath.find("I1394679")>0 or
+        hpath.find("I1487277")>0 or
         hpath.find("CMS_2013_I1208923")>0 or
         hpath.find("1393758")>0 or
-        hpath.find("1459051")>0) :
-        if(type(hsets.values()[0].values()[0])==yoda.core.Scatter2D) :
-            outhistos[hpath] = yoda.core.Scatter2D(hsets.values()[0].values()[0].path,
-                                                   hsets.values()[0].values()[0].title)
-        elif(type(hsets.values()[0].values()[0])==yoda.core.Profile1D) :
-            outhistos[hpath] = yoda.core.Profile1D(hsets.values()[0].values()[0].path,
-                                                   hsets.values()[0].values()[0].title)
-            for i in range(0,hsets.values()[0].values()[0].numBins) :
-                outhistos[hpath].addBin(hsets.values()[0].values()[0].bins[i].xMin,
-                                        hsets.values()[0].values()[0].bins[i].xMax)
-        elif(type(hsets.values()[0].values()[0])==yoda.core.Histo1D) :
-            outhistos[hpath] = yoda.core.Histo1D(hsets.values()[0].values()[0].path,
-                                                hsets.values()[0].values()[0].title)
-            for i in range(0,hsets.values()[0].values()[0].numBins) :
-                outhistos[hpath].addBin(hsets.values()[0].values()[0].bins[i].xMin,
-                                        hsets.values()[0].values()[0].bins[i].xMax)
+        hpath.find("ATLAS_2016_CONF_2016_092")>0 or
+        hpath.find("1111014")>0 or hpath.find("1385107")>0 or hpath.find("I1486238") or
+        hpath.find("1459051")>0 or hpath.find("1634970")>0) :
+        title=""
+        path=""
+        histo = hsets.values()[0].values()[0]
+        if hasattr(histo, 'title'):
+            title=histo.title()
+        if hasattr(histo, 'path'):
+            path=histo.path()
+        if(type(histo)==yoda.core.Counter) :
+            outhistos[hpath] = yoda.core.Counter(path,title)
+        elif(type(histo)==yoda.core.Scatter2D) :
+            outhistos[hpath] = yoda.core.Scatter2D(path,title)
+        elif(type(histo)==yoda.core.Profile1D) :
+            outhistos[hpath] = yoda.core.Profile1D(path,title)
+            for i in range(0,histo.numBins()) :
+                outhistos[hpath].addBin(histo.bins()[i].xMin(),
+                                        histo.bins()[i].xMax())
+        elif(type(histo)==yoda.core.Histo1D) :
+            outhistos[hpath] = yoda.core.Histo1D(path,title)
+            for i in range(0,histo.numBins()) :
+                outhistos[hpath].addBin(histo.bins()[i].xMin(),
+                                        histo.bins()[i].xMax())
         else :
             logging.error("Histogram %s is of unknown type" % hpath)
             sys.exit(1) 
 
 ## Make empty output histos if needed
 for hpath,hsets in inhistos_mass.iteritems():
-    if(hpath.find("1268975")>0) :
-        if(type(hsets.values()[0].values()[0])==yoda.core.Scatter2D) :
-            outhistos[hpath] = yoda.core.Scatter2D(hsets.values()[0].values()[0].path,
-                                                   hsets.values()[0].values()[0].title)
-        elif(type(hsets.values()[0].values()[0])==yoda.core.Profile1D) :
-            outhistos[hpath] = yoda.core.Profile1D(hsets.values()[0].values()[0].path,
-                                                   hsets.values()[0].values()[0].title)
-            for i in range(0,hsets.values()[0].values()[0].numBins) :
-                outhistos[hpath].addBin(hsets.values()[0].values()[0].bins[i].xMin,
-                                        hsets.values()[0].values()[0].bins[i].xMax)
-        elif(type(hsets.values()[0].values()[0])==yoda.core.Histo1D) :
-            outhistos[hpath] = yoda.core.Histo1D(hsets.values()[0].values()[0].path,
-                                                hsets.values()[0].values()[0].title)
-            for i in range(0,hsets.values()[0].values()[0].numBins) :
-                outhistos[hpath].addBin(hsets.values()[0].values()[0].bins[i].xMin,
-                                        hsets.values()[0].values()[0].bins[i].xMax)
+    if(hpath.find("1268975")>0 or
+       hpath.find("1634970")>0) :
+        title=""
+        path=""
+        histo = hsets.values()[0].values()[0]
+        if hasattr(histo, 'title'):
+            title=histo.title()
+        if hasattr(histo, 'path'):
+            path=histo.path()
+        if(type(histo)==yoda.core.Counter) :
+            outhistos[hpath] = yoda.core.Counter(path,title)
+        elif(type(histo)==yoda.core.Scatter2D) :
+            outhistos[hpath] = yoda.core.Scatter2D(path,title)
+        elif(type(histo)==yoda.core.Profile1D) :
+            outhistos[hpath] = yoda.core.Profile1D(path,title)
+            for i in range(0,histo.numBins()) :
+                outhistos[hpath].addBin(histo.bins()[i].xMin(),
+                                        histo.bins()[i].xMax())
+        elif(type(histo)==yoda.core.Histo1D) :
+            outhistos[hpath] = yoda.core.Histo1D(path,title)
+            for i in range(0,histo.numBins()) :
+                outhistos[hpath].addBin(histo.bins()[i].xMin(),
+                                        histo.bins()[i].xMax())
         else :
             logging.error("Histogram %s is of unknown type" % hpath)
             sys.exit(1)
@@ -1293,17 +1385,17 @@ mergeByPt("/ATLAS_2014_I1307243/d40-x01-y01", "7000")
 
 logging.info("Processing ATLAS_2014_I1325553")
 mergeByPt("/ATLAS_2014_I1325553/d01-x01-y01", "7000")
-mergeByPt("/ATLAS_2014_I1325553/d01-x01-y02", "7000")
-mergeByPt("/ATLAS_2014_I1325553/d01-x01-y03", "7000")
-mergeByPt("/ATLAS_2014_I1325553/d01-x01-y04", "7000")
-mergeByPt("/ATLAS_2014_I1325553/d01-x01-y05", "7000")
-mergeByPt("/ATLAS_2014_I1325553/d01-x01-y06", "7000")
 mergeByPt("/ATLAS_2014_I1325553/d02-x01-y01", "7000")
-mergeByPt("/ATLAS_2014_I1325553/d02-x01-y02", "7000")
-mergeByPt("/ATLAS_2014_I1325553/d02-x01-y03", "7000")
-mergeByPt("/ATLAS_2014_I1325553/d02-x01-y04", "7000")
-mergeByPt("/ATLAS_2014_I1325553/d02-x01-y05", "7000")
-mergeByPt("/ATLAS_2014_I1325553/d02-x01-y06", "7000")
+mergeByPt("/ATLAS_2014_I1325553/d03-x01-y01", "7000")
+mergeByPt("/ATLAS_2014_I1325553/d04-x01-y01", "7000")
+mergeByPt("/ATLAS_2014_I1325553/d05-x01-y01", "7000")
+mergeByPt("/ATLAS_2014_I1325553/d06-x01-y01", "7000")
+mergeByPt("/ATLAS_2014_I1325553/d07-x01-y01", "7000")
+mergeByPt("/ATLAS_2014_I1325553/d08-x01-y01", "7000")
+mergeByPt("/ATLAS_2014_I1325553/d09-x01-y01", "7000")
+mergeByPt("/ATLAS_2014_I1325553/d10-x01-y01", "7000")
+mergeByPt("/ATLAS_2014_I1325553/d11-x01-y01", "7000")
+mergeByPt("/ATLAS_2014_I1325553/d12-x01-y01", "7000")
 
 logging.info("Processing ATLAS_2016_I1419070")
 for i in range(1,13) :
@@ -1324,17 +1416,28 @@ for ihist in range(1,4) :
     hsum  = yoda.Scatter2D(sstring,sstring)
     outhistos[dstring]= hdiff
     outhistos[sstring]= hsum
-    for nbin in range(0,h2.numBins) :
-        bsum  = h1.bins[nbin]+h2.bins[nbin]
-        ydiff = h2.bins[nbin].mean-h1.bins[nbin].mean
-        ysum  = bsum.mean
-        yerr  = math.sqrt(h1.bins[nbin].stdErr**2+h2.bins[nbin].stdErr**2)
-        x    = h1.bins[nbin].xMid
-        xerr = 0.5*h1.bins[nbin].xWidth
+    for nbin in range(0,h2.numBins()) :
+        bsum  = h1.bins()[nbin]+h2.bins()[nbin]
+        try:
+          ydiff = h2.bins()[nbin].mean()-h1.bins()[nbin].mean()
+        except:
+          ydiff = 0
+        try:
+          ysum  = bsum.mean()
+          bstderr = bsum.stdErr()
+        except:
+          ysum  = 0
+          bstderr = 0
+        try:
+          yerr  = math.sqrt(h1.bins()[nbin].stdErr()**2+h2.bins()[nbin].stdErr()**2)
+        except:
+          yerr  = 0
+        x    = h1.bins()[nbin].xMid()
+        xerr = 0.5*h1.bins()[nbin].xWidth()
         hdiff.addPoint(x,ydiff,xerr,yerr)
-        hsum.addPoint(x,ysum ,xerr,bsum.stdErr)
+        hsum.addPoint(x,ysum ,xerr,bstderr)
 
-logging.info("ATLAS_2015_I1394679")
+logging.info("Processing ATLAS_2015_I1394679")
 for i in range(1,5) :
     mergeByPt("/ATLAS_2015_I1394679/d0%s-x01-y01" % i, "8000")
 for i in range(5,11) :
@@ -1396,7 +1499,156 @@ for i in range(1,13) :
 logging.info("Processing CMS_2016_I1459051")
 for i in range(1,15) :
     mergeByPt("/CMS_2016_I1459051/d%02d-x01-y01" % i, "13000")
+    
+logging.info("Processing ATLAS_2016_CONF_2016_092")
+for i in range(1,7) :
+    mergeByPt("/ATLAS_2016_CONF_2016_092/d%02d-x01-y01" % i, "13000")
+    
+logging.info("Processing ATLAS_2017_I1609253")
+useOnePt( "/ATLAS_2017_I1609253/d01-x01-y01",  "8000", "260" )
+useOnePt( "/ATLAS_2017_I1609253/d02-x01-y01",  "8000", "260" )
+useOnePt( "/ATLAS_2017_I1609253/d03-x01-y01",  "8000", "260" )
+useOnePt( "/ATLAS_2017_I1609253/d04-x01-y01",  "8000", "260" )
+useOnePt( "/ATLAS_2017_I1609253/d05-x01-y01",  "8000", "400" )
+useOnePt( "/ATLAS_2017_I1609253/d06-x01-y01",  "8000", "400" )
+useOnePt( "/ATLAS_2017_I1609253/d07-x01-y01",  "8000", "400" )
+useOnePt( "/ATLAS_2017_I1609253/d08-x01-y01",  "8000", "400" )
+useOnePt( "/ATLAS_2017_I1609253/d09-x01-y01",  "8000", "400" )
+useOnePt( "/ATLAS_2017_I1609253/d10-x01-y01",  "8000", "400" )
+useOnePt( "/ATLAS_2017_I1609253/d11-x01-y01",  "8000", "600" )
+useOnePt( "/ATLAS_2017_I1609253/d12-x01-y01",  "8000", "600" )
 
+logging.info("Processing CMS_2016_I1487277")
+mergeByPt("/CMS_2016_I1487277/d01-x01-y01", "8000")
+mergeByPt("/CMS_2016_I1487277/d02-x01-y01", "8000")
+mergeByPt("/CMS_2016_I1487277/d03-x01-y01", "8000")
+mergeByPt("/CMS_2016_I1487277/d04-x01-y01", "8000")
+mergeByPt("/CMS_2016_I1487277/d05-x01-y01", "8000")
+mergeByPt("/CMS_2016_I1487277/d06-x01-y01", "8000")
+mergeByPt("/CMS_2016_I1487277/d07-x01-y01", "8000")
+
+logging.info("Processing CMS_2016_I1421646")
+useOnePt( "/CMS_2016_I1421646/d01-x01-y01",  "8000", "210" )
+useOnePt( "/CMS_2016_I1421646/d02-x01-y01",  "8000", "260" )
+useOnePt( "/CMS_2016_I1421646/d03-x01-y01",  "8000", "400" )
+useOnePt( "/CMS_2016_I1421646/d04-x01-y01",  "8000", "400" )
+useOnePt( "/CMS_2016_I1421646/d05-x01-y01",  "8000", "600" )
+useOnePt( "/CMS_2016_I1421646/d06-x01-y01",  "8000", "900" )
+useOnePt( "/CMS_2016_I1421646/d07-x01-y01",  "8000", "900" )
+
+
+logging.info("Processing CMS_2017_I1605749")
+for i in [1,2,3,4,5,6,7,8,9,10,13,16] :
+    useOnePt("/CMS_2017_I1605749/d%02d-x01-y01" % i, "8000", "400" )
+for i in [11,14,17]:
+    useOnePt("/CMS_2017_I1605749/d%02d-x01-y01" % i, "8000", "600" )
+for i in [12,15,18]:
+    useOnePt("/CMS_2017_I1605749/d%02d-x01-y01" % i, "8000", "900" )
+
+def CMS_2012_I1111014_name(i,j) :
+    if(i+j<100) :
+        return "/CMS_2012_I1111014/d%02d-x01-y01" % (i+j)
+    else :
+        return "/CMS_2012_I1111014/d%03d-x01-y01" % (i+j)
+
+logging.info("Processing CMS_2012_I1111014")
+for j in [0,22,44,66,87,106]:
+    for i in [1,2,3] :
+        useOnePt(CMS_2012_I1111014_name(i,j), "7000", "20" )
+    for i in [4,5,6,7]:
+        useOnePt(CMS_2012_I1111014_name(i,j), "7000", "40" )
+    for i in [8,9,10]:
+        useOnePt(CMS_2012_I1111014_name(i,j), "7000", "80" )
+    for i in [11,12,13,14,15,16]:
+        useOnePt(CMS_2012_I1111014_name(i,j), "7000", "110" )
+    for i in [17,18]:
+        useOnePt(CMS_2012_I1111014_name(i,j), "7000", "210" )
+    useOnePt(CMS_2012_I1111014_name(19,j), "7000", "260" )
+    if(j<87) :
+        for i in [20,21]:
+            useOnePt(CMS_2012_I1111014_name(i,j), "7000", "400" )
+    if(j<66) :
+        useOnePt(CMS_2012_I1111014_name(22,j), "7000", "600" )
+
+for i in [126,127,128] :
+    for j in [1,2] :
+        mergeByPt("/CMS_2012_I1111014/d%03d-x01-y%02d" % (i,j), "7000")
+        
+logging.info("Processing CMS_2018_I1682495")
+for i in [0,1,2,3] :
+    useOnePt("/CMS_2018_I1682495/d%02d-x01-y01" % (12*i+ 1), "13000", "110" )
+    useOnePt("/CMS_2018_I1682495/d%02d-x01-y01" % (12*i+ 2), "13000", "260" )
+    useOnePt("/CMS_2018_I1682495/d%02d-x01-y01" % (12*i+ 3), "13000", "260" )
+    useOnePt("/CMS_2018_I1682495/d%02d-x01-y01" % (12*i+ 4), "13000", "400" )
+    useOnePt("/CMS_2018_I1682495/d%02d-x01-y01" % (12*i+ 5), "13000", "400" )
+    useOnePt("/CMS_2018_I1682495/d%02d-x01-y01" % (12*i+ 6), "13000", "600" )
+    useOnePt("/CMS_2018_I1682495/d%02d-x01-y01" % (12*i+ 7), "13000", "600" )
+    useOnePt("/CMS_2018_I1682495/d%02d-x01-y01" % (12*i+ 8), "13000", "900" )
+    useOnePt("/CMS_2018_I1682495/d%02d-x01-y01" % (12*i+ 9), "13000", "900" )
+    useOnePt("/CMS_2018_I1682495/d%02d-x01-y01" % (12*i+10), "13000", "900" )
+    useOnePt("/CMS_2018_I1682495/d%02d-x01-y01" % (12*i+11), "13000", "900" )
+    useOnePt("/CMS_2018_I1682495/d%02d-x01-y01" % (12*i+12), "13000", "900" )
+    
+logging.info("Processing CMS_2015_I1385107")
+for i in range(1,9) :
+    mergeByPt("/CMS_2015_I1385107/d%02d-x01-y01" % i, "2760")
+
+
+logging.info("Processing CMS_2018_I1663452")
+useOneMass("/CMS_2018_I1663452/d01-x01-y01", "13000", "5900" )
+useOneMass("/CMS_2018_I1663452/d02-x01-y01", "13000", "4900" )
+useOneMass("/CMS_2018_I1663452/d03-x01-y01", "13000", "3900" )
+useOneMass("/CMS_2018_I1663452/d04-x01-y01", "13000", "3900" )
+useOneMass("/CMS_2018_I1663452/d05-x01-y01", "13000", "2800" )
+useOneMass("/CMS_2018_I1663452/d06-x01-y01", "13000", "2800" )
+useOneMass("/CMS_2018_I1663452/d07-x01-y01", "13000", "2200" )
+    
+logging.info("Processing CMS_2017_I1519995")
+useOneMass("/CMS_2017_I1519995/d01-x01-y01", "13000", "3900" )
+useOneMass("/CMS_2017_I1519995/d02-x01-y01", "13000", "3900" )
+useOneMass("/CMS_2017_I1519995/d03-x01-y01", "13000", "2800" )
+useOneMass("/CMS_2017_I1519995/d04-x01-y01", "13000", "2800" )
+useOneMass("/CMS_2017_I1519995/d05-x01-y01", "13000", "2200" )
+useOneMass("/CMS_2017_I1519995/d06-x01-y01", "13000", "1600" )
+
+logging.info("Processing CMS_2016_I1486238")
+for i in [1,5,9,10,12,13,14,16,17] :
+    useOnePt("/CMS_2016_I1486238/d%02d-x01-y01" % i, "7000", "20" )
+mergeByPt("/CMS_2016_I1486238/d11-x01-y01", "7000")
+mergeByPt("/CMS_2016_I1486238/d15-x01-y01", "7000")
+
+logging.info("Processing ATLAS_2018_I1634970")
+for i in range(1,7) :
+    mergeByPt("/ATLAS_2018_I1634970/d%02d-x01-y01"%i, "13000")
+for i in range(7,13) :
+    mergeByMass("/ATLAS_2018_I1634970/d%02d-x01-y01"%i, "13000", 1.)
+        
+        
+
+
+# rescaling for semi-leptonic top decays (we only simulate 1 charge combination)
+for i in range(96,116,2) :
+    rescale("/ATLAS_2018_I1656578/d%s-x01-y01" % i,2.)
+for i in range(15,29,2) :
+    rescale("/ATLAS_2017_I1614149/d%s-x01-y01" % i,2.)
+for i in range(1,23,2) :
+    rescale("/ATLAS_2015_I1404878/d%02d-x01-y01" % i,2.)
+rescale("/ATLAS_2015_I1397637/d01-x01-y01",2.)
+for i in range(1,22,1) :
+    rescale("/ATLAS_2015_I1345452/d%02d-x01-y01" % i,2.)
+for i in range(1,10,1) :
+    rescale("/ATLAS_2014_I1304688/d%02d-x01-y01" % i,2.)
+for i in range(1,82) :
+    rescale("/CMS_2018_I1663958/d%02d-x01-y01" % i,2.)
+for i in range(169,173,1) :
+    rescale("/CMS_2018_I1663958/d%02d-x01-y01" % i,2.)
+for i in range(8,15) :
+    rescale("/CMS_2018_I1662081/d%02d-x01-y01" % i,2.)
+for i in range(1,41) :
+    rescale("/CMS_2016_I1491950/d%02d-x02-y01" % i,2.)
+for i in range(1,13) :
+    rescale("/CMS_2016_I1454211/d%02d-x01-y01" % i,2.)
+rescale("/CMS_2017_I1518399/d01-x01-y01",2.)
 # Choose output file
 name = args[0]+"-Jets.yoda"
 yoda.writeYODA(outhistos,name)

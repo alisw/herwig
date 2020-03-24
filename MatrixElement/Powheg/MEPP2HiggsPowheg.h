@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEPP2HiggsPowheg.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -271,16 +271,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEPP2HiggsPowheg> initMEPP2HiggsPowheg;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEPP2HiggsPowheg & operator=(const MEPP2HiggsPowheg &);
+  MEPP2HiggsPowheg & operator=(const MEPP2HiggsPowheg &) = delete;
 
 private:
 
@@ -419,40 +413,6 @@ private:
    */
   double scaleFact_;
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the base classes of MEPP2HiggsPowheg. */
-template <>
-struct BaseClassTrait<Herwig::MEPP2HiggsPowheg,1> {
-  /** Typedef of the first base class of MEPP2HiggsPowheg. */
-  typedef Herwig::MEPP2Higgs NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEPP2HiggsPowheg class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEPP2HiggsPowheg>
-  : public ClassTraitsBase<Herwig::MEPP2HiggsPowheg> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEPP2HiggsPowheg"; }
-  /**
-   * The name of a file containing the dynamic library where the class
-   * MEPP2HiggsPowheg is implemented. It may also include several, space-separated,
-   * libraries if the class MEPP2HiggsPowheg depends on other classes (base classes
-   * excepted). In this case the listed libraries will be dynamically
-   * linked in the order they are specified.
-   */
-  static string library() { return "HwMEHadron.so HwPowhegMEHadron.so"; }
-};
-
-/** @endcond */
 
 }
 

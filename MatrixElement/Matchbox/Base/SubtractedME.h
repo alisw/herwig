@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SubtractedME.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -56,11 +56,6 @@ public:
    * Return the factory which produced this matrix element
    */
   Ptr<MatchboxFactory>::tcptr factory() const;
-
-  /**
-   * Set the factory which produced this matrix element
-   */
-  void factory(Ptr<MatchboxFactory>::tcptr f);
 
   /** @name Phasespace and subprocess information */
   //@{
@@ -450,11 +445,6 @@ protected:
 private:
 
   /**
-   * The factory which produced this matrix element
-   */
-  Ptr<MatchboxFactory>::tcptr theFactory;
-
-  /**
    * The underlying born matrix elements, overriding the ones
    * contained in the factory object.
    */
@@ -517,7 +507,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  SubtractedME & operator=(const SubtractedME &);
+  SubtractedME & operator=(const SubtractedME &) = delete;
 
 };
 

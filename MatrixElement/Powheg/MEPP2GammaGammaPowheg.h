@@ -8,7 +8,7 @@
 #include "Herwig/MatrixElement/HwMEBase.h"
 #include "ThePEG/Helicity/Vertex/Vector/FFVVertex.h"
 #include "Herwig/MatrixElement/ProductionMatrixElement.h"
-#include "Herwig/Shower/Core/Couplings/ShowerAlpha.h"
+#include "Herwig/Shower/ShowerAlpha.h"
 
 namespace Herwig {
 
@@ -282,6 +282,7 @@ protected:
       return make_pair(scale2/(pT2+scale2),pT2/(pT2+scale2));
     default:
       assert(false);
+      return make_pair(0.,0.);
     }
   }
 
@@ -320,7 +321,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEPP2GammaGammaPowheg & operator=(const MEPP2GammaGammaPowheg &);
+  MEPP2GammaGammaPowheg & operator=(const MEPP2GammaGammaPowheg &) = delete;
 
 private:
 

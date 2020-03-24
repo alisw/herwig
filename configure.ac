@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([Herwig],[7.1.2],[herwig@projects.hepforge.org],[Herwig])
+AC_INIT([Herwig],[7.2.0],[herwig@projects.hepforge.org],[Herwig])
 AC_CONFIG_SRCDIR([Utilities/HerwigStrategy.cc])
 AC_CONFIG_AUX_DIR([Config])
 AC_CONFIG_MACRO_DIR([m4])
@@ -11,7 +11,7 @@ AC_CANONICAL_HOST
 
 dnl === disable debug symbols by default =====
 if test "x$CXXFLAGS" = "x"; then
-   CXXFLAGS=-O2
+   CXXFLAGS="-O2 -DBOOST_UBLAS_NDEBUG"
 fi
 if test "x$CFLAGS" = "x"; then
    CFLAGS=-O2
@@ -30,6 +30,8 @@ AX_CXX_COMPILE_STDCXX([11],[noext],[mandatory])
 dnl check for POSIX
 AC_CHECK_HEADER([unistd.h],[],
       [AC_MSG_ERROR([Herwig needs "unistd.h". Non-POSIX systems are not supported.])])
+AC_CHECK_HEADER([sys/stat.h],[],
+      [AC_MSG_ERROR([Herwig needs "sys/stat.h". Non-POSIX systems are not supported.])])
 
 dnl Checks for programs.
 AC_PROG_INSTALL
@@ -49,6 +51,7 @@ AC_COMPILE_IFELSE(
 	]
 )
 AC_LANG_POP([Fortran])
+AC_FC_WRAPPERS
 
 
 LT_PREREQ([2.2.6])
@@ -78,8 +81,6 @@ dnl BOOST_FIND_HEADER([boost/numeric/ublas/matrix_sparse.hpp])
 dnl BOOST_FIND_HEADER([boost/numeric/ublas/symmetric.hpp])
 dnl BOOST_FIND_HEADER([boost/numeric/ublas/vector.hpp])
 BOOST_FIND_HEADER([boost/operators.hpp])
-BOOST_FIND_HEADER([boost/progress.hpp])
-BOOST_FILESYSTEM([mt])
 BOOST_TEST()
 
 HERWIG_CHECK_VBFNLO
@@ -180,7 +181,8 @@ AC_CONFIG_FILES([UnderlyingEvent/Makefile
 		MatrixElement/Matchbox/External/GoSam/Makefile
 		MatrixElement/Matchbox/External/OpenLoops/Makefile
 		MatrixElement/Matchbox/External/MadGraph/Makefile
-		MatrixElement/Matchbox/External/MadGraph/mg2herwig.py
+		MatrixElement/Matchbox/External/MadGraph/mg2herwig
+		MatrixElement/FxFx/Makefile
 		Sampling/Makefile
 		Sampling/CellGrids/Makefile
 		Shower/Makefile
@@ -192,6 +194,7 @@ AC_CONFIG_FILES([UnderlyingEvent/Makefile
 		Shower/Dipole/Kinematics/Makefile
 		Shower/Dipole/Utility/Makefile
 		Shower/Dipole/AlphaS/Makefile
+		Shower/Dipole/SpinCorrelations/Makefile
 		Utilities/Makefile
 		Utilities/XML/Makefile
 		Utilities/Statistics/Makefile
@@ -234,7 +237,7 @@ AC_CONFIG_FILES([UnderlyingEvent/Makefile
 
 AC_CONFIG_LINKS([Doc/BSMlibs.in:Doc/BSMlibs.in])
 AC_CONFIG_FILES([Doc/fixinterfaces.pl],[chmod +x Doc/fixinterfaces.pl])
-
+AC_CONFIG_HEADERS([PDF/SaSPhotonPDF.cc])
 HERWIG_OVERVIEW
 
 AC_CONFIG_COMMANDS([summary],[cat config.herwig])

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SatPDF.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "SatPDF.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 
 #ifdef ThePEG_TEMPLATES_IN_CC_FILE
@@ -83,8 +84,10 @@ void SatPDF::persistentInput(PersistentIStream & is, int) {
   is >> thePDF >> theX0 >> theExp;
 }
 
-ClassDescription<SatPDF> SatPDF::initSatPDF;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<SatPDF,PDFBase>
+describeHerwigSatPDF("Herwig::SatPDF", "HwSatPDF.so");
 
 void SatPDF::Init() {
 

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEqq2W2ffPowheg.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -215,16 +215,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEqq2W2ffPowheg> initMEqq2W2ffPowheg;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEqq2W2ffPowheg & operator=(const MEqq2W2ffPowheg &);
+  MEqq2W2ffPowheg & operator=(const MEqq2W2ffPowheg &) = delete;
 
 private:
   
@@ -373,37 +367,6 @@ private:
   mutable double _oldqbar;
   //@}
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEqq2W2ffPowheg. */
-template <>
-struct BaseClassTrait<Herwig::MEqq2W2ffPowheg,1> {
-  /** Typedef of the first base class of MEqq2W2ffPowheg. */
-  typedef Herwig::MEqq2W2ff NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEqq2W2ffPowheg class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEqq2W2ffPowheg>
-  : public ClassTraitsBase<Herwig::MEqq2W2ffPowheg> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEqq2W2ffPowheg"; }
-  /** Return the name(s) of the shared library (or libraries) be loaded to get
-   *  access to the MEqq2W2ffPowheg class and any other class on which it depends
-   *  (except the base class). */
-  static string library() { return "HwMEHadron.so HwPowhegMEHadron.so"; }
-};
-
-/** @endcond */
 
 }
 

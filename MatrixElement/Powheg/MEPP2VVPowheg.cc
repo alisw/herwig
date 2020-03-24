@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEPP2VVPowheg.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "MEPP2VVPowheg.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/Interface/Reference.h"
 #include "ThePEG/Interface/Parameter.h"
@@ -24,8 +25,6 @@
 #include "Herwig/Models/StandardModel/StandardModel.h"
 #include "Herwig/MatrixElement/HardVertex.h"
 #include "Herwig/Decay/GeneralDecayMatrixElement.h"
-#include "Herwig/Shower/Core/Base/ShowerProgenitor.h"
-#include "Herwig/Shower/Core/Base/Branching.h"
 #include "Herwig/Shower/RealEmissionProcess.h"
 
 using namespace Herwig;
@@ -68,8 +67,10 @@ void MEPP2VVPowheg::persistentInput(PersistentIStream & is, int) {
      >> iunit( min_pT_, GeV );
 }
 
-ClassDescription<MEPP2VVPowheg> MEPP2VVPowheg::initMEPP2VVPowheg;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEPP2VVPowheg,MEPP2VV>
+describeHerwigMEPP2VVPowheg("Herwig::MEPP2VVPowheg", "HwMEHadron.so HwPowhegMEHadron.so");
 
 void MEPP2VVPowheg::Init() {
 
@@ -3872,10 +3873,12 @@ RealEmissionProcessPtr MEPP2VVPowheg::generateHardest(RealEmissionProcessPtr bor
      (V1_->id()== 23&&abs(V2_->id())== 24) ) {
     swap(V1_,V2_);
     order = true;
-    swap(cmap[0],cmap[2]);
-    swap(cmap[1],cmap[3]);
-    swap(children_[0],children_[2]);
-    swap(children_[1],children_[3]);
+    if(born->bornOutgoing().size()==4) {
+      swap(cmap[0],cmap[2]);
+      swap(cmap[1],cmap[3]);
+      swap(children_[0],children_[2]);
+      swap(children_[1],children_[3]);
+    }
   }
   // *** N.B. ***
   // We should not have to do a swap in the ZZ case, even if the different
@@ -4377,7 +4380,7 @@ Energy2 MEPP2VVPowheg::t_u_M_R_qqb_hel_amp(realVVKinematics R, bool getMatrix) c
 	    // the (fermion) propagator denominator massless: 1/p^2.
 	    // If W+Z / W-Z calculate the two V+jet-like s-channel diagrams
 	      SpinorWaveFunction    p1_v1 = ffv1->evaluate(EWScale_,5,intermediate_t,q[p1hel],v1[k1hel]);
-	      SpinorBarWaveFunction p2_v2 = ffv2->evaluate(EWScale_,5,intermediate_t,qb[p2hel],v2[k2hel]);
+	      SpinorBarWaveFunction p2_v2 = ffv2->evaluate(EWScale_,5,intermediate_t->CC(),qb[p2hel],v2[k2hel]);
 	      // First calculate all the off-shell fermion currents
 	      // Now calculate the 6 t-channel diagrams
 	      // q+qb->g+v1+v2, q+qb->v1+g+v2, q+qb->v1+v2+g
@@ -4388,7 +4391,7 @@ Energy2 MEPP2VVPowheg::t_u_M_R_qqb_hel_amp(realVVKinematics R, bool getMatrix) c
 	      }
 	      intermediate_t = (!(k1data->id()==24&&k2data->id()==-24)) ? p1data : tc[ix];
 	      SpinorWaveFunction    p1_v2 = ffv2->evaluate(EWScale_,5,intermediate_t,q[p1hel],v2[k2hel]);
-	      SpinorBarWaveFunction p2_v1 = ffv1->evaluate(EWScale_,5,intermediate_t,qb[p2hel],v1[k1hel]);
+	      SpinorBarWaveFunction p2_v1 = ffv1->evaluate(EWScale_,5,intermediate_t->CC(),qb[p2hel],v1[k1hel]);
 	      // q+qb->g+v2+v1, q+qb->v2+g+v1, q+qb->v2+v1+g
 	      if(!((k1data->id()==24&&k2data->id()==-24)&&(abs(p1data->id())%2==0))) {
 		diagrams.push_back(ffv2->evaluate(EWScale_,p1_k,p2_v1,v2[k2hel]));
@@ -4577,7 +4580,7 @@ Energy2 MEPP2VVPowheg::t_u_M_R_qg_hel_amp(realVVKinematics R, bool getMatrix) co
 	    for(unsigned int ix=0;ix<tc.size();ix++) {
 	      intermediate_q = (!(k1data->id()==24&&k2data->id()==-24)) ? showerAntiquark_->dataPtr() : tc[ix];
 	      SpinorWaveFunction    p1_v1 = ffv1->evaluate(EWScale_,5,intermediate_q,qin[p1hel],v1[k1hel]);
-	      SpinorBarWaveFunction k_v2  = ffv2->evaluate(EWScale_,5,intermediate_q,qout[khel],v2[k2hel]);
+	      SpinorBarWaveFunction k_v2  = ffv2->evaluate(EWScale_,5,intermediate_q->CC(),qout[khel],v2[k2hel]);
 	      // First calculate all the off-shell fermion currents
 	      // Now calculate the 6 abelian diagrams
 	      // q+g->v1+v2+q with 2 t-channel propagators, 1 s- and 1 t-channel and 2 t-channel ones.
@@ -4588,7 +4591,7 @@ Energy2 MEPP2VVPowheg::t_u_M_R_qg_hel_amp(realVVKinematics R, bool getMatrix) co
 	      }
 	      intermediate_q = (!(k1data->id()==24&&k2data->id()==-24)) ? p1data : tc[ix];
 	      SpinorWaveFunction    p1_v2 = ffv2->evaluate(EWScale_,5,intermediate_q,qin[p1hel],v2[k2hel]);
-              SpinorBarWaveFunction k_v1  = ffv1->evaluate(EWScale_,5,intermediate_q,qout[khel],v1[k1hel]);
+              SpinorBarWaveFunction k_v1  = ffv1->evaluate(EWScale_,5,intermediate_q->CC(),qout[khel],v1[k1hel]);
 	      // q+g->v2+v1+q, with 2 t-channel propagators, 1 s- and 1 t-channel and 2 t-channel ones.
 	      if(!((k1data->id()==24&&k2data->id()==-24)&&(abs(p1data->id())%2==0))) {
 		diagrams.push_back(ffv1->evaluate(EWScale_,p1_v2,p2_k,v1[k1hel]));
@@ -4776,7 +4779,7 @@ Energy2 MEPP2VVPowheg::t_u_M_R_gqb_hel_amp(realVVKinematics R, bool getMatrix) c
 	    tcPDPtr intermediate_q;
 	    for(unsigned int ix=0;ix<tc.size();ix++) {
 	      intermediate_q = (!(k1data->id()==24&&k2data->id()==-24)) ? showerQuark_->dataPtr() : tc[ix];
-	      SpinorBarWaveFunction p2_v1 = ffv1->evaluate(EWScale_,5,intermediate_q,qbin[p2hel],v1[k1hel]);
+	      SpinorBarWaveFunction p2_v1 = ffv1->evaluate(EWScale_,5,intermediate_q->CC(),qbin[p2hel],v1[k1hel]);
 	      SpinorWaveFunction    k_v2  = ffv2->evaluate(EWScale_,5,intermediate_q,qbout[khel],v2[k2hel]);
 	      // First calculate all the off-shell fermion currents
 	      // Now calculate the 6 abelian diagrams q+g->v1+v2+q 
@@ -4788,7 +4791,7 @@ Energy2 MEPP2VVPowheg::t_u_M_R_gqb_hel_amp(realVVKinematics R, bool getMatrix) c
 		diagrams.push_back(ffv1->evaluate(EWScale_,k_v2,p1_p2,v1[k1hel]));
 	      }
 	      intermediate_q = (!(k1data->id()==24&&k2data->id()==-24)) ? p2data : tc[ix];
-	      SpinorBarWaveFunction p2_v2 = ffv2->evaluate(EWScale_,5,intermediate_q,qbin[p2hel],v2[k2hel]);
+	      SpinorBarWaveFunction p2_v2 = ffv2->evaluate(EWScale_,5,intermediate_q->CC(),qbin[p2hel],v2[k2hel]);
               SpinorWaveFunction    k_v1  = ffv1->evaluate(EWScale_,5,intermediate_q,qbout[khel],v1[k1hel]);
 	      // q+g->v2+v1+q, with 2 t-channel propagators, 1 s- and 1 t-channel and 2 t-channel ones.
 	      if(!((k1data->id()==24&&k2data->id()==-24)&&(abs(p2data->id())%2==1))) {

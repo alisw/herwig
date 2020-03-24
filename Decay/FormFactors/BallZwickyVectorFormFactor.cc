@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // BallZwickyVectorFormFactor.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "BallZwickyVectorFormFactor.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/ParVector.h"
 #include "ThePEG/Interface/Parameter.h"
@@ -247,8 +248,10 @@ void BallZwickyVectorFormFactor::persistentInput(PersistentIStream & is, int) {
      >> iunit(_T3mR2,GeV2) >> iunit(_T3mfit2,GeV2) >> iunit(_cutoff,GeV2);
 }
 
-ClassDescription<BallZwickyVectorFormFactor> BallZwickyVectorFormFactor::initBallZwickyVectorFormFactor;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<BallZwickyVectorFormFactor,ScalarFormFactor>
+describeHerwigBallZwickyVectorFormFactor("Herwig::BallZwickyVectorFormFactor", "HwFormFactors.so");
 
 void BallZwickyVectorFormFactor::Init() {
 
@@ -506,7 +509,7 @@ void BallZwickyVectorFormFactor::ScalarVectorSigmaFormFactor(Energy2 q2,
       T3 = _T3r1[mode]/(1.-q2/_T3mR2[mode])+_T3r2[mode]/(1.-q2/_T3mfit2[mode]);
     }
     // convert for T_3tilde to T_3
-    T3 = (m0*m0-m1*m1)/q2*(T3-T2);
+    T3 = Complex((m0*m0-m1*m1)/q2*(T3-T2));
   }
   else {
     InvEnergy2 smallT2,smallT3;

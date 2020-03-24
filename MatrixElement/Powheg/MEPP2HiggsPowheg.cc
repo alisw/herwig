@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEPP2HiggsPowheg.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "MEPP2HiggsPowheg.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/Switch.h"
@@ -32,8 +33,10 @@ MEPP2HiggsPowheg::MEPP2HiggsPowheg() :
   scaleopt_(1),  mu_F_(100.*GeV)    ,  mu_UV_(100.*GeV) , scaleFact_(1.) 
 {}
 
-ClassDescription<MEPP2HiggsPowheg> MEPP2HiggsPowheg::initMEPP2HiggsPowheg;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEPP2HiggsPowheg,MEPP2Higgs>
+describeHerwigMEPP2HiggsPowheg("Herwig::MEPP2HiggsPowheg", "HwMEHadron.so HwPowhegMEHadron.so");
 
 void MEPP2HiggsPowheg::persistentOutput(PersistentOStream & os) const {
   os << contrib_       << nlo_alphaS_opt_  << fixed_alphaS_ 

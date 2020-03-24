@@ -5,6 +5,7 @@
 //
 
 #include "SSGVNVVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 
 
@@ -18,6 +19,7 @@ SSGVNVVertex::SSGVNVVertex() : sw_(0.), cw_(0.), sb_(0.), cb_(0.),
 			       mz_(91.1876*GeV), MPlanck_(2.4e18*GeV) {
   orderInGem(1);
   orderInGs(0);
+  colourStructure(ColourStructure::SINGLET);
 }
 
 IBPtr SSGVNVVertex::clone() const {
@@ -36,8 +38,10 @@ void SSGVNVVertex::persistentInput(PersistentIStream & is, int) {
   is >> sw_ >> cw_ >> sb_ >> cb_ >> iunit(mz_,GeV) >> nmix_ >> iunit(MPlanck_,GeV);
 }
 
-ClassDescription<SSGVNVVertex> SSGVNVVertex::initSSGVNVVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<SSGVNVVertex,Helicity::RFVVertex>
+describeHerwigSSGVNVVertex("Herwig::SSGVNVVertex", "SSGVNVVertex.so");
 
 void SSGVNVVertex::Init() {
 
@@ -99,7 +103,7 @@ void SSGVNVVertex::setCoupling(Energy2 ,
     lV.push_back( coup[0]);
     lV.push_back(0.);
     rV=lV;
-    rV[0] = (-coup[0]*part2->mass()+mz_*coup[1])*UnitRemoval::InvE;
+    rV[0] = Complex((-coup[0]*part2->mass()+mz_*coup[1])*UnitRemoval::InvE);
     break;
   case ParticleID::g :
     lV.push_back(-double(part2->mass()*UnitRemoval::InvE));

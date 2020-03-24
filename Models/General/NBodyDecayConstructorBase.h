@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // NBodyDecayConstructorBase.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -171,7 +171,7 @@ protected:
   bool excluded(VertexBasePtr vertex) const {
     // skip an effective vertex
     if( excludeEffective_ &&
-	int(vertex->orderInGs() + vertex->orderInGem()) != int(vertex->getNpoint())-2)
+	vertex->orderInAllCouplings() != int(vertex->getNpoint())-2)
       return true;
     // check if explicitly forbidden
     return excludedVerticesSet_.find(vertex)!=excludedVerticesSet_.end();
@@ -218,17 +218,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is an abstract class with persistent data.
-   */
-  static AbstractClassDescription<NBodyDecayConstructorBase> 
-  initNBodyDecayConstructorBase;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  NBodyDecayConstructorBase & operator=(const NBodyDecayConstructorBase &);
+  NBodyDecayConstructorBase & operator=(const NBodyDecayConstructorBase &) = delete;
 
 private:
 

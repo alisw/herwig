@@ -5,6 +5,7 @@
 //
 
 #include "MEPP2WH.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/PDT/DecayMode.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/Switch.h"
@@ -20,8 +21,10 @@ using namespace Herwig;
 MEPP2WH::MEPP2WH() : _plusminus(0)
 {}
 
-ClassDescription<MEPP2WH> MEPP2WH::initMEPP2WH;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEPP2WH,MEfftoVH>
+describeHerwigMEPP2WH("Herwig::MEPP2WH", "HwMEHadron.so");
 
 void MEPP2WH::persistentOutput(PersistentOStream & os) const {
   os << _plusminus;
@@ -74,17 +77,21 @@ void MEPP2WH::getDiagrams() const {
 				   getParticleData(ParticleID::cbar)));
     parentpair.push_back(make_pair(getParticleData(ParticleID::b), 
 				   getParticleData(ParticleID::ubar)));
+    [[fallthrough]];
   case 4:
     parentpair.push_back(make_pair(getParticleData(ParticleID::s), 
 				   getParticleData(ParticleID::cbar)));
     parentpair.push_back(make_pair(getParticleData(ParticleID::d), 
 				   getParticleData(ParticleID::cbar)));
+    [[fallthrough]];
   case 3:
     parentpair.push_back(make_pair(getParticleData(ParticleID::s), 
 				   getParticleData(ParticleID::ubar)));
+    [[fallthrough]];
   case 2:
     parentpair.push_back(make_pair(getParticleData(ParticleID::d), 
 				   getParticleData(ParticleID::ubar)));
+    [[fallthrough]];
   default:
     ;
   }

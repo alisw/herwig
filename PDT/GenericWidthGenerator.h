@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // GenericWidthGenerator.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -310,7 +310,7 @@ private:
   /**
    * Private and non-existent assignment operator.
    */
-  GenericWidthGenerator & operator=(const GenericWidthGenerator &);
+  GenericWidthGenerator & operator=(const GenericWidthGenerator &) = delete;
 
 private:
 

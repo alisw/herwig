@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxPhasespace.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -198,6 +198,13 @@ public:
   void fillDiagramWeights(double flatCut = 0.0);
 
   /**
+   * Clear the diagram weights.
+   */
+  void clearDiagramWeights() {
+    diagramWeights().clear();
+  }
+
+  /**
    * Clone this phase space generator.
    */
   Ptr<MatchboxPhasespace>::ptr cloneMe() const {
@@ -350,7 +357,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MatchboxPhasespace & operator=(const MatchboxPhasespace &);
+  MatchboxPhasespace & operator=(const MatchboxPhasespace &) = delete;
 
 };
 

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // DipoleMatching.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -105,12 +105,20 @@ void DipoleMatching::persistentInput(PersistentIStream & is, int) {
 
 void DipoleMatching::doinit() {
   if ( theShowerHandler ) {
+    theShowerHandler->init();
     hardScaleFactor(theShowerHandler->hardScaleFactor());
     factorizationScaleFactor(theShowerHandler->factorizationScaleFactor());
     renormalizationScaleFactor(theShowerHandler->renormalizationScaleFactor());
     profileScales(theShowerHandler->profileScales());
     restrictPhasespace(theShowerHandler->restrictPhasespace());
     hardScaleIsMuF(theShowerHandler->hardScaleIsMuF());
+    if ( theShowerHandler->showerPhaseSpaceOption() == 0 ) {
+      useOpenZ(false);
+    } else if ( theShowerHandler->showerPhaseSpaceOption() == 1 ) {
+      useOpenZ(true);
+    } else {
+      throw InitException() << "DipoleMatching::doinit(): Choice of shower phase space cannot be handled by the matching";
+    }
   }
   // need to fo this after for consistency checks
   ShowerApproximation::doinit();

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxAmplitudelnuqqbarqqbar.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -22,6 +22,8 @@ MatchboxAmplitudelnuqqbarqqbar::~MatchboxAmplitudelnuqqbarqqbar() {}
 
 void MatchboxAmplitudelnuqqbarqqbar::doinit() {
   MatchboxAmplitude::doinit();
+  MZ = getParticleData(ParticleID::Z0)->hardProcessMass();
+  GZ = getParticleData(ParticleID::Z0)->hardProcessWidth();
   MW = getParticleData(ParticleID::Wplus)->hardProcessMass();
   GW = getParticleData(ParticleID::Wplus)->hardProcessWidth();
   CA = SM().Nc();
@@ -32,6 +34,12 @@ void MatchboxAmplitudelnuqqbarqqbar::doinit() {
 
 void MatchboxAmplitudelnuqqbarqqbar::doinitrun() {
   MatchboxAmplitude::doinitrun();
+  MZ = getParticleData(ParticleID::Z0)->hardProcessMass();
+  GZ = getParticleData(ParticleID::Z0)->hardProcessWidth();
+  MW = getParticleData(ParticleID::Wplus)->hardProcessMass();
+  GW = getParticleData(ParticleID::Wplus)->hardProcessWidth();
+  CA = SM().Nc();
+  CF = (SM().Nc()*SM().Nc()-1.)/(2.*SM().Nc());
   nPoints(6);
 }
 
@@ -236,11 +244,11 @@ Complex MatchboxAmplitudelnuqqbarqqbar::evaluate(size_t a, const vector<int>& he
 }
 
 void MatchboxAmplitudelnuqqbarqqbar::persistentOutput(PersistentOStream & os) const {
-  os << theDiagonal << theCKM << ounit(MW,GeV) << ounit(GW,GeV) << CA << CF;
+  os << theDiagonal << theCKM ;
 }
 
 void MatchboxAmplitudelnuqqbarqqbar::persistentInput(PersistentIStream & is, int) {
-  is >> theDiagonal >> theCKM >> iunit(MW,GeV) >> iunit(GW,GeV) >> CA >> CF;
+  is >> theDiagonal >> theCKM ;
 }
 
 DescribeClass<MatchboxAmplitudelnuqqbarqqbar,MatchboxAmplitude>

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SSGFSVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -24,6 +24,7 @@ SSGFSVertex::SSGFSVertex() :_q2last(0.*GeV2),_couplast(0.),
 			    _id1last(0), _id2last(0) {
   orderInGs(1);
   orderInGem(0);
+  colourStructure(ColourStructure::SU3TFUND);
 }
 
 void SSGFSVertex::persistentOutput(PersistentOStream & os) const {

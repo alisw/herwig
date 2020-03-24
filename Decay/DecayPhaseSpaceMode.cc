@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // DecayPhaseSpaceMode.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "DecayPhaseSpaceMode.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "Herwig/PDT/GenericWidthGenerator.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Parameter.h"
@@ -32,28 +33,25 @@ using namespace ThePEG::Helicity;
 void DecayPhaseSpaceMode::persistentOutput(PersistentOStream & os) const {
   os << _integrator << _channels << _channelwgts << _maxweight << _niter 
      << _npoint << _ntry << _extpart << _partial << _widthgen << _massgen
-     << _testOnShell;
+     << _testOnShell << ounit(_eps,GeV);
 }
 
 void DecayPhaseSpaceMode::persistentInput(PersistentIStream & is, int) {
   is >> _integrator >> _channels >> _channelwgts >> _maxweight >> _niter 
      >> _npoint >> _ntry >> _extpart >> _partial >> _widthgen >> _massgen
-     >> _testOnShell;
+     >> _testOnShell >> iunit(_eps,GeV);
 }
 
-ClassDescription<DecayPhaseSpaceMode> DecayPhaseSpaceMode::initDecayPhaseSpaceMode;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<DecayPhaseSpaceMode,Base>
+describeHerwigDecayPhaseSpaceMode("Herwig::DecayPhaseSpaceMode", "Herwig.so");
 
 void DecayPhaseSpaceMode::Init() {
 
   static ClassDocumentation<DecayPhaseSpaceMode> documentation
     ("The DecayPhaseSpaceMode class contains a number of phase space"
      " channels for the integration of a particular decay mode");
-
-  static RefVector<DecayPhaseSpaceMode,DecayPhaseSpaceChannel> interfaceChannels
-    ("Channels",
-     "The phase space integration channels.",
-     &DecayPhaseSpaceMode::_channels, 0, false, false, true, true);
  
 }
 
@@ -95,6 +93,7 @@ Energy DecayPhaseSpaceMode::flatPhaseSpace(bool cc, const Particle & inpart,
 
 // initialise the phase space
 Energy DecayPhaseSpaceMode::initializePhaseSpace(bool init, bool onShell) {
+  _integrator->ME(DecayMEPtr());
   Energy output(ZERO);
   // ensure that the weights add up to one
   if(!_channels.empty()) {
@@ -428,13 +427,12 @@ ostream & Herwig::operator<<(ostream & os, const DecayPhaseSpaceMode & decay) {
   return os;
 }
 
-void DecayPhaseSpaceMode::doinit() {
+void DecayPhaseSpaceMode::init() {
   // check the size of the weight vector is the same as the number of channels
   if(_channelwgts.size()!=numberChannels()) {
     throw Exception() << "Inconsistent number of channel weights and channels"
 		      << " in DecayPhaseSpaceMode " << Exception::abortnow;
   }
-  Interfaced::doinit();
   _massgen.resize(_extpart.size());
   _widthgen = dynamic_ptr_cast<cGenericWidthGeneratorPtr>(_extpart[0]->widthGenerator());
   for(unsigned int ix=0;ix<_extpart.size();++ix) {
@@ -444,9 +442,11 @@ void DecayPhaseSpaceMode::doinit() {
   for(unsigned int ix=0;ix<_channels.size();++ix) {
     _channels[ix]->init();
   }
+  // set the phase-space cut off
+  _eps = _integrator->epsilonPS();
 }
   
-void DecayPhaseSpaceMode::doinitrun() {
+void DecayPhaseSpaceMode::initrun() {
   // update the mass and width generators
   if(_extpart[0]->widthGenerator()!=_widthgen) {
     _widthgen= dynamic_ptr_cast<cGenericWidthGeneratorPtr>(_extpart[0]->widthGenerator());
@@ -470,7 +470,6 @@ void DecayPhaseSpaceMode::doinitrun() {
       dynamic_ptr_cast<tcGenericWidthGeneratorPtr>(_extpart[ix]->widthGenerator());
     if(wtemp) const_ptr_cast<tGenericWidthGeneratorPtr>(wtemp)->initrun();
   }
-  Interfaced::doinitrun();
 }
 
 // generate the masses of the external particles
@@ -497,14 +496,16 @@ vector<Energy> DecayPhaseSpaceMode::externalMasses(Energy inmass,double & wgt,
     }
   }
   if(mlow>inmass) {
-    CurrentGenerator::log() << "Decay mode " << _extpart[0]->PDGName() << " -> ";
-    for(unsigned int ix=1;ix<_extpart.size();++ix) {
-      CurrentGenerator::log() << _extpart[ix]->PDGName() << " ";
-    }
-    CurrentGenerator::log() << "is below threshold in DecayPhaseMode::externalMasses()"
-			    << "the threshold is " << mlow/GeV 
-			    << "GeV and the parent mass is " << inmass/GeV 
-			    << " GeV\n";
+    // if(_integrator->state()==runready) {
+    //   CurrentGenerator::log() << "Decay mode " << _extpart[0]->PDGName() << " -> ";
+    //   for(unsigned int ix=1;ix<_extpart.size();++ix) {
+    // 	CurrentGenerator::log() << _extpart[ix]->PDGName() << " ";
+    //   }
+    //   CurrentGenerator::log() << "is below threshold in DecayPhaseMode::externalMasses()"
+    // 			      << "the threshold is " << mlow/GeV
+    // 			      << "GeV and the parent mass is " << inmass/GeV
+    // 			      << " GeV\n";
+    // }
     throw Veto();
   }
   // now we need to generate the masses for the particles we haven't

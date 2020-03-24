@@ -5,6 +5,7 @@
 //
 
 #include "MEGammaGamma2ff.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -102,11 +103,11 @@ double MEGammaGamma2ff::helicityME(vector<VectorWaveFunction> &p1,
       for(unsigned int ohel1=0;ohel1<2;++ohel1) { 
 	for(unsigned int ohel2=0;ohel2<2;++ohel2) {
 	  //first t-channel diagram
-	  inters =vertex_->evaluate(mt,1,fbar[ohel2].particle(),
+	  inters =vertex_->evaluate(mt,1,fbar[ohel2].particle()->CC(),
 				    fbar[ohel2],p2[ihel2]);
 	  diag[0]=vertex_->evaluate(mt,inters,f[ohel1],p1[ihel1]);
 	  //second t-channel diagram
-	  inters =vertex_->evaluate(mt,1,fbar[ohel2].particle(),
+	  inters =vertex_->evaluate(mt,1,fbar[ohel2].particle()->CC(),
 				    fbar[ohel2],p1[ihel1]);
 	  diag[1]=vertex_->evaluate(mt,inters,f[ohel1],p2[ihel2]);
 	  sumdiag[0] += norm(diag[0]);
@@ -126,15 +127,15 @@ double MEGammaGamma2ff::helicityME(vector<VectorWaveFunction> &p1,
   meInfo(save);
   // colour factors if needed
   if(mePartonData()[2]->coloured()) output *= 3.;
-  // code to test vs the analytic result
-//   Energy2 m2 = sqr(f[0].particle()->mass());
-//   Energy2 tm = (p1[0].getMomentum()+f   [0].getMomentum()).m2()-m2;
-//   Energy2 um = (p1[0].getMomentum()+fbar[0].getMomentum()).m2()-m2;
-//   double test = 8.*um/tm+8.*tm/um- 32*m2/tm - 32*m2/um
-//     -32*sqr(double(m2/tm)) - 64*sqr(m2)/tm/um - 32*sqr(double(m2/um));
-//   test *= sqr(4.*Constants::pi*SM().alphaEM());
-//   if(mePartonData()[2]->coloured()) test *= 3.;
-//   cerr << "testing ME " << (output-test)/(output+test) << "\n"; 
+  // // code to test vs the analytic result
+  // Energy2 m2 = sqr(f[0].particle()->mass());
+  // Energy2 tm = (p1[0].momentum()+f   [0].momentum()).m2()-m2;
+  // Energy2 um = (p1[0].momentum()+fbar[0].momentum()).m2()-m2;
+  // double test = 8.*um/tm+8.*tm/um- 32*m2/tm - 32*m2/um
+  //   -32*sqr(double(m2/tm)) - 64*sqr(m2)/tm/um - 32*sqr(double(m2/um));
+  // test *= sqr(4.*Constants::pi*SM().alphaEM());
+  // if(mePartonData()[2]->coloured()) test *= 3.;
+  // cerr << "testing ME " << (output-test)/(output+test) << "\n"; 
   // spin factors
   return 0.25*output;
 }
@@ -166,8 +167,10 @@ void MEGammaGamma2ff::persistentInput(PersistentIStream & is, int) {
   is >> process_ >> vertex_;
 }
 
-ClassDescription<MEGammaGamma2ff> MEGammaGamma2ff::initMEGammaGamma2ff;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEGammaGamma2ff,HwMEBase>
+describeHerwigMEGammaGamma2ff("Herwig::MEGammaGamma2ff", "HwMEGammaGamma.so");
 
 void MEGammaGamma2ff::Init() {
 

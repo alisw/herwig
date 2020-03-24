@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEfv2vf.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -19,6 +19,7 @@
 #include "ThePEG/Helicity/WaveFunction/SpinorBarWaveFunction.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFVVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractVVVVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractFFVVVertex.h"
 
 namespace Herwig {
 using namespace ThePEG;
@@ -27,9 +28,9 @@ using namespace ThePEG;
  * This class implements the matrix element for a fermion and a vector
  * boson to a fermion and a vector boson. It inherits from GeneralHardME
  * and implements the appropriate virtual functions. 
+ * 
+ * @see GeneralHardME
  *
- * @see \ref MEfv2vfInterfaces "The interfaces"
- * defined for MEfv2vf.
  */
 class MEfv2vf: public GeneralHardME {
 
@@ -171,16 +172,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEfv2vf> initMEfv2vf;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEfv2vf & operator=(const MEfv2vf &);
+  MEfv2vf & operator=(const MEfv2vf &) = delete;
 
 private:
   
@@ -195,36 +190,14 @@ private:
    * A pair of FFVVertex, VVVertex pointers 
    */
   vector<pair<AbstractFFVVertexPtr, AbstractVVVVertexPtr> > vector_;
-    //@}
+
+  /**
+   *  Four point vertices
+   */
+  vector<AbstractFFVVVertexPtr> four_;
+  //@}
 
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEfv2vf. */
-template <>
-struct BaseClassTrait<Herwig::MEfv2vf,1> {
-  /** Typedef of the first base class of MEfv2vf. */
-  typedef Herwig::GeneralHardME NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEfv2vf class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEfv2vf>
-  : public ClassTraitsBase<Herwig::MEfv2vf> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEfv2vf"; }
-};
-
-/** @endcond */
 
 }
 

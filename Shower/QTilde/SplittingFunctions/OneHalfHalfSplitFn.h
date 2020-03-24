@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // OneHalfHalfSplitFn.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,7 +12,7 @@
 // This is the declaration of the OneHalfHalfSplitFn class.
 //
 
-#include "Herwig/Shower/Core/SplittingFunctions/SplittingFunction.h"
+#include "Herwig/Shower/QTilde/SplittingFunctions/SplittingFunction.h"
 
 namespace Herwig {
 
@@ -39,11 +39,6 @@ using namespace ThePEG;
 class OneHalfHalfSplitFn: public SplittingFunction {
 
 public:
-
-  /**
-   * The default constructor.
-   */
-  OneHalfHalfSplitFn() : SplittingFunction(1) {}
 
   /**
    *  Concrete implementation of the method to determine whether this splitting
@@ -184,7 +179,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  OneHalfHalfSplitFn & operator=(const OneHalfHalfSplitFn &);
+  OneHalfHalfSplitFn & operator=(const OneHalfHalfSplitFn &) = delete;
 
 };
 

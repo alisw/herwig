@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ScalarFormFactor.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -379,14 +379,9 @@ protected:
 private:
 
   /**
-   * Describe an abstract base class with persistent data.
-   */
-  static AbstractClassDescription<ScalarFormFactor> initScalarFormFactor;
-
-  /**
    * Private and non-existent assignment operator.
    */
-  ScalarFormFactor & operator=(const ScalarFormFactor &);
+  ScalarFormFactor & operator=(const ScalarFormFactor &) = delete;
 
   private:
 
@@ -426,37 +421,6 @@ private:
   unsigned int _numbermodes;
 
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/**
- * This template specialization informs ThePEG about the base class of
- * ScalarFormFactor.
- */
-template <>
- struct BaseClassTrait<Herwig::ScalarFormFactor,1> {
-  /** Typedef of the base class of ScalarFormFactor. */
-  typedef Interfaced NthBase;
-};
-
-/**
- * This template specialization informs ThePEG about the name of the
- * ScalarFormFactor class.
- */
-template <>
-struct ClassTraits<Herwig::ScalarFormFactor>
-  : public ClassTraitsBase<Herwig::ScalarFormFactor> {
-  /** Return the class name. */
-  static string className() { return "Herwig::ScalarFormFactor"; }
-};
-
-/** @endcond */
 
 }
 

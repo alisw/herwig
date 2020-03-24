@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxMEBase.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -47,9 +47,9 @@ MatchboxMEBase::MatchboxMEBase()
 
 MatchboxMEBase::~MatchboxMEBase() {}
 
-Ptr<MatchboxFactory>::tptr MatchboxMEBase::factory() const { return theFactory; }
-
-void MatchboxMEBase::factory(Ptr<MatchboxFactory>::tptr f) { theFactory = f; }
+Ptr<MatchboxFactory>::tptr MatchboxMEBase::factory() const {
+  return MatchboxFactory::currentFactory();
+}
 
 Ptr<Tree2toNGenerator>::tptr MatchboxMEBase::diagramGenerator() const { return factory()->diagramGenerator(); }
 
@@ -628,12 +628,29 @@ double MatchboxMEBase::finalStateSymmetry() const {
 
 double MatchboxMEBase::me2Norm(unsigned int addAlphaS) const {
 
-  // assume that we always have incoming
-  // spin-1/2 or massless spin-1 particles
-  double fac = 1./4.;
+  double fac = 1.;
 
-  if ( hasInitialAverage() )
-    fac = 1.;
+  if ( !hasInitialAverage() ) {
+    for ( size_t k = 0; k < 2; ++k ) {
+      // Spin 0 does not involve any additional factors
+      if ( mePartonData()[k]->iSpin() == PDT::Spin1Half )
+	fac *= 1./2.;
+      else if ( mePartonData()[k]->iSpin() == PDT::Spin1 &&
+		mePartonData()[k]->hardProcessMass() == ZERO )
+	fac *= 1./2.;
+      else if ( mePartonData()[k]->iSpin() == PDT::Spin1 &&
+		mePartonData()[k]->hardProcessMass() > ZERO )
+	fac *= 1./3.;
+      else if ( mePartonData()[k]->iSpin() == PDT::Spin3Half )
+	fac *= 1./4.;
+      else if ( mePartonData()[k]->iSpin() == PDT::Spin2 &&
+		mePartonData()[k]->hardProcessMass() == ZERO )
+	fac *= 1./2.;
+      else if ( mePartonData()[k]->iSpin() == PDT::Spin2 &&
+		mePartonData()[k]->hardProcessMass() > ZERO )
+	fac *= 1./5.;
+    }
+  }  
 
   double couplings = 1.0;
   if ( (orderInAlphaS() > 0 || addAlphaS != 0) && !hasRunningAlphaS() ) {
@@ -718,18 +735,34 @@ CrossSection MatchboxMEBase::dSigHatDR() const {
   if (theMerger){
     lastMECrossSection(theMerger->MergingDSigDR());
     return lastMECrossSection();
-  }else if (lastXCombPtr()->willPassCuts() ) {
-    lastMECrossSection(dSigHatDRB()+
-                       dSigHatDRV()+
-                       dSigHatDRI());
+  }
+  else if (lastXCombPtr()->willPassCuts() ) {
+	lastME2(me2());
+	CrossSection _dSigHatDRB, _dSigHatDRV, _dSigHatDRI, res = ZERO;
+	// ----- dSigHatDRB -----
+	_dSigHatDRB = oneLoopNoBorn()?ZERO:prefactor() * lastME2();
+	// ----- dSigHatDRV -----
+	_dSigHatDRV = ( oneLoop() && !oneLoopNoLoops() )?(prefactor() * oneLoopInterference()):ZERO;
+	// ----- dSigHatDRI -----
+    if  (oneLoop() &&!onlyOneLoop())  {
+    for ( auto const & v : virtuals()) {
+      v->setXComb(lastXCombPtr());
+      res += v->dSigHatDR();
+    }
+    if ( checkPoles() && oneLoop() )
+      logPoles();
+  }
+	_dSigHatDRI = res;
+	// ----- finalizing -----
+    lastMECrossSection(_dSigHatDRB + _dSigHatDRV + _dSigHatDRI);
     return lastMECrossSection();
   }
-
+  else
+  {
   lastME2(ZERO);
   lastMECrossSection(ZERO);
-
   return lastMECrossSection();
-
+  }
 }
 
 double MatchboxMEBase::oneLoopInterference() const {
@@ -1025,7 +1058,6 @@ MatchboxMEBase::getDipoles(const vector<SubtractionDipolePtr>& dipoles,
 	      continue;
 	    // now get to work
 	    d->clearBookkeeping();
-	    d->factory(factory());
 	    d->realEmitter(emitter);
 	    d->realEmission(emission);
 	    d->realSpectator(spectator);
@@ -1553,7 +1585,7 @@ StdXCombPtr MatchboxMEBase::makeXComb(tStdXCombPtr newHead,
 }
 
 void MatchboxMEBase::persistentOutput(PersistentOStream & os) const {
-  os << theLastXComb << theFactory << thePhasespace 
+  os << theLastXComb << thePhasespace 
      << theAmplitude << theScaleChoice << theVirtuals 
      << theReweights << theSubprocess << theOneLoop 
      << theOneLoopNoBorn << theOneLoopNoLoops
@@ -1564,7 +1596,7 @@ void MatchboxMEBase::persistentOutput(PersistentOStream & os) const {
 }
 
 void MatchboxMEBase::persistentInput(PersistentIStream & is, int) {
-  is >> theLastXComb >> theFactory >> thePhasespace 
+  is >> theLastXComb >> thePhasespace 
      >> theAmplitude >> theScaleChoice >> theVirtuals 
      >> theReweights >> theSubprocess >> theOneLoop 
      >> theOneLoopNoBorn >> theOneLoopNoLoops

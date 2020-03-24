@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEvv2vv.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -149,16 +149,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEvv2vv> initMEvv2vv;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEvv2vv & operator=(const MEvv2vv &);
+  MEvv2vv & operator=(const MEvv2vv &) = delete;
 
 private:
 
@@ -180,36 +174,14 @@ private:
   /**
    * Store the dynamically casted VVVVVertex pointer
    */
-  AbstractVVVVVertexPtr fourPointVertex_;
+  vector<AbstractVVVVVertexPtr> four_;
+
+  /**
+   *   Four points for colour flows
+   */
+  map<unsigned int,vector<pair<unsigned int,double> > > fourFlow_;
   
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEvv2vv. */
-template <>
-struct BaseClassTrait<Herwig::MEvv2vv,1> {
-  /** Typedef of the first base class of MEvv2vv. */
-  typedef Herwig::GeneralHardME NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEvv2vv class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEvv2vv>
-  : public ClassTraitsBase<Herwig::MEvv2vv> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEvv2vv"; }
-};
-
-/** @endcond */
 
 }
 

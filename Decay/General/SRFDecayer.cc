@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SRFDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "SRFDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -33,22 +34,30 @@ IBPtr SRFDecayer::fullclone() const {
   return new_ptr(*this);
 }
 
-void SRFDecayer::doinit() {
-  perturbativeVertex_ = dynamic_ptr_cast<RFSVertexPtr>        (getVertex());
-  abstractVertex_     = dynamic_ptr_cast<AbstractRFSVertexPtr>(getVertex());
-  GeneralTwoBodyDecayer::doinit();
+void SRFDecayer::setDecayInfo(PDPtr incoming, PDPair outgoing,
+			      vector<VertexBasePtr> vertex,
+			      map<ShowerInteraction,VertexBasePtr> &,
+			      const vector<map<ShowerInteraction,VertexBasePtr> > &,
+			      map<ShowerInteraction,VertexBasePtr>) {
+  decayInfo(incoming,outgoing);
+  for(auto vert : vertex) {
+    vertex_             .push_back(dynamic_ptr_cast<AbstractRFSVertexPtr>(vert));
+    perturbativeVertex_ .push_back(dynamic_ptr_cast<RFSVertexPtr>        (vert));
+  }
 }
 
 void SRFDecayer::persistentOutput(PersistentOStream & os) const {
-  os << abstractVertex_ << perturbativeVertex_;
+  os << vertex_ << perturbativeVertex_;
 }
 
 void SRFDecayer::persistentInput(PersistentIStream & is, int) {
-  is >> abstractVertex_ >> perturbativeVertex_;
+  is >> vertex_ >> perturbativeVertex_;
 }
 
-ClassDescription<SRFDecayer> SRFDecayer::initSRFDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<SRFDecayer,GeneralTwoBodyDecayer>
+describeHerwigSRFDecayer("Herwig::SRFDecayer", "Herwig.so");
 
 void SRFDecayer::Init() {
 
@@ -73,6 +82,8 @@ double SRFDecayer::me2(const int , const Particle & inpart,
     ScalarWaveFunction::
       calculateWaveFunctions(rho_,const_ptr_cast<tPPtr>(&inpart),incoming);
     swave_ = ScalarWaveFunction(inpart.momentum(),inpart.dataPtr(),incoming);
+    // fix rho if no correlations
+    fixRho(rho_);
   }
   if(meopt==Terminate) {
     ScalarWaveFunction::
@@ -107,20 +118,32 @@ double SRFDecayer::me2(const int , const Particle & inpart,
   for(unsigned int ifm = 0; ifm < 4; ++ifm){
     for(unsigned int ia = 0; ia < 2; ++ia) {
       if(irs==0) {
-	if(ferm)
-	  (*ME())(0, ifm, ia) = abstractVertex_->evaluate(scale,wave_[ia],
-						       RSwavebar_[ifm],swave_);
-	else
-	  (*ME())(0, ifm, ia) = abstractVertex_->evaluate(scale,RSwave_[ifm],
-						       wavebar_[ia],swave_);
+	if(ferm) {
+	  (*ME())(0, ifm, ia) = 0.;
+	  for(auto vert : vertex_)
+	    (*ME())(0, ifm, ia) += vert->evaluate(scale,wave_[ia],
+						  RSwavebar_[ifm],swave_);
+	}
+	else {
+	  (*ME())(0, ifm, ia) = 0.;
+	  for(auto vert : vertex_)
+	    (*ME())(0, ifm, ia) += vert->evaluate(scale,RSwave_[ifm],
+						  wavebar_[ia],swave_);
+	}
       }
       else {
-	if(ferm)
-	  (*ME())(0, ia, ifm) = abstractVertex_->evaluate(scale,wave_[ia],
-						       RSwavebar_[ifm],swave_);
-	else
-	  (*ME())(0, ia, ifm) = abstractVertex_->evaluate(scale,RSwave_[ifm],
-						       wavebar_[ia],swave_);
+	if(ferm) {
+	  (*ME())(0, ia, ifm) = 0.;
+	  for(auto vert : vertex_)
+	    (*ME())(0, ia, ifm) += vert->evaluate(scale,wave_[ia],
+						  RSwavebar_[ifm],swave_);
+	}
+	else {
+	  (*ME())(0, ia, ifm) = 0.;
+	  for(auto vert : vertex_)
+	    (*ME())(0, ia, ifm) += vert->evaluate(scale,RSwave_[ifm],
+						  wavebar_[ia],swave_);
+	}
       }
     }
   }
@@ -135,22 +158,23 @@ double SRFDecayer::me2(const int , const Particle & inpart,
 Energy SRFDecayer::partialWidth(PMPair inpart, PMPair outa, 
 				PMPair outb) const {
   if( inpart.second < outa.second + outb.second  ) return ZERO;
-  if(perturbativeVertex_) {
+  if(perturbativeVertex_.size()==1 &&
+     perturbativeVertex_[0]) {
     Energy q = inpart.second;
     Energy m1 = outa.second, m2 = outb.second;
     // couplings
     tcPDPtr in = inpart.first->CC() ? tcPDPtr(inpart.first->CC()) : inpart.first;
     if(outa.first->iSpin()==PDT::Spin1Half) {
       swap(m1,m2);
-      perturbativeVertex_->setCoupling(sqr(inpart.second),outb.first,
+      perturbativeVertex_[0]->setCoupling(sqr(inpart.second),outb.first,
 				       outa.first, in);
     }
     else {
-      perturbativeVertex_->setCoupling(sqr(inpart.second),outa.first,
+      perturbativeVertex_[0]->setCoupling(sqr(inpart.second),outa.first,
 				       outb.first, in);
     }
-    Complex left  = perturbativeVertex_-> left()*perturbativeVertex_-> norm();
-    Complex right = perturbativeVertex_->right()*perturbativeVertex_-> norm();
+    Complex left  = perturbativeVertex_[0]-> left()*perturbativeVertex_[0]-> norm();
+    Complex right = perturbativeVertex_[0]->right()*perturbativeVertex_[0]-> norm();
     complex<InvEnergy> A1 = 0.5*(left+right)*UnitRemoval::InvE;
     complex<InvEnergy> B1 = 0.5*(right-left)*UnitRemoval::InvE;
     Energy2 q2(q*q),m12(m1*m1),m22(m2*m2);

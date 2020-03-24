@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEPP2GammaJet.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "MEPP2GammaJet.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
@@ -125,8 +126,10 @@ void MEPP2GammaJet::persistentInput(PersistentIStream & is, int) {
   is >> _gluonvertex >> _photonvertex >> _maxflavour >> _processopt >> scalePreFactor_;
 }
 
-ClassDescription<MEPP2GammaJet> MEPP2GammaJet::initMEPP2GammaJet;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEPP2GammaJet,HwMEBase>
+describeHerwigMEPP2GammaJet("Herwig::MEPP2GammaJet", "HwMEHadron.so");
 
 void MEPP2GammaJet::Init() {
 

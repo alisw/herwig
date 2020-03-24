@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ShowerVeto.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -14,10 +14,10 @@
 
 #include "ThePEG/Interface/Interfaced.h"
 #include "ShowerVeto.fh"
-#include "Herwig/Shower/Core/ShowerConfig.h"
-#include "Herwig/Shower/Core/Base/ShowerParticle.fh"
-#include "Herwig/Shower/Core/Base/ShowerProgenitor.fh"
-#include "Herwig/Shower/Core/Base/ShowerTree.fh"
+#include "Herwig/Shower/QTilde/ShowerConfig.h"
+#include "Herwig/Shower/QTilde/Base/ShowerParticle.fh"
+#include "Herwig/Shower/QTilde/Base/ShowerProgenitor.fh"
+#include "Herwig/Shower/QTilde/Base/ShowerTree.fh"
 
 namespace Herwig {
 
@@ -123,7 +123,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  ShowerVeto & operator=(const ShowerVeto &);
+  ShowerVeto & operator=(const ShowerVeto &) = delete;
 
 private:
 

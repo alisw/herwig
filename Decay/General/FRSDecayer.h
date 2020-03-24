@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // FRSDecayer.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -59,6 +59,15 @@ public:
    */
   virtual Energy partialWidth(PMPair inpart, PMPair outa, 
 			      PMPair outb) const;
+
+  /**
+   *  Set the information on the decay
+   */
+  virtual void setDecayInfo(PDPtr incoming, PDPair outgoing,
+			    vector<VertexBasePtr>,
+			    map<ShowerInteraction,VertexBasePtr> &,
+			    const vector<map<ShowerInteraction,VertexBasePtr> > &,
+			    map<ShowerInteraction,VertexBasePtr>);
   //@}
 
 public:
@@ -104,43 +113,25 @@ protected:
   virtual IBPtr fullclone() const;
   //@}
 
-protected:
-
-  /** @name Standard Interfaced functions. */
-  //@{
-   /**
-   * Initialize this object after the setup phase before saving and
-   * EventGenerator to disk.
-   * @throws InitException if object could not be initialized properly.
-   */
-  virtual void doinit();
-  //@}
-
 private:
-
-  /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<FRSDecayer> initFRSDecayer;
 
   /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  FRSDecayer & operator=(const FRSDecayer &);
+  FRSDecayer & operator=(const FRSDecayer &) = delete;
 
 private:
 
   /**
    *  Abstract pointer to AbstractFRSVertex
    */
-  AbstractRFSVertexPtr abstractVertex_;
+  vector<AbstractRFSVertexPtr> vertex_;
 
   /**
    * Pointer to the perturbative vertex
    */
-  RFSVertexPtr perturbativeVertex_;
+  vector<RFSVertexPtr> perturbativeVertex_;
 
   /**
    *  Spin density matrix
@@ -169,33 +160,5 @@ private:
 };
 
 }
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of FRSDecayer. */
-template <>
-struct BaseClassTrait<Herwig::FRSDecayer,1> {
-  /** Typedef of the first base class of FRSDecayer. */
-  typedef Herwig::GeneralTwoBodyDecayer NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the FRSDecayer class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::FRSDecayer>
-  : public ClassTraitsBase<Herwig::FRSDecayer> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::FRSDecayer"; }
-};
-
-/** @endcond */
-
-}
-
 
 #endif /* HERWIG_FRSDecayer_H */

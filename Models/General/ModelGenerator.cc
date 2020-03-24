@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ModelGenerator.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -270,7 +270,6 @@ void ModelGenerator::doinit() {
     ofs.open(filename.c_str());
   }
 
-
   if(decayOutput_!=0) {
     if(decayOutput_==1) {
       os << "# The decay modes listed below will have spin\n"
@@ -296,6 +295,18 @@ void ModelGenerator::doinit() {
     // mass-shell
     checkDecays(parent);
     parent->reset();
+    // Now switch off the modes if needed
+    for(DecaySet::const_iterator it=parent->decayModes().begin();
+	it!=parent->decayModes().end();++it) {
+      if( _theDecayConstructor->disableDecayMode((**it).tag()) ) {
+	DMPtr mode = *it;
+	generator()->preinitInterface(mode, "Active", "set", "No");
+	if(mode->CC()) {
+	  DMPtr CCmode = mode->CC();
+	  generator()->preinitInterface(CCmode, "Active", "set", "No");
+	}
+      }
+    }
     parent->update();
     if( parent->CC() ) parent->CC()->synchronize();
     if( parent->decaySelector().empty() ) {
@@ -321,14 +332,15 @@ void ModelGenerator::doinit() {
       }
 
     }
-
+    // set the offshellness 
+    Energy minMass = minimumMass(parent);
+    Energy offShellNess = howOffShell_*parent->width();
+    if(minMass>parent->mass()-offShellNess) {
+      offShellNess = parent->mass()-minMass;
+    }
+    parent->widthCut(offShellNess);
+    
     if( parent->massGenerator() ) {
-      Energy minMass = minimumMass(parent);
-      Energy offShellNess = howOffShell_*parent->width();
-      if(minMass>parent->mass()-offShellNess) {
-	offShellNess = parent->mass()-minMass;
-      }
-      parent->widthCut(offShellNess);
 
       parent->massGenerator()->reset();
       if(decayOutput_==1)
@@ -345,12 +357,6 @@ void ModelGenerator::doinit() {
       parent->widthGenerator()->init();
     if(parent->massGenerator())
       parent->massGenerator()->init();
-    // Now switch off the modes if needed
-    for(DecaySet::const_iterator it=parent->decayModes().begin();
-	it!=parent->decayModes().end();++it) {
-      if( _theDecayConstructor->disableDecayMode((**it).tag()) )
-	generator()->preinitInterface(*it, "Active", "set", "No");
-    }
     // output the modes if needed
     if( !parent->decaySelector().empty() ) {
       if ( decayOutput_ == 2 )
@@ -445,7 +451,7 @@ void ModelGenerator::checkDecays(PDPtr parent) {
 
 namespace {
   struct DecayModeOrdering {
-    bool operator()(tcDMPtr m1, tcDMPtr m2) {
+    bool operator()(tcDMPtr m1, tcDMPtr m2) const {
       if(m1->brat()!=m2->brat()) {
 	return m1->brat()>m2->brat();
       }

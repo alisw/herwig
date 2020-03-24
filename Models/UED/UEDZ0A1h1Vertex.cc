@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // UEDZ0A1h1Vertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "UEDZ0A1h1Vertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -24,6 +25,7 @@ UEDZ0A1h1Vertex::UEDZ0A1h1Vertex() : theSin2ThetaW(0.), theKappa(0.),
 				     theq2Last(ZERO), theCoupLast(0.) {
   orderInGs(0);
   orderInGem(1);
+  colourStructure(ColourStructure::SINGLET);
 }
 
 void UEDZ0A1h1Vertex::doinit() {
@@ -50,8 +52,10 @@ void UEDZ0A1h1Vertex::persistentInput(PersistentIStream & is, int) {
   is >> theSin2ThetaW >> theKappa;
 }
 
-ClassDescription<UEDZ0A1h1Vertex> UEDZ0A1h1Vertex::initUEDZ0A1h1Vertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<UEDZ0A1h1Vertex,VSSVertex>
+describeHerwigUEDZ0A1h1Vertex("Herwig::UEDZ0A1h1Vertex", "HwUED.so");
 
 void UEDZ0A1h1Vertex::Init() {
 

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEvv2ss.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -151,16 +151,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEvv2ss> initMEvv2ss;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEvv2ss & operator=(const MEvv2ss &);
+  MEvv2ss & operator=(const MEvv2ss &) = delete;
 
 private:
 
@@ -194,38 +188,11 @@ private:
   /**
    * The contact vertex 
    */
-  AbstractVVSSVertexPtr contact_;
+  vector<AbstractVVSSVertexPtr> contact_;
   //@}
   
   
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEvv2ss. */
-template <>
-struct BaseClassTrait<Herwig::MEvv2ss,1> {
-  /** Typedef of the first base class of MEvv2ss. */
-  typedef Herwig::GeneralHardME NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEvv2ss class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEvv2ss>
-  : public ClassTraitsBase<Herwig::MEvv2ss> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEvv2ss"; }
-};
-
-/** @endcond */
 
 }
 

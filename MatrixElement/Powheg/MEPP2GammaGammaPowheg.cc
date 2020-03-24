@@ -152,7 +152,7 @@ bool MEPP2GammaGammaPowheg::generateKinematics(const double * r) {
     q = SimplePhaseSpace::
       getMagnitude(shat, meMomenta()[2].mass(), ZERO);
   } 
-  catch ( ImpossibleKinematics ) {
+  catch ( ImpossibleKinematics & e ) {
     return false;
   }
   Energy e = 0.5*sqrt(shat);
@@ -422,8 +422,10 @@ double MEPP2GammaGammaPowheg::me2() const {
       return 2.*Constants::twopi*alphaS_*
 	loGammaqbarME(mePartonData(),meMomenta(),true);
     }
-    else
+    else {
       assert(false);
+      return 0.;
+    }
   }
   // hard emission configurations
   else {
@@ -433,8 +435,10 @@ double MEPP2GammaGammaPowheg::me2() const {
       return sHat()*realGammaGammaqME   (mePartonData(),meMomenta(),dipole_,Hard,true);
     else if(mePartonData()[4]->id()<0&&mePartonData()[4]->id()>-6)
       return sHat()*realGammaGammaqbarME(mePartonData(),meMomenta(),dipole_,Hard,true);
-    else
+    else {
       assert(false);
+      return 0.;
+    }
   }
 }
 
@@ -905,10 +909,10 @@ double MEPP2GammaGammaPowheg::loGammaGammaME(const cPDVector & particles,
       for(unsigned int ihel2=0;ihel2<2;++ihel2) {
 	for(unsigned int ohel1=0;ohel1<2;++ohel1) {
 	  for(unsigned int ohel2=0;ohel2<2;++ohel2) {
-	    inter   = FFPvertex_->evaluate(ZERO,5,f1[ihel1].particle(),
+	    inter   = FFPvertex_->evaluate(ZERO,5,f1[ihel1].particle()->CC(),
 					   f1[ihel1],v1[ohel1]);
 	    diag[0] = FFPvertex_->evaluate(ZERO,inter,a1[ihel2],v2[ohel2]);
-	    inter   = FFPvertex_->evaluate(ZERO,5,f1[ihel1].particle(),
+	    inter   = FFPvertex_->evaluate(ZERO,5,f1[ihel1].particle()->CC(),
 					   f1[ihel1] ,v2[ohel2]);
 	    diag[1] = FFPvertex_->evaluate(ZERO,inter,a1[ihel2],v1[ohel1]);
 	    // individual diagrams
@@ -977,7 +981,7 @@ double MEPP2GammaGammaPowheg::loGammaqME(const cPDVector & particles,
       for(unsigned int ihel2=0;ihel2<2;++ihel2) {
 	for(unsigned int ohel1=0;ohel1<2;++ohel1) {
 	  // intermediates for the diagrams
-	  interb= FFGvertex_->evaluate(scale(),5,particles[3],
+	  interb= FFGvertex_->evaluate(scale(),5,particles[3]->CC(),
 				       fout[ohel1],gin[ihel2]);
 	  inters= FFGvertex_->evaluate(scale(),5,particles[0],
 				       fin[ihel1],gin[ihel2]);
@@ -1057,7 +1061,7 @@ double MEPP2GammaGammaPowheg::loGammaqbarME(const cPDVector & particles,
       for(unsigned int ihel2=0;ihel2<2;++ihel2) {
 	for(unsigned int ohel1=0;ohel1<2;++ohel1) {
 	  // intermediates for the diagrams
-	  inters= FFGvertex_->evaluate(scale(),5,particles[3],
+	  inters= FFGvertex_->evaluate(scale(),5,particles[3]->CC(),
 				       aout[ohel1],gin[ihel1]);
 	  interb= FFGvertex_->evaluate(scale(),5,particles[1],
 				       ain[ihel2],gin[ihel1]);
@@ -1440,30 +1444,30 @@ realME(const cPDVector & particles,
 	  for(unsigned int ghel=0;ghel<2;++ghel) {
 	    // first diagram
 	    SpinorWaveFunction inters1 = 
-	      FFPvertex_->evaluate(ZERO,5,qin[ihel1].particle(),qin[ihel1],pout[phel]);
+	      FFPvertex_->evaluate(ZERO,5,qin[ihel1].particle()->CC(),qin[ihel1],pout[phel]);
 	    SpinorBarWaveFunction inters2 = 
-	      FFPvertex_->evaluate(ZERO,5,qin[ihel1].particle()->CC(),
+	      FFPvertex_->evaluate(ZERO,5,qin[ihel1].particle(),
 			       qbarin[ihel2],wout[whel]);
 	    diag[0] = FFGvertex_->evaluate(mu2,inters1,inters2,gout[ghel]);
 	    // second diagram
 	    SpinorWaveFunction inters3 = 
-	      FFGvertex_->evaluate(mu2,5,qin[ihel1].particle(),qin[ihel1],gout[ghel]);
+	      FFGvertex_->evaluate(mu2,5,qin[ihel1].particle()->CC(),qin[ihel1],gout[ghel]);
 	    SpinorBarWaveFunction inters4 = 
-	      FFPvertex_->evaluate(ZERO,5,qbarin[ihel2].particle(),
+	      FFPvertex_->evaluate(ZERO,5,qbarin[ihel2].particle()->CC(),
 				   qbarin[ihel2],pout[phel]);
 	    diag[1] = FFPvertex_->evaluate(ZERO,inters3,inters4,wout[whel]);
 	    // fourth diagram
 	    diag[2] = FFPvertex_->evaluate(ZERO,inters3,inters2,pout[phel]);
 	    // fifth diagram
 	    SpinorBarWaveFunction inters5 = 
-	      FFGvertex_->evaluate(mu2,5,qbarin[ihel2].particle(),
+	      FFGvertex_->evaluate(mu2,5,qbarin[ihel2].particle()->CC(),
 				   qbarin[ihel2],gout[ghel]);
 	    diag[3] = 
 	      FFPvertex_->evaluate(ZERO,inters1,inters5,wout[whel]);
 	    // sixth diagram
 	    SpinorWaveFunction inters6 = 
-	      FFPvertex_->evaluate(ZERO,5,qbarin[ihel2].particle()->CC(),
-			       qin[ihel1],wout[whel]);
+	      FFPvertex_->evaluate(ZERO,5,qbarin[ihel2].particle(),
+				   qin[ihel1],wout[whel]);
 	    diag[4] = FFGvertex_->evaluate(mu2,inters6,inters4,gout[ghel]);
 	    // eighth diagram
 	    diag[5] = FFPvertex_->evaluate(ZERO,inters6,inters5,pout[phel]);

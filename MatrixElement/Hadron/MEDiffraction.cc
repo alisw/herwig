@@ -5,11 +5,13 @@
 //
 
 #include "MEDiffraction.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
+#include "ThePEG/Interface/Reference.h"
 #include "ThePEG/Utilities/SimplePhaseSpace.h"
 #include "ThePEG/Repository/EventGenerator.h"
 #include "ThePEG/Handlers/StandardXComb.h"
-
+#include "ThePEG/Handlers/SamplerBase.h"
 
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -214,12 +216,12 @@ bool MEDiffraction::generateKinematics(const double * ) {
   
   Energy2 Mx2;
   switch(diffDirection){
-    case 0:
-      Mx2=M12;
-      break;
-    case 1: 
-      Mx2=M22;
-      break;
+  case 0:
+    Mx2=M12;
+    break;
+  case 1: 
+    Mx2=M22;
+    break;
   }
    
     
@@ -233,230 +235,192 @@ bool MEDiffraction::generateKinematics(const double * ) {
   double frac = UseRandom::rnd();
   
   switch(dissociationDecay){
-    case 0:
-      if(!deltaOnly)
-      {
-    
-        pair<Lorentz5Momentum,Lorentz5Momentum> decayMomenta;
-        pair<Lorentz5Momentum,Lorentz5Momentum> decayMomentaTwo;
-        const double phiprime = phi;
+  case 0:
+    if(!deltaOnly) {
+      pair<Lorentz5Momentum,Lorentz5Momentum> decayMomenta;
+      pair<Lorentz5Momentum,Lorentz5Momentum> decayMomentaTwo;	
+      //absolute collinear dissociation of the hadron 
+      const double phiprime = phi; 
+      //aligned with outgoing dissociated proton
+      const double costhetaprime = costheta;
+      
+      const double sinthetaprime=sqrt(1-sqr(costhetaprime));
+      //axis along which diquark from associated proton is aligned
+      Axis dir = Axis(sinthetaprime*cos(phiprime), sinthetaprime*sin(phiprime), costhetaprime);
+      
+      switch (diffDirection){
+      case 0://Left single diffraction
+	meMomenta()[4].setT(sqrt(mq2+sqr(meMomenta()[4].x())+sqr(meMomenta()[4].y())+sqr(meMomenta()[4].z())));
+	////////////////////////////////////////////////////
         
-        //aligned with outgoing dissociated proton
-        const double costhetaprime = costheta;
+	do{}
+	while(!Kinematics::twoBodyDecay(p3,mqq(),mq(),-dir,decayMomenta.first,decayMomenta.second));
+	///////////
         
-        const double sinthetaprime=sqrt(1-sqr(costhetaprime));
-        //axis along which diquark from associated proton is aligned
-         Axis dir = Axis(sinthetaprime*cos(phiprime), sinthetaprime*sin(phiprime), costhetaprime);
+	meMomenta()[2] = p4;
+	meMomenta()[3] = decayMomenta. first;
+	meMomenta()[4] = decayMomenta.second;
+	break;
+      case 1://Right single diffraction
+	meMomenta()[4].setT(sqrt(mq2+sqr(meMomenta()[4].x())+sqr(meMomenta()[4].y())+sqr(meMomenta()[4].z())));
+	////////////////////////////////////////////////////
         
-        switch (diffDirection){
-            case 0://Left single diffraction
-              meMomenta()[4].setT(sqrt(mq2+sqr(meMomenta()[4].x())+sqr(meMomenta()[4].y())+sqr(meMomenta()[4].z())));
-              ////////////////////////////////////////////////////
-              
-              do{}
-              while(!Kinematics::twoBodyDecay(p3,mqq(),mq(),-dir,decayMomenta.first,decayMomenta.second));
-              ///////////
-              
-              meMomenta()[2].setVect(p4.vect());
-              meMomenta()[2].setT(p4.t());
+	do{}
+	while(!Kinematics::twoBodyDecay(p4,mqq(),mq(),dir,decayMomenta.first,decayMomenta.second));
         
-              meMomenta()[3].setVect(decayMomenta.first.vect());
-              meMomenta()[3].setT(decayMomenta.first.t());
-              meMomenta()[4].setVect(decayMomenta.second.vect());
-              meMomenta()[4].setT(decayMomenta.second.t());
+	meMomenta()[2] = p3;
+	meMomenta()[3] = decayMomenta. first;
+	meMomenta()[4] = decayMomenta.second; 
+	break;
+      case 2://double diffraction
+	
+	do{}
+	while(!Kinematics::twoBodyDecay(p3,mqq(),mq(),-dir,decayMomenta.first,decayMomenta.second));
         
-              meMomenta()[2].rescaleEnergy();
-              meMomenta()[3].rescaleEnergy();
-              meMomenta()[4].rescaleEnergy(); 
-              break;
-            case 1://Right single diffraction
-              meMomenta()[4].setT(sqrt(mq2+sqr(meMomenta()[4].x())+sqr(meMomenta()[4].y())+sqr(meMomenta()[4].z())));
-              ////////////////////////////////////////////////////
-              
-              do{}
-              while(!Kinematics::twoBodyDecay(p4,mqq(),mq(),dir,decayMomenta.first,decayMomenta.second));
-              
-              meMomenta()[2].setVect(p3.vect());
-              meMomenta()[2].setT(p3.t());
+	do{}
+	while(!Kinematics::twoBodyDecay(p4,mqq(),mq(),dir,decayMomentaTwo.first,decayMomentaTwo.second));
         
-              meMomenta()[3].setVect(decayMomenta.first.vect());
-              meMomenta()[3].setT(decayMomenta.first.t());
-              meMomenta()[4].setVect(decayMomenta.second.vect());
-              meMomenta()[4].setT(decayMomenta.second.t());
-        
-              meMomenta()[2].rescaleEnergy();
-              meMomenta()[3].rescaleEnergy();
-              meMomenta()[4].rescaleEnergy(); 
-                break;
-            case 2://double diffraction
-              
-              do{}
-              while(!Kinematics::twoBodyDecay(p3,mqq(),mq(),-dir,decayMomenta.first,decayMomenta.second));
-              
-              do{}
-              while(!Kinematics::twoBodyDecay(p4,mqq(),mq(),dir,decayMomentaTwo.first,decayMomentaTwo.second));
-              
-              meMomenta()[2].setVect(decayMomenta.first.vect());
-              meMomenta()[2].setT(decayMomenta.first.t());
-              meMomenta()[3].setVect(decayMomenta.second.vect());
-              meMomenta()[3].setT(decayMomenta.second.t());
-              
-              meMomenta()[4].setVect(decayMomentaTwo.second.vect());
-              meMomenta()[4].setT(decayMomentaTwo.second.t());
-              meMomenta()[5].setVect(decayMomentaTwo.first.vect());
-              meMomenta()[5].setT(decayMomentaTwo.first.t());
-              
-              
-              meMomenta()[2].rescaleEnergy();
-              meMomenta()[3].rescaleEnergy();
-              meMomenta()[4].rescaleEnergy(); 
-        
-              meMomenta()[5].rescaleEnergy();
-        
-              break;            
+	meMomenta()[2] = decayMomenta. first;
+	meMomenta()[3] = decayMomenta.second;  
+	meMomenta()[4] = decayMomentaTwo.second;
+	meMomenta()[5] = decayMomentaTwo. first;
+	break;            
       }
       
-      }else
-      {
-            const auto tmp=diffDirection==1?1:0;
-            meMomenta()[2+tmp].setVect(p3.vect());
-            meMomenta()[2+tmp].setT(p3.t());
-            meMomenta()[3-tmp].setVect(p4.vect());
-            meMomenta()[3-tmp].setT(p4.t());
-    
-            meMomenta()[2].rescaleEnergy();
-            meMomenta()[3].rescaleEnergy();
- 
-      }
-      break;
-    case 1:
-      switch(diffDirection){
-        case 0: 
-          //quark and diquark masses
-          meMomenta()[2].setMass(mqq());
-          meMomenta()[3].setMass(mq());
-          
-          //gluon constituent mass
-          meMomenta()[4].setMass(getParticleData(21)->constituentMass());
-          
-          //outgoing proton
-          meMomenta()[5].setVect(p4.vect());
-          meMomenta()[5].setT(p4.t());
-          
-          //two body decay of the outgoing dissociation proton
-          do{}
-            while(!Kinematics::twoBodyDecay(p3,mqq()+mq(),getParticleData(21)->constituentMass(),
-                p3.vect().unit(),momPair.first,momPair.second));
-            //put gluon back-to-back with quark-diquark   
-            //set momenta of quark and diquark
-            frac = mqq()/(mqq()+mq());
-            meMomenta()[2].setVect(frac*momPair.first.vect());
-            meMomenta()[2].setT(sqrt(sqr(frac)*momPair.first.vect().mag2()+sqr(mqq())));
-            meMomenta()[3].setVect((1-frac)*momPair.first.vect());
-            meMomenta()[3].setT(sqrt(sqr(1-frac)*momPair.first.vect().mag2()+sqr(mq())));
-            //set momentum of gluon
-            meMomenta()[4].setVect(momPair.second.vect());
-            meMomenta()[4].setT(momPair.second.t());
-                    
-          break;
-        case 1: 
-          //quark and diquark masses
-          meMomenta()[5].setMass(mqq());
-          meMomenta()[4].setMass(mq());
-          
-          //gluon constituent mass
-          meMomenta()[3].setMass(getParticleData(21)->constituentMass());
-          
-          //outgoing proton
-          meMomenta()[2].setVect(p3.vect());
-          meMomenta()[2].setT(p3.t());
-          
-          //two body decay of the outgoing dissociation proton
-          do{}
-            while(!Kinematics::twoBodyDecay(p4,mqq()+mq(),getParticleData(21)->constituentMass(),
-                p4.vect().unit(),momPair.first,momPair.second));
-            
-            //put gluon back-to-back with quark-diquark   
-            //set momenta of quark and diquark
-            frac = mqq()/(mqq()+mq());
-            meMomenta()[5].setVect(frac*momPair.first.vect());
-            meMomenta()[5].setT(sqrt(sqr(frac)*momPair.first.vect().mag2()+sqr(mqq())));
-            meMomenta()[4].setVect((1-frac)*momPair.first.vect());
-            meMomenta()[4].setT(sqrt(sqr(1-frac)*momPair.first.vect().mag2()+sqr(mq())));
-            //set momentum of gluon
-            meMomenta()[3].setVect(momPair.second.vect());
-            meMomenta()[3].setT(momPair.second.t());
-          
-          
-        
-          break;
-        case 2: 
-          //first dissociated proton constituents
-          meMomenta()[2].setMass(mqq());
-          meMomenta()[3].setMass(mq());
-          meMomenta()[4].setMass(getParticleData(21)->constituentMass());
-          //second dissociated proton constituents
-          meMomenta()[5].setMass(getParticleData(21)->constituentMass());
-          meMomenta()[6].setMass(mq());
-          meMomenta()[7].setMass(mqq());
-          
-          
-          //two body decay of the outgoing dissociation proton
-          do{}
-            while(!Kinematics::twoBodyDecay(p3,mqq()+mq(),getParticleData(21)->constituentMass(),
-                p3.vect().unit(),momPair.first,momPair.second));
-            
-            do{}
-            while(!Kinematics::twoBodyDecay(p4,mqq()+mq(),getParticleData(21)->constituentMass(),
-                p4.vect().unit(),momPair1.first,momPair1.second));    
-          
-          //put gluon back-to-back with quark-diquark
-          frac = mqq()/(mqq()+mq());
-          
-          //first dissociated proton
-          //set momenta of quark and diquark
-            
-            meMomenta()[2].setVect(frac*momPair.first.vect());
-            meMomenta()[2].setT(sqrt(sqr(frac)*momPair.first.vect().mag2()+sqr(mqq())));
-            meMomenta()[3].setVect((1-frac)*momPair.first.vect());
-            meMomenta()[3].setT(sqrt(sqr(1-frac)*momPair.first.vect().mag2()+sqr(mq())));
-            //set momentum of gluon
-            meMomenta()[4].setVect(momPair.second.vect());
-            meMomenta()[4].setT(momPair.second.t());
-            
-            //first dissociated proton
-          //set momenta of quark and diquark
-            
-            meMomenta()[7].setVect(frac*momPair1.first.vect());
-            meMomenta()[7].setT(sqrt(sqr(frac)*momPair1.first.vect().mag2()+sqr(mqq())));
-            meMomenta()[6].setVect((1-frac)*momPair1.first.vect());
-            meMomenta()[6].setT(sqrt(sqr(1-frac)*momPair1.first.vect().mag2()+sqr(mq())));
-            //set momentum of gluon
-            meMomenta()[5].setVect(momPair1.second.vect());
-            meMomenta()[5].setT(momPair1.second.t());
-          break;
-        
-      }
-      meMomenta()[2].rescaleEnergy();
-      meMomenta()[3].rescaleEnergy();
-      meMomenta()[4].rescaleEnergy();
-      meMomenta()[5].rescaleEnergy();
-      if(diffDirection==2){
-        meMomenta()[6].rescaleEnergy();
-        meMomenta()[7].rescaleEnergy();
-      }
+    }
+    else {
+      meMomenta()[2] = p3;
+      meMomenta()[3] = p4;
+    }
+    break;
+  case 1:
+    switch(diffDirection){
+    case 0: 
+      //quark and diquark masses
+      meMomenta()[2].setMass(mqq());
+      meMomenta()[3].setMass(mq());
+      
+      //gluon constituent mass
+      meMomenta()[4].setMass(getParticleData(21)->constituentMass());
+      
+      //outgoing proton
+      meMomenta()[5].setVect(p4.vect());
+      meMomenta()[5].setT(p4.t());
+      
+      //two body decay of the outgoing dissociation proton
+      do{}
+      while(!Kinematics::twoBodyDecay(p3,mqq()+mq(),getParticleData(21)->constituentMass(),
+				      p3.vect().unit(),momPair.first,momPair.second));
+      //put gluon back-to-back with quark-diquark   
+      //set momenta of quark and diquark
+      frac = mqq()/(mqq()+mq());
+      meMomenta()[2].setVect(frac*momPair.first.vect());
+      meMomenta()[2].setT(sqrt(sqr(frac)*momPair.first.vect().mag2()+sqr(mqq())));
+      meMomenta()[3].setVect((1-frac)*momPair.first.vect());
+      meMomenta()[3].setT(sqrt(sqr(1-frac)*momPair.first.vect().mag2()+sqr(mq())));
+      //set momentum of gluon
+      meMomenta()[4].setVect(momPair.second.vect());
+      meMomenta()[4].setT(momPair.second.t());
       
       break;
+    case 1: 
+      //quark and diquark masses
+      meMomenta()[5].setMass(mqq());
+      meMomenta()[4].setMass(mq());
+      
+      //gluon constituent mass
+      meMomenta()[3].setMass(getParticleData(21)->constituentMass());
+      
+      //outgoing proton
+      meMomenta()[2].setVect(p3.vect());
+      meMomenta()[2].setT(p3.t());
+      
+      //two body decay of the outgoing dissociation proton
+      do{}
+      while(!Kinematics::twoBodyDecay(p4,mqq()+mq(),getParticleData(21)->constituentMass(),
+				      p4.vect().unit(),momPair.first,momPair.second));
+      
+      //put gluon back-to-back with quark-diquark   
+      //set momenta of quark and diquark
+      frac = mqq()/(mqq()+mq());
+      meMomenta()[5].setVect(frac*momPair.first.vect());
+      meMomenta()[5].setT(sqrt(sqr(frac)*momPair.first.vect().mag2()+sqr(mqq())));
+      meMomenta()[4].setVect((1-frac)*momPair.first.vect());
+      meMomenta()[4].setT(sqrt(sqr(1-frac)*momPair.first.vect().mag2()+sqr(mq())));
+      //set momentum of gluon
+      meMomenta()[3].setVect(momPair.second.vect());
+      meMomenta()[3].setT(momPair.second.t());
+      
+      
+      
+      break;
+    case 2: 
+      //first dissociated proton constituents
+      meMomenta()[2].setMass(mqq());
+      meMomenta()[3].setMass(mq());
+      meMomenta()[4].setMass(getParticleData(21)->constituentMass());
+      //second dissociated proton constituents
+      meMomenta()[5].setMass(getParticleData(21)->constituentMass());
+      meMomenta()[6].setMass(mq());
+      meMomenta()[7].setMass(mqq());
+      
+      
+      //two body decay of the outgoing dissociation proton
+      do{}
+      while(!Kinematics::twoBodyDecay(p3,mqq()+mq(),getParticleData(21)->constituentMass(),
+				      p3.vect().unit(),momPair.first,momPair.second));
+      
+      do{}
+      while(!Kinematics::twoBodyDecay(p4,mqq()+mq(),getParticleData(21)->constituentMass(),
+				      p4.vect().unit(),momPair1.first,momPair1.second));    
+      
+      //put gluon back-to-back with quark-diquark
+      frac = mqq()/(mqq()+mq());
+      
+      //first dissociated proton
+      //set momenta of quark and diquark
+      
+      meMomenta()[2].setVect(frac*momPair.first.vect());
+      meMomenta()[2].setT(sqrt(sqr(frac)*momPair.first.vect().mag2()+sqr(mqq())));
+      meMomenta()[3].setVect((1-frac)*momPair.first.vect());
+      meMomenta()[3].setT(sqrt(sqr(1-frac)*momPair.first.vect().mag2()+sqr(mq())));
+      //set momentum of gluon
+      meMomenta()[4].setVect(momPair.second.vect());
+      meMomenta()[4].setT(momPair.second.t());
+      
+      //first dissociated proton
+      //set momenta of quark and diquark
+      
+      meMomenta()[7].setVect(frac*momPair1.first.vect());
+      meMomenta()[7].setT(sqrt(sqr(frac)*momPair1.first.vect().mag2()+sqr(mqq())));
+      meMomenta()[6].setVect((1-frac)*momPair1.first.vect());
+      meMomenta()[6].setT(sqrt(sqr(1-frac)*momPair1.first.vect().mag2()+sqr(mq())));
+      //set momentum of gluon
+      meMomenta()[5].setVect(momPair1.second.vect());
+      meMomenta()[5].setT(momPair1.second.t());
+      break;
+      
+    }
+    meMomenta()[2].rescaleEnergy();
+    meMomenta()[3].rescaleEnergy();
+    meMomenta()[4].rescaleEnergy();
+    meMomenta()[5].rescaleEnergy();
+    if(diffDirection==2){
+      meMomenta()[6].rescaleEnergy();
+      meMomenta()[7].rescaleEnergy();
+    }
+    
+    break;
   }
   
   jacobian(sqr(cmEnergy)/GeV2);
   return true;
 }
+
 //Generate masses of dissociated protons and momentum transfer from probability f(M2,t) 
 //(for single diffraction). Sample according to f(M2,t)=f(M2)f(t|M2).
 pair<pair<Energy2,Energy2>,Energy2> MEDiffraction::diffractiveMassAndMomentumTransfer() const {
   Energy2 theM12(ZERO),theM22(ZERO), thet(ZERO);
-  int count = 0;
   //proton mass squared
   const Energy2 m2 = sqr(theProtonMass);
   //delta mass squared
@@ -468,81 +432,90 @@ pair<pair<Energy2,Energy2>,Energy2> MEDiffraction::diffractiveMassAndMomentumTra
     //check if we want only delta 
     if(deltaOnly) {
       switch(diffDirection){
-        case 0:
-          theM12 = md2;
-          theM22 = m2;
-          M2 = md2;
-          thet = randomt(md2);
-          break;
-        case 1:
-          theM22 = md2;
-          theM12 = m2;
-          M2 = md2;   
-          thet = randomt(md2);
-          break;
-        case 2:
-          theM12 = md2;
-          theM22 = md2;
-          M2 = md2;
-          thet = doublediffrandomt(theM12,theM22);
-          break;  
+      case 0:
+	theM12 = md2;
+	theM22 = m2;
+	M2 = md2;
+	if(generator()->maximumCMEnergy()<sqrt(theM12)+sqrt(theM22)) {
+	  continue;
+	}
+	thet = randomt(md2);
+	break;
+      case 1:
+	theM22 = md2;
+	theM12 = m2;
+	M2 = md2;   
+	if(generator()->maximumCMEnergy()<sqrt(theM12)+sqrt(theM22)) {
+	  continue;
+	}
+	thet = randomt(md2);
+	break;
+      case 2:
+	theM12 = md2;
+	theM22 = md2;
+	M2 = md2;
+	if(generator()->maximumCMEnergy()<sqrt(theM12)+sqrt(theM22)) {
+	  continue;
+	}
+	thet = doublediffrandomt(theM12,theM22);
+	break;  
       }
-
     }
     else {
       switch (diffDirection){
       case 0:
         M2=randomM2();
-        thet = randomt(M2);
         theM12=M2;
-        
         theM22=m2;
-        
+	if(generator()->maximumCMEnergy()<sqrt(theM12)+sqrt(theM22)) {
+	  continue;
+	}
+        thet = randomt(M2);
         break;
       case 1:
-        
         theM12=m2;
         M2=randomM2();
-        thet = randomt(M2);
-        
-        
         theM22=M2; 
+	if(generator()->maximumCMEnergy()<sqrt(theM12)+sqrt(theM22)) {
+	  continue;
+	}
+        thet = randomt(M2);
         break;
       case 2:
         theM12=randomM2();
         theM22=randomM2();
         M2=(theM12>theM22) ? theM12: theM22;
-        
+	if(generator()->maximumCMEnergy()<sqrt(theM12)+sqrt(theM22)) {
+	  continue;
+	}
         thet = doublediffrandomt(theM12,theM22);
-        
         break;
       }
     }
-    count++;
   
-  const Energy cmEnergy = generator()->maximumCMEnergy();
-  const Energy2 s = sqr(cmEnergy);
+    const Energy cmEnergy = generator()->maximumCMEnergy();
+    const Energy2 s = sqr(cmEnergy);
     if(generator()->maximumCMEnergy()<sqrt(theM12)+sqrt(theM22)) {
       condition = true;
+      continue;
     }
-    else {
-  InvEnergy2 slope;
-  if(diffDirection==2){
-    slope = 2*softPomeronSlope()*log(.1+(sqr(cmEnergy)/softPomeronSlope())/(theM12*theM22));
-  }else{
-    slope = protonPomeronSlope()
-                         + 2*softPomeronSlope()*log(sqr(cmEnergy)/M2);
-  }
-
-  
-  const double expmax = exp(slope*tmaxfun(s,m2,M2));
-  const double expmin = exp(slope*tminfun(s,m2,M2));
-  
-  
-  //without (1-M2/s) constraint
-  condition = (UseRandom::rnd()>(protonPomeronSlope()*GeV2)*(expmax-expmin)/(slope*GeV2))
-      ||((theM12/GeV2)*(theM22/GeV2)>=(sqr(cmEnergy)/GeV2)/(softPomeronSlope()*GeV2));
+    
+    InvEnergy2 slope;
+    if(diffDirection==2)
+      slope = 2*softPomeronSlope()*log(.1+(sqr(cmEnergy)/softPomeronSlope())/(theM12*theM22));
+    else 
+      slope = protonPomeronSlope() + 2*softPomeronSlope()*log(sqr(cmEnergy)/M2);
+    
+    if(theM12*theM22 >= sqr(cmEnergy)/softPomeronSlope()) {
+      condition = true;
+      continue;
     }
+    
+    const double expmax = exp(slope*tmaxfun(s,m2,M2));
+    const double expmin = exp(slope*tminfun(s,m2,M2));
+    
+    // without (1-M2/s) constraint
+    condition = (UseRandom::rnd() > protonPomeronSlope()*(expmax-expmin)/slope );
   }
   while(condition);
   
@@ -586,11 +559,17 @@ Energy2 MEDiffraction::randomt(Energy2 M2) const {
   const Energy cmEnergy = generator()->maximumCMEnergy();
   const Energy2 ttmin = tminfun(sqr(cmEnergy),m2,M2);
   const Energy2 ttmax = tmaxfun(sqr(cmEnergy),m2,M2);
-
   const InvEnergy2 slope = protonPomeronSlope()
                          + 2*softPomeronSlope()*log(sqr(cmEnergy)/M2);
-    return log( exp(slope*ttmin) +
-              UseRandom::rnd()*(exp(slope*ttmax) - exp(slope*ttmin)) ) / slope;
+  double r = UseRandom::rnd();
+  Energy2 newVal;
+  if(slope*ttmax>slope*ttmin) {
+    newVal = ttmax + log( r + (1.-r)*exp(slope*(ttmin-ttmax)) ) / slope;
+  }
+  else {
+    newVal = ttmin + log( 1. - r + r*exp(slope*(ttmax-ttmin))) / slope;
+  }
+  return newVal;
 }
 
 Energy2 MEDiffraction::doublediffrandomt(Energy2 M12, Energy2 M22) const {
@@ -629,17 +608,74 @@ Energy2 MEDiffraction::tminfun(Energy2 s, Energy2 M12, Energy2 M22) const {
 
 Energy2 MEDiffraction::tmaxfun(Energy2 s, Energy2 M12, Energy2 M22) const  {
   const Energy2 m2 = sqr( theProtonMass );
-  
   return 0.5/s*(sqrt(kallen(s, m2, m2)*kallen(s, M12, M22))-sqr(s)+2*s*m2+s*M12+s*M22);
 }
 
 
+
+double  MEDiffraction::correctionweight() const {
+
+
+  // Here we calculate the weight to restore the diffractiveXSec
+  // given by the MPIHandler. 
+  
+  // First get the eventhandler to get the current cross sections. 
+  static Ptr<StandardEventHandler>::tptr eh =
+  dynamic_ptr_cast<Ptr<StandardEventHandler>::tptr>(generator()->eventHandler());
+
+  // All diffractive processes make use of this ME. 
+  // The static map can be used to collect all the sumOfWeights.
+  static map<XCombPtr,double> weightsmap;
+  weightsmap[lastXCombPtr()]=lastXComb().stats().sumWeights();
+  
+
+  // Define static variable to keep trac of reweighting
+  static double rew_=1.;
+  static int countUpdateWeight=50;
+  static double sumRew=0.;
+  static double countN=0;
+
+  // if we produce events we count
+  if(eh->integratedXSec()>ZERO)sumRew+=rew_;
+  if(eh->integratedXSec()>ZERO)countN+=1.;
+
+  if(countUpdateWeight<countN){
+    // Summing all diffractive processes (various initial states)
+    double sum=0.;
+    for(auto xx:weightsmap){
+     sum+=xx.second;
+    }
+    double avRew=sumRew/countN;
+    
+    CrossSection XS_have =eh->sampler()->maxXSec()/eh->sampler()->attempts()*sum;
+    CrossSection XS_wanted=MPIHandler_->diffractiveXSec();
+    double deltaN=50;
+    
+      // Cross section without reweighting: XS_norew
+      // XS_have = avcsNorm2*XS_norew    (for large N)
+      // We want to determine the rew that allows to get the wanted XS.
+      // In deltaN points we want (left) and we get (right):
+      // XS_wanted*(countN+deltaN) = XS_have*countN + rew*deltaN*XS_norew
+      // Solve for rew:
+    
+    rew_=avRew*(XS_wanted*(countN+deltaN)-XS_have*countN)/(XS_have*deltaN);
+    countUpdateWeight+=deltaN;
+  }
+  //Make sure we dont produce negative weights. 
+  // TODO: write finalize method that checks if reweighting was performed correctly. 
+  rew_=max(rew_,0.000001);
+  rew_=min(rew_,10000.0);
+  
+  return rew_;
+  
+}
+
 double MEDiffraction::me2() const{
-  return theme2; 
+  return theme2;
 }
 
 CrossSection MEDiffraction::dSigHatDR() const {
-  return me2()*jacobian()/sHat()*sqr(hbarc);
+  return me2()*jacobian()/sHat()*sqr(hbarc)*correctionweight();
 }
 
 unsigned int MEDiffraction::orderInAlphaS() const {
@@ -783,19 +819,21 @@ IBPtr MEDiffraction::fullclone() const {
 }
 
 
-ClassDescription<MEDiffraction> MEDiffraction::initMEDiffraction;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEDiffraction,HwMEBase>
+describeHerwigMEDiffraction("Herwig::MEDiffraction", "HwMEHadron.so");
 
 void MEDiffraction::persistentOutput(PersistentOStream & os) const {
   os << theme2 << deltaOnly << diffDirection << theprotonPomeronSlope
      << thesoftPomeronIntercept << thesoftPomeronSlope << dissociationDecay
-     << ounit(theProtonMass,GeV);
+     << ounit(theProtonMass,GeV) << MPIHandler_;
 }
 
 void MEDiffraction::persistentInput(PersistentIStream & is, int) {
   is >> theme2 >> deltaOnly >> diffDirection >> theprotonPomeronSlope
      >> thesoftPomeronIntercept >> thesoftPomeronSlope >> dissociationDecay
-     >> iunit(theProtonMass,GeV);
+     >> iunit(theProtonMass,GeV)>> MPIHandler_;
 }
 
 InvEnergy2 MEDiffraction::protonPomeronSlope() const{
@@ -871,4 +909,14 @@ void MEDiffraction::Init() {
     (interfaceDissociationDecay,"One","Dissociated proton decays into one cluster", 0);
   static SwitchOption two
     (interfaceDissociationDecay,"Two","Dissociated proton decays into two clusters", 1);
+
+
+  static Reference<MEDiffraction,UEBase> interfaceMPIHandler
+    ("MPIHandler",
+     "The object that administers all additional scatterings.",
+     &MEDiffraction::MPIHandler_, false, false, true, true);
+
+
+
+
 } 

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // UEDG0G0G1G1Vertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -23,6 +23,7 @@ UEDG0G0G1G1Vertex::UEDG0G0G1G1Vertex() :
   theq2Last(ZERO), theCoupLast(0.) {
   orderInGs(2);
   orderInGem(0);
+  colourStructure(ColourStructure::SU3FF);
 }
 
 void UEDG0G0G1G1Vertex::doinit() {
@@ -31,11 +32,8 @@ void UEDG0G0G1G1Vertex::doinit() {
   VVVVVertex::doinit();
 }
 
-// *** Attention *** The following static variable is needed for the type
-// description system in ThePEG. Please check that the template arguments
-// are correct (the class and its base class), and that the constructor
-// arguments are correct (the class name and the name of the dynamically
-// loadable library where the class implementation can be found).
+// The following static variable is needed for the type
+// description system in ThePEG.
 DescribeNoPIOClass<UEDG0G0G1G1Vertex,Helicity::VVVVVertex>
 describeUEDG0G0G1G1Vertex("Herwig::UEDG0G0G1G1Vertex", "HwUED.so");
 
@@ -50,12 +48,10 @@ void UEDG0G0G1G1Vertex::Init() {
 void UEDG0G0G1G1Vertex::setCoupling(Energy2 q2, tcPDPtr part1, tcPDPtr part2, 
 				    tcPDPtr part3, tcPDPtr part4) {
   int ismg(0), ikkg(0);
-  vector<tcPDPtr> particles(4);
-  particles[0] = part1; particles[1] = part2;
-  particles[2] = part3; particles[3] = part4;
-  for(vector<long>::size_type i = 0; i < 4; ++i) {
-    if(particles[i]->id() == ParticleID::g) ++ismg;
-    if(particles[i]->id() == 5100021) ++ikkg;
+  const array<tcPDPtr, 4> particles{{ part1, part2, part3, part4 }};
+  for(auto p : particles) {
+    if(p->id() == ParticleID::g) ++ismg;
+    if(p->id() == 5100021) ++ikkg;
   }
   assert(ismg == 2 && ikkg == 2);
   if(q2 != theq2Last || theCoupLast == 0. ) {

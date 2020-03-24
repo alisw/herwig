@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // RSModel.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "RSModel.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Interface/Reference.h"
@@ -47,8 +48,10 @@ void RSModel::persistentInput(PersistentIStream & is, int) {
      >> GGGGRVertex_ >> WWWGRVertex_;
 }
 
-ClassDescription<RSModel> RSModel::initRSModel;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<RSModel,BSMModel>
+describeHerwigRSModel("Herwig::RSModel", "HwRSModel.so");
 
 void RSModel::Init() {
   

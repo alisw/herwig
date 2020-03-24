@@ -24,6 +24,7 @@ RPVFFWVertex::RPVFFWVertex() : _diagonal(false), _ckm(3,vector<Complex>(3,0.0)),
 			       _rightlast(0.), _interactions(0) {
   orderInGs(0);
   orderInGem(1);
+  colourStructure(ColourStructure::DELTA);
 }
 
 IBPtr RPVFFWVertex::clone() const {
@@ -198,7 +199,12 @@ void RPVFFWVertex::Init() {
 }
 
 void RPVFFWVertex::setCoupling(Energy2 q2,tcPDPtr part1,
-			       tcPDPtr part2,tcPDPtr part3) {
+			       tcPDPtr part2,
+#ifndef NDEBUG
+  tcPDPtr part3) {
+#else
+  tcPDPtr) {
+#endif
   assert(abs(part3->id()) == ParticleID::Wplus);
   // normalization
   // first the overall normalisation

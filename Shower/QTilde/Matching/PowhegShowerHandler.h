@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // PowhegShowerHandler.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -15,7 +15,7 @@
 #include "Herwig/Shower/QTilde/QTildeShowerHandler.h"
 #include "Herwig/MatrixElement/Matchbox/MatchboxFactory.h"
 #include "Herwig/MatrixElement/HwMEBase.h"
-#include "Herwig/Shower/Core/Base/HardBranching.h"
+#include "Herwig/Shower/QTilde/Base/HardBranching.h"
 
 #include "Herwig/Shower/QTilde/Matching/CKKWTree.h"
 #include "Herwig/Shower/QTilde/Matching/ProtoTree.h"
@@ -25,15 +25,15 @@
 #include "ThePEG/MatrixElement/DiagramBase.fh"
 #include "ThePEG/MatrixElement/MEBase.h"
 #include "ThePEG/PDF/PartonExtractor.h"
-#include "Herwig/Shower/Core/Base/HardTree.h"
+#include "Herwig/Shower/QTilde/Base/HardTree.h"
 
-// #include "Herwig/Shower/Core/SplittingFunctions/SplittingGenerator.h"
+// #include "Herwig/Shower/QTilde/SplittingFunctions/SplittingGenerator.h"
 // #include "Herwig/Shower/QTilde/Base/ShowerModel.h"
 // #include "ThePEG/PDF/BeamParticleData.h"
-// #include "Herwig/Shower/Core/Base/ShowerTree.h"
-// #include "Herwig/Shower/Core/Base/ShowerProgenitor.fh"
+// #include "Herwig/Shower/QTilde/Base/ShowerTree.h"
+// #include "Herwig/Shower/QTilde/Base/ShowerProgenitor.fh"
 // #include "Herwig/Shower/QTilde/QTildeShowerHandler.fh"
-// #include "Herwig/Shower/Core/Base/Branching.h"
+// #include "Herwig/Shower/QTilde/Base/Branching.h"
 // #include "Herwig/Shower/QTilde/Base/ShowerVeto.h"
 // #include "ThePEG/Handlers/XComb.h"
 // #include "Herwig/Decay/HwDecayerBase.h"
@@ -58,10 +58,7 @@ public:
 
 public:
 
-  Ptr<MatchboxFactory>::ptr Factory(){return theFactory;}
-
-  Ptr<MatchboxFactory>::ptr Factory() const {return theFactory;}
-
+  Ptr<MatchboxFactory>::tptr Factory() const{return MatchboxFactory::currentFactory();}
 
   /**
    * Return true, if the shower handler can generate a truncated 
@@ -158,11 +155,6 @@ protected:
 
 
 private:
-
-   /**
-   * The factory object to fetch splitting channels from
-   */
-  Ptr<MatchboxFactory>::ptr theFactory;
 
  /**
    *  The matrix element for the core process
@@ -265,7 +257,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  PowhegShowerHandler & operator=(const PowhegShowerHandler &);
+  PowhegShowerHandler & operator=(const PowhegShowerHandler &) = delete;
 
 private:
 

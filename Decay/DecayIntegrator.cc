@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // DecayIntegrator.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -14,6 +14,7 @@
 // 
 
 #include "DecayIntegrator.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/PDT/DecayMode.h"
 #include "ThePEG/PDT/EnumParticles.h"
 #include "ThePEG/EventRecord/Particle.h"
@@ -43,26 +44,24 @@ ParticleVector DecayIntegrator::decay(const Particle & parent,
   // generate the decay
   bool cc;
   _imode = modeNumber(cc,parent.dataPtr(),children);
+  if(numberModes()==0) return ParticleVector();
   return _modes[_imode]->generate(_generateinter,cc,parent);
 }
   
 void DecayIntegrator::persistentOutput(PersistentOStream & os) const {
-  os << _modes << _niter << _npoint << _ntry << _photongen << _generateinter;
+  os << _modes << _niter << _npoint << _ntry << _photongen << _generateinter << ounit(_eps,GeV);
 }
   
 void DecayIntegrator::persistentInput(PersistentIStream & is, int) {
-  is >> _modes >> _niter >> _npoint >> _ntry >> _photongen >> _generateinter;
+  is >> _modes >> _niter >> _npoint >> _ntry >> _photongen >> _generateinter >> iunit(_eps,GeV);
 }
   
-AbstractClassDescription<DecayIntegrator> DecayIntegrator::initDecayIntegrator;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeAbstractClass<DecayIntegrator,HwDecayerBase>
+describeHerwigDecayIntegrator("Herwig::DecayIntegrator", "Herwig.so");
   
 void DecayIntegrator::Init() {
-    
-  static RefVector<DecayIntegrator,DecayPhaseSpaceMode> interfaceModes
-    ("Modes",
-     "The phase space integration modes.",
-     &DecayIntegrator::_modes, 0, false, false, true, true); 
   
   static ClassDocumentation<DecayIntegrator> documentation
     ("The DecayIntegrator class is a base decayer class "

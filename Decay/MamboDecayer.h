@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MamboDecayer.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -115,16 +115,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MamboDecayer> initMamboDecayer;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MamboDecayer & operator=(const MamboDecayer &);
+  MamboDecayer & operator=(const MamboDecayer &) = delete;
 
 private:
 
@@ -284,37 +278,6 @@ private:
    */
   vector<double> _a1;
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MamboDecayer. */
-template <>
-struct BaseClassTrait<Herwig::MamboDecayer,1> {
-  /** Typedef of the first base class of MamboDecayer. */
-  typedef Herwig::HwDecayerBase NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MamboDecayer class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MamboDecayer>
-  : public ClassTraitsBase<Herwig::MamboDecayer> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MamboDecayer"; }
-  /** Return the name of the shared library be loaded to get
-   *  access to the MamboDecayer class and every other class it uses
-   *  (except the base class). */
-  static string library() { return "HwMamboDecay.so"; }
-};
-
-/** @endcond */
 
 }
 

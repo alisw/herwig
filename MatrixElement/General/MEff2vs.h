@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEff2vs.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -17,6 +17,7 @@
 #include "ThePEG/Helicity/Vertex/AbstractFFVVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractVSSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractVVSVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractFFVSVertex.h"
 #include "ThePEG/Helicity/WaveFunction/SpinorWaveFunction.h"
 #include "ThePEG/Helicity/WaveFunction/SpinorBarWaveFunction.h"
 #include "ThePEG/Helicity/WaveFunction/VectorWaveFunction.h"
@@ -145,16 +146,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEff2vs> initMEff2vs;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEff2vs & operator=(const MEff2vs &);
+  MEff2vs & operator=(const MEff2vs &) = delete;
 
 private:
 
@@ -198,34 +193,12 @@ private:
    * fermion
    */
   vector<pair<AbstractFFVVertexPtr, AbstractFFSVertexPtr> > fermion_;
+
+  /**
+   *  Four point vertices
+   */
+  vector<AbstractFFVSVertexPtr> four_;
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEff2vs. */
-template <>
-struct BaseClassTrait<Herwig::MEff2vs,1> {
-  /** Typedef of the first base class of MEff2vs. */
-  typedef Herwig::GeneralHardME NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEff2vs class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEff2vs>
-  : public ClassTraitsBase<Herwig::MEff2vs> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEff2vs"; }
-};
-
-/** @endcond */
 
 }
 

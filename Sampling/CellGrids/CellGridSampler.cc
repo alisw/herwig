@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // CellGridSampler.cpp is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -29,7 +29,7 @@
 #include "ThePEG/Handlers/StandardEventHandler.h"
 #include "ThePEG/Handlers/StandardXComb.h"
 
-#include <boost/progress.hpp>
+#include "Herwig/Utilities/Progress.h"
 
 #include "CellGridSampler.h"
 #include "Herwig/Sampling/GeneralSampler.h"
@@ -155,10 +155,10 @@ void CellGridSampler::initialize(bool progress) {
 
   UseRandom rnd;
 
-  boost::progress_display* progressBar = 0;
+  progress_display* progressBar = nullptr;
   if ( progress ) {
     Repository::clog() << "exploring " << process();
-    progressBar = new boost::progress_display(theExplorationSteps,Repository::clog());
+    progressBar = new progress_display{ theExplorationSteps, Repository::clog() };
   }
   std::set<SimpleCellGrid*> newCells;
   

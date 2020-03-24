@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEqq2W2ff.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "MEqq2W2ff.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/Interface/Parameter.h"
@@ -62,13 +63,17 @@ void MEqq2W2ff::getDiagrams() const {
   case 5:
     parentpair.push_back(make_pair(ParticleID::b, ParticleID::cbar));
     parentpair.push_back(make_pair(ParticleID::b, ParticleID::ubar));
+    [[fallthrough]];
   case 4:
     parentpair.push_back(make_pair(ParticleID::s, ParticleID::cbar));
     parentpair.push_back(make_pair(ParticleID::d, ParticleID::cbar));
+    [[fallthrough]];
   case 3:
     parentpair.push_back(make_pair(ParticleID::s, ParticleID::ubar));
+    [[fallthrough]];
   case 2:
     parentpair.push_back(make_pair(ParticleID::d, ParticleID::ubar));
+    [[fallthrough]];
   default:
     ;
   }
@@ -180,8 +185,10 @@ void MEqq2W2ff::persistentInput(PersistentIStream & is, int) {
   is >> _maxflavour >> _plusminus >> _process >> _theFFWVertex >> _wp >> _wm;
 }
 
-ClassDescription<MEqq2W2ff> MEqq2W2ff::initMEqq2W2ff;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEqq2W2ff,DrellYanBase>
+describeHerwigMEqq2W2ff("Herwig::MEqq2W2ff", "HwMEHadron.so");
 
 void MEqq2W2ff::Init() {
 

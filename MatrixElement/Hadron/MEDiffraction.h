@@ -6,6 +6,7 @@
 //
 
 #include "Herwig/MatrixElement/HwMEBase.h"
+#include "Herwig/Shower/UEBase.h"
 
 namespace Herwig {
 
@@ -47,6 +48,12 @@ public:
    * dimensionless number.
    */
   virtual double me2() const;
+  
+  /**
+   * Correction weight to reweight the cross section to the diffractive
+   * cross section.
+   */
+  double correctionweight() const;
 
   /**
    * Return the scale associated with the last set phase space point.
@@ -275,69 +282,33 @@ private:
    
 
   /* Kallen function */
-  template<int L, int E, int Q, int DL, int DE, int DQ>
-  Qty<2*L,2*E,2*Q,DL,DE,DQ> kallen(Qty<L,E,Q,DL,DE,DQ> a,
-                                   Qty<L,E,Q,DL,DE,DQ> b,
-                                   Qty<L,E,Q,DL,DE,DQ> c) const {
+  template<typename A, typename B, typename C>
+  auto kallen(A a, B b, C c) const -> decltype(a*a)
+  {
     return a*a + b*b + c*c - 2.0*(a*b + b*c + c*a);
   }
   
   
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEDiffraction> initMEDiffraction;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEDiffraction & operator=(const MEDiffraction &);
+  MEDiffraction & operator=(const MEDiffraction &) = delete;
 
   bool isInRunPhase; 
   
  
   /* The proton mass */
   Energy theProtonMass;
+
+  /**
+   * a MPIHandler to administer the creation of several (semihard) 
+   * partonic interactions.
+   */
+  UEBasePtr MPIHandler_;
   
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEDiffraction. */
-template <>
-struct BaseClassTrait<Herwig::MEDiffraction,1> {
-  /** Typedef of the first base class of MEDiffraction. */
-  typedef Herwig::HwMEBase NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEDiffraction class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEDiffraction>
-  : public ClassTraitsBase<Herwig::MEDiffraction> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEDiffraction"; }
-  /**
-   * The name of a file containing the dynamic library where the class
-   * MEDiffraction is implemented. It may also include several, space-separated,
-   * libraries if the class MEDiffraction depends on other classes (base classes
-   * excepted). In this case the listed libraries will be dynamically
-   * linked in the order they are specified.
-   */
-  static string library() {return "HwMEHadron.so";}
-};
-
-/** @endcond */
 
 }
 

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ScalarMesonFactorizedDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "ScalarMesonFactorizedDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/PDT/DecayMode.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/RefVector.h"
@@ -420,9 +421,10 @@ void ScalarMesonFactorizedDecayer::persistentInput(PersistentIStream & is, int) 
      >> _wgtmax >> _weights >> _CKMfact;
 }
 
-ClassDescription<ScalarMesonFactorizedDecayer> 
-ScalarMesonFactorizedDecayer::initScalarMesonFactorizedDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<ScalarMesonFactorizedDecayer,DecayIntegrator>
+describeHerwigScalarMesonFactorizedDecayer("Herwig::ScalarMesonFactorizedDecayer", "HwSMDecay.so");
 
 void ScalarMesonFactorizedDecayer::Init() {
 
@@ -581,7 +583,7 @@ double ScalarMesonFactorizedDecayer::me2(const int ichan,
       _form[_formmapA[mode][iy]]->ScalarVectorFormFactor(q2,_formmapB[mode][iy],id0,
 							 id1,MP,MV,A0,A1,A2,V);
       if(cc){V=-V;}
-      A3 = 0.5/MV*(msum*A1-mdiff*A2);
+      A3 = Complex(0.5/MV*(msum*A1-mdiff*A2));
       // compute the hadron currents
       for(unsigned int ix=0;ix<3;++ix) {
 	// dot product
@@ -639,8 +641,8 @@ double ScalarMesonFactorizedDecayer::me2(const int ichan,
       }
       for(fhel=0;fhel<form.size();++fhel) {
 	ihel[_formpart[mode][iy]+1]=fhel;
-	(*ME())(ihel) +=pre*_CKMfact[mode][iy]*
-	  form[fhel].dot(curr[chel])*SM().fermiConstant();
+	(*ME())(ihel) += Complex(pre*_CKMfact[mode][iy]*
+				 form[fhel].dot(curr[chel])*SM().fermiConstant());
       }
     }
   }

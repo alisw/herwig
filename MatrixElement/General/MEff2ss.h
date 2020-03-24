@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEff2ss.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -14,11 +14,13 @@
 
 #include "GeneralHardME.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFSVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractRFSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFVVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractVSSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractSSSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFTVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractSSTVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractFFSSVertex.h"
 #include "Herwig/MatrixElement/ProductionMatrixElement.h"
 
 namespace Herwig {
@@ -33,8 +35,6 @@ using ThePEG::Helicity::ScalarWaveFunction;
  * GeneralHardME and implements the appropriate virtual functions for this 
  * specific spin combination.
  *
- * @see \ref MEff2ssInterfaces "The interfaces"
- * defined for MEff2ss.
  * @see GeneralHardME
  */
 class MEff2ss: public GeneralHardME {
@@ -48,11 +48,6 @@ public:
   typedef vector<SpinorBarWaveFunction> SpinorBarVector;
 
 public:
-
-  /**
-   * The default constructor.
-   */
-  MEff2ss() : fermion_(0), vector_(0), tensor_(0) {}
 
   /** @name Virtual functions required by the MEBase class. */
   //@{
@@ -140,16 +135,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEff2ss> initMEff2ss;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEff2ss & operator=(const MEff2ss &);
+  MEff2ss & operator=(const MEff2ss &) = delete;
 
 private:
 
@@ -173,6 +162,12 @@ private:
 
   /**
    * Storage for dynamically cast vertices for a diagram with intermediate
+   * vector
+   */
+  vector<pair<AbstractFFSVertexPtr, AbstractSSSVertexPtr> > scalar_;
+  
+  /**
+   * Storage for dynamically cast vertices for a diagram with intermediate
    * fermion
    */
   vector<pair<AbstractFFSVertexPtr, AbstractFFSVertexPtr> > fermion_;
@@ -181,47 +176,25 @@ private:
    * Storage for dynamically cast vertices for a diagram with intermediate
    * vector
    */
-  vector<pair<AbstractFFSVertexPtr, AbstractSSSVertexPtr> > scalar_;
+  vector<pair<AbstractFFVVertexPtr, AbstractVSSVertexPtr> > vector_;
 
   /**
    * Storage for dynamically cast vertices for a diagram with intermediate
-   * vector
+   * fermion
    */
-  vector<pair<AbstractFFVVertexPtr, AbstractVSSVertexPtr> > vector_;
+  vector<pair<AbstractRFSVertexPtr, AbstractRFSVertexPtr> > RSfermion_;
   
   /**
    * Storage for dynamically cast vertices for a diagram with intermediate
    * tensor
    */
   vector<pair<AbstractFFTVertexPtr, AbstractSSTVertexPtr> > tensor_;
+
+  /**
+   *  Storage for dynamically cast 4 point vertices
+   */
+  vector<AbstractFFSSVertexPtr> fourPoint_;
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEff2ss. */
-template <>
-struct BaseClassTrait<Herwig::MEff2ss,1> {
-  /** Typedef of the first base class of MEff2ss. */
-  typedef Herwig::GeneralHardME NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEff2ss class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEff2ss>
-  : public ClassTraitsBase<Herwig::MEff2ss> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEff2ss"; }
-};
-
-/** @endcond */
 
 }
 

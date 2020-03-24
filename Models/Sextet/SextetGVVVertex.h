@@ -24,7 +24,9 @@ public:
   /**
    * The default constructor.
    */
-  SextetGVVVertex() {}
+  SextetGVVVertex() {
+    colourStructure(ColourStructure::SU3T6);
+  }
 
   /** Calculate the coupling
    *@param q2 The scale at which to evaluate the coupling
@@ -79,7 +81,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  SextetGVVVertex & operator=(const SextetGVVVertex &);
+  SextetGVVVertex & operator=(const SextetGVVVertex &) = delete;
 
 private:
   

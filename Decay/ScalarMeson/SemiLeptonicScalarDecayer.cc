@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SemiLeptonicScalarDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "SemiLeptonicScalarDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/StandardModel/StandardModelBase.h"
 #include "ThePEG/Interface/ParVector.h"
@@ -145,8 +146,10 @@ void SemiLeptonicScalarDecayer::persistentInput(PersistentIStream & is, int) {
   is >> _current >> _form >> _maxwgt >> _modemap;
 }
 
-ClassDescription<SemiLeptonicScalarDecayer> SemiLeptonicScalarDecayer::initSemiLeptonicScalarDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<SemiLeptonicScalarDecayer,DecayIntegrator>
+describeHerwigSemiLeptonicScalarDecayer("Herwig::SemiLeptonicScalarDecayer", "HwSMDecay.so");
 
 void SemiLeptonicScalarDecayer::Init() {
 
@@ -268,7 +271,7 @@ double SemiLeptonicScalarDecayer::me2(const int ichan,
     complex<Energy> dot;
     Energy MP(inpart.mass()),MV(decay[0]->mass()),msum(MP+MV),mdiff(MP-MV);
     _form->ScalarVectorFormFactor(q2,iloc,id0,id1,MP,MV,A0,A1,A2,V);
-    A3 = 0.5/MV*(msum*A1-mdiff*A2);
+    A3 = Complex(0.5/MV*(msum*A1-mdiff*A2));
     if(cc) V*=-1.;
     // compute the hadron currents
     for(unsigned int ix=0;ix<3;++ix) {
@@ -312,7 +315,7 @@ double SemiLeptonicScalarDecayer::me2(const int ichan,
       // helicities of mesons
       ihel[0]=0;
       ihel[_imes+1]=mhel;
-      (*ME())(ihel)= lepton[lhel].dot(hadron[mhel])*SM().fermiConstant();
+      (*ME())(ihel) = Complex(lepton[lhel].dot(hadron[mhel])*SM().fermiConstant());
     }
   }
   // store the matrix element

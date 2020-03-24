@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SubtractedME.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -36,9 +36,9 @@ SubtractedME::SubtractedME()
 
 SubtractedME::~SubtractedME() {}
 
-Ptr<MatchboxFactory>::tcptr SubtractedME::factory() const { return theFactory; }
-
-void SubtractedME::factory(Ptr<MatchboxFactory>::tcptr f) { theFactory = f; }
+Ptr<MatchboxFactory>::tcptr SubtractedME::factory() const {
+  return MatchboxFactory::currentFactory();
+}
 
 bool SubtractedME::subProcessGroups() const { 
   return 
@@ -758,7 +758,7 @@ void SubtractedME::lastEventSubtraction() {
 }
 
 void SubtractedME::persistentOutput(PersistentOStream & os) const {
-  os << theLastXComb << theFactory << theBorns << theReal 
+  os << theLastXComb << theBorns << theReal 
      << collinearHistograms << softHistograms 
      << fnamesSoftSubtraction
      << theRealShowerSubtraction << theVirtualShowerSubtraction
@@ -766,7 +766,7 @@ void SubtractedME::persistentOutput(PersistentOStream & os) const {
 }
 
 void SubtractedME::persistentInput(PersistentIStream & is, int) {
-  is >> theLastXComb >> theFactory >> theBorns >> theReal 
+  is >> theLastXComb >> theBorns >> theReal 
      >> collinearHistograms >> softHistograms 
      >> fnamesSoftSubtraction
      >> theRealShowerSubtraction >> theVirtualShowerSubtraction

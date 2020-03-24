@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ScalarMesonTensorScalarDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "ScalarMesonTensorScalarDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/ParVector.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
@@ -113,9 +114,10 @@ void ScalarMesonTensorScalarDecayer::persistentInput(PersistentIStream & is, int
   is >> iunit(_coupling,1/GeV) >> _incoming >> _outgoingT >> _outgoingS >> _maxweight;
 }
 
-ClassDescription<ScalarMesonTensorScalarDecayer> 
-ScalarMesonTensorScalarDecayer::initScalarMesonTensorScalarDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<ScalarMesonTensorScalarDecayer,DecayIntegrator>
+describeHerwigScalarMesonTensorScalarDecayer("Herwig::ScalarMesonTensorScalarDecayer", "HwSMDecay.so");
 
 void ScalarMesonTensorScalarDecayer::Init() {
 
@@ -180,7 +182,7 @@ double ScalarMesonTensorScalarDecayer::me2(const int,
   LorentzPolarizationVectorE vtemp;
   for(unsigned int ix=0;ix<5;++ix) {
     vtemp = _tensors[ix]*inpart.momentum(); 
-    (*ME())(0,ix,0) = fact * decay[1]->momentum().dot(vtemp);
+    (*ME())(0,ix,0) = Complex(fact * decay[1]->momentum().dot(vtemp));
   }
   // test of the matrix element
 //   double me=newME.contract(rhoin).real();

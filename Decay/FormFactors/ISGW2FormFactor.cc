@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // ISGW2FormFactor.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "ISGW2FormFactor.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Switch.h"
 #include "ThePEG/Interface/Parameter.h"
@@ -551,8 +552,10 @@ void ISGW2FormFactor::persistentInput(PersistentIStream & is, int) {
      >> iunit(_beta1P,GeV) >> iunit(_massPoh,GeV) >> iunit(_massPth,GeV) >> _includeaW;
 }
 
-ClassDescription<ISGW2FormFactor> ISGW2FormFactor::initISGW2FormFactor;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<ISGW2FormFactor,ScalarFormFactor>
+describeHerwigISGW2FormFactor("Herwig::ISGW2FormFactor", "HwFormFactors.so");
 
 void ISGW2FormFactor::Init() {
 
@@ -1095,9 +1098,9 @@ void ISGW2FormFactor::formFactor(Energy2 q2, unsigned int iloc, int, int id1,
     Energy msum(mX+mY),mdiff(mY-mX);
     Complex ii(0.,1.);
     f2 = -ii*f/msum;
-    f3 = +ii*ap*msum;
-    f1 = -ii*0.5/mX*(am*q2+ii*msum*f2-ii*mdiff*f3);
-    f4 =  ii*g*msum;
+    f3 = +Complex(ii*ap*msum);
+    f1 = -Complex(ii*0.5/mX*(am*q2+ii*msum*f2-ii*mdiff*f3));
+    f4 =  Complex(ii*g*msum);
   }
   else if(jspin==2) {
     Energy msum(mX+mY);

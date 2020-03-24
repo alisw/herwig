@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MatchboxAmplitude.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -141,11 +141,6 @@ public:
    * Return the factory which produced this matrix element
    */
   Ptr<MatchboxFactory>::tptr factory() const;
-
-  /**
-   * Set the factory which produced this matrix element
-   */
-  virtual void factory(Ptr<MatchboxFactory>::tptr f);
 
   /** @name Subprocess information */
   //@{
@@ -288,6 +283,11 @@ public:
    * Check if reshuffling is needed at all
    */
   void checkReshuffling(Ptr<MatchboxPhasespace>::tptr);
+
+  /**
+   * Return true, if this amplitude makes use of amplitudeMomenta
+   */
+  virtual bool hasAmplitudeMomenta() const { return false; }
 
   //@}
 
@@ -630,11 +630,6 @@ protected:
 private:
 
   /**
-   * The factory which produced this matrix element
-   */
-  Ptr<MatchboxFactory>::tptr theFactory;
-
-  /**
    * Recursively generate helicities
    */
   void doGenerateHelicities(set<vector<int> >& res,
@@ -698,7 +693,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MatchboxAmplitude & operator=(const MatchboxAmplitude &);
+  MatchboxAmplitude & operator=(const MatchboxAmplitude &) = delete;
 
 };
 

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SimpleLHCAnalysis.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "SimpleLHCAnalysis.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Repository/EventGenerator.h"
 #include "ThePEG/EventRecord/Particle.h"
 #include "ThePEG/EventRecord/Event.h"
@@ -106,8 +107,10 @@ void SimpleLHCAnalysis::analyze(tEventPtr event, long, int, int) {
   }
 }
 
-NoPIOClassDescription<SimpleLHCAnalysis> SimpleLHCAnalysis::initSimpleLHCAnalysis;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeNoPIOClass<SimpleLHCAnalysis,AnalysisHandler>
+describeHerwigSimpleLHCAnalysis("Herwig::SimpleLHCAnalysis", "HwAnalysis.so");
 
 void SimpleLHCAnalysis::Init() {
 

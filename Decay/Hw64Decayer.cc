@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // Hw64Decayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "Hw64Decayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include <ThePEG/EventRecord/Event.h>
 #include <ThePEG/PDT/EnumParticles.h>
 #include <ThePEG/PDT/DecayMode.h>
@@ -69,7 +70,10 @@ void Hw64Decayer::Init() {
 
 }
 
-ClassDescription<Hw64Decayer> Hw64Decayer::initHw64Decayer;
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<Hw64Decayer,HwDecayerBase>
+describeHerwigHw64Decayer("Herwig::Hw64Decayer", "Hw64Decay.so");
 
 bool Hw64Decayer::accept(tcPDPtr, const tPDVector & children) const  {
   return children.size() <= 3;

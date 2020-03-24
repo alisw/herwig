@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // HQETFormFactor.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "HQETFormFactor.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/Parameter.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
@@ -48,8 +49,10 @@ void HQETFormFactor::persistentInput(PersistentIStream & is, int) {
   is >> _f1scalar >> _f1vector >> _r1 >> _r2 >> _rho2scalar >> _rho2vector;
 }
 
-ClassDescription<HQETFormFactor> HQETFormFactor::initHQETFormFactor;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<HQETFormFactor,ScalarFormFactor>
+describeHerwigHQETFormFactor("Herwig::HQETFormFactor", "HwFormFactors.so");
 
 void HQETFormFactor::Init() {
 

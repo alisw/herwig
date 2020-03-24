@@ -76,7 +76,7 @@ double FIMqx2qgxDipoleKernel::evaluate(const DipoleSplittingInfo& split) const {
   double ret = alphaPDF(split);
 
   // Mi=mi=mQ, m=0, Mj=mj=0
-  Energy2 mQ2 = sqr(split.emitterData()->mass());
+  Energy2 mQ2 = sqr(split.emitterMass());
 
   double z = split.lastZ();
   double x = 1. / ( 1. + 
@@ -89,6 +89,48 @@ double FIMqx2qgxDipoleKernel::evaluate(const DipoleSplittingInfo& split) const {
 
   return ret > 0. ? ret : 0.;
 
+}
+
+vector< pair<int, Complex> >
+FIMqx2qgxDipoleKernel::generatePhi(const DipoleSplittingInfo&, const RhoDMatrix&) const {
+
+  // No dependence on the spin density matrix,
+  // dependence on off-diagonal terms cancels.
+  return {{ {0, 1.} }};
+}
+
+DecayMEPtr FIMqx2qgxDipoleKernel::matrixElement( const DipoleSplittingInfo& dInfo ) const {
+
+  double z = dInfo.lastZ();
+  Energy pt = dInfo.lastPt();
+  Energy mi = dInfo.emitterMass();
+  
+  // Altarelli-Parisi spin-indexed kernels:
+  Energy den = sqrt(sqr(mi)*sqr(1.-z) + sqr(pt));
+  double v_AP_ppp = pt / den / sqrt(1.-z);
+  double v_AP_ppm = - z * v_AP_ppp ;
+  double v_AP_pmp = mi*(1.-z)*sqrt(1.-z) / den ;
+
+  double v_AP_mmm = -v_AP_ppp;
+  double v_AP_mmp = -v_AP_ppm;
+  double v_AP_mpm = v_AP_pmp;
+  
+  // Construct the (phi-dependent) spin-unaveraged splitting kernel
+  DecayMEPtr kernelPhiDep
+    (new_ptr(TwoBodyDecayMatrixElement(PDT::Spin1Half,PDT::Spin1Half,PDT::Spin1)));
+  Complex phase = exp(Complex(0.,1.)*dInfo.lastPhi());
+
+  // 0 = -1 or -1/2, 1=+1/2, 2 = +1
+  (*kernelPhiDep)(0,0,0) = v_AP_mmm*phase;
+  (*kernelPhiDep)(1,1,2) = v_AP_ppp/phase;
+  (*kernelPhiDep)(0,0,2) = v_AP_mmp/phase;
+  (*kernelPhiDep)(1,1,0) = v_AP_ppm*phase;
+  (*kernelPhiDep)(0,1,0) = v_AP_mpm;
+  (*kernelPhiDep)(1,0,2) = v_AP_pmp;
+  (*kernelPhiDep)(0,1,2) = 0.;
+  (*kernelPhiDep)(1,0,0) = 0.;
+
+  return kernelPhiDep;
 }
 
 // If needed, insert default implementations of  function defined

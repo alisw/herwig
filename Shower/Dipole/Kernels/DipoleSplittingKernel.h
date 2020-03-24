@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // DipoleSplittingKernel.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -19,6 +19,10 @@
 #include "Herwig/Shower/Dipole/Utility/PDFRatio.h"
 #include "Herwig/Shower/Dipole/Base/DipoleSplittingInfo.h"
 #include "Herwig/Shower/Dipole/Kinematics/DipoleSplittingKinematics.h"
+
+#include "ThePEG/EventRecord/RhoDMatrix.h"
+#include "Herwig/Decay/DecayMatrixElement.h"
+#include "Herwig/Decay/TwoBodyDecayMatrixElement.h"
 
 namespace Herwig {
 
@@ -226,6 +230,17 @@ public:
    * dipole splitting.
    */
   virtual double evaluate(const DipoleSplittingInfo&) const = 0;
+  
+  /**
+   * Evaluate rho_ii' V_ijk V*_i'jk / equivalent for initial-state splitting,
+   * required for generating spin-correlated azimuthal angles.
+   **/
+  virtual vector< pair<int, Complex> >  generatePhi( const DipoleSplittingInfo& dInfo, const RhoDMatrix& rho) const = 0;
+   
+  /**
+   * Return the completely spin-unaveraged (i.e. spin-indexed) splitting kernel.
+   **/
+  virtual DecayMEPtr matrixElement(const DipoleSplittingInfo& dInfo) const = 0;
 
   /**
    * Clear the alphaPDF cache
@@ -382,7 +397,13 @@ private:
    * to generate a splitting.
    */
   unsigned long theMaxtry;
-
+  
+  /**
+   * The maximum value for any pdf ratio.
+   * TODO: JB:Should this be an interfaced value? Is there a reasobable case where it should be allowed to be bigger than 1000000.?
+   */
+  static double theMaxPDFRatio;
+  
   /**
    * Return the number of accepted points after which the grid should
    * be frozen
@@ -476,7 +497,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  DipoleSplittingKernel & operator=(const DipoleSplittingKernel &);
+  DipoleSplittingKernel & operator=(const DipoleSplittingKernel &) = delete;
 
 };
 

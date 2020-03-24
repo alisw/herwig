@@ -1,6 +1,83 @@
 Herwig News							 -*- outline -*-
 ================================================================================
 
+* Herwig 7.2.0 release: 2019-12-09
+
+** improvements to the simulation of multiple-parton interactions, including diffractive processes
+
+** a new model for baryonic colour reconnection
+
+** spin correlations in both the dipole and angular-ordered parton showers
+
+** improvements to strangeness production
+
+** an improved choice of evolution variable in the angular-ordered parton shower
+
+** support for generic Lorentz structures in BSM models.
+
+* Herwig 7.1.6 release: 2019-12-11
+
+** fix if no W in top in external events
+
+** vertex position fix for dip[ole shower events
+
+** update boost m4
+
+** add max,min, re, im to functions for ufo conversion
+
+** comparision operators should be const, issues with C++17, thanks to Ivan Razumov (GENSER)
+
+* Herwig 7.1.5 release: 2019-04-04
+
+** Add option of producing partons on physically mass shell after the parton shower
+   to allow the string model to be used to hadronize events
+
+** Fixes for template issues and compiler warnings for gcc8,9, icc and clang
+
+** Fixes to the calculation of W, Z and h widths if decay modes removed
+
+** Fix typo in FI g to gg dipole.
+
+** Fix to allow 1 parameter to specify the mass of more than one particle in the UFO converter
+
+** Fix to partial width calculation of VSS decays
+
+** Fix the PDF assignment for DIS processes with Matchbox
+
+** Fix for undecayed W bosons in internal POWHEG gauge boson pair code
+
+** Update boost detection in configure script
+
+* Herwig 7.1.4 release: 2018-06-28
+
+** More matrix elements and better handling of BSM physics
+
+** Fix for spin correlations in angular-ordered shower, effects top decays
+
+** Allow fixed target collisions
+
+** various minor fixes
+
+* Herwig 7.1.3 release: 2018-04-05
+
+** Dipole Shower
+*** Changed default phase space limits
+*** g -> gg splitting function asymmetrized
+*** Initial retune supplied, given the visible changes 
+    to LEP observables
+
+** Added new Baryonic colour reconnection model 
+   (arXiv 1710:10906)
+
+** Added Schuler-Sjostrand Photon PDFs
+
+** Handling of massless taus from external sources
+
+** various minor fixes
+
+** use std::array<> where possible
+
+
 
 * Herwig 7.1.2 release: 2017-11-01
 
@@ -22,6 +99,7 @@ Herwig News							 -*- outline -*-
 ** Fix in jacobian for massive dipole kinematics.
 
 ** General improvements for UFO model handling.
+
 
 
 * Herwig 7.1.1 release: 2017-07-14

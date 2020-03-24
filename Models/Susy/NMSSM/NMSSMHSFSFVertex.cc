@@ -5,6 +5,7 @@
 //
 
 #include "NMSSMHSFSFVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -20,6 +21,7 @@ NMSSMHSFSFVertex::NMSSMHSFSFVertex() :
   _couplast(0.), _masslast(make_pair(0.*MeV,0.*MeV)), _idlast(make_pair(0,0)) {
   orderInGem(1);
   orderInGs(0);
+  colourStructure(ColourStructure::DELTA);
 }
 
 void NMSSMHSFSFVertex::persistentOutput(PersistentOStream & os) const {
@@ -38,8 +40,10 @@ void NMSSMHSFSFVertex::persistentInput(PersistentIStream & is, int) {
      >> _sw >> _cw >> iunit(_mw,GeV) >> iunit(_mz,GeV) >> _sb >> _cb >> _tb;
 }
 
-ClassDescription<NMSSMHSFSFVertex> NMSSMHSFSFVertex::initNMSSMHSFSFVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<NMSSMHSFSFVertex,Helicity::SSSVertex>
+describeHerwigNMSSMHSFSFVertex("Herwig::NMSSMHSFSFVertex", "HwSusy.so HwNMSSM.so");
 
 void NMSSMHSFSFVertex::Init() {
 

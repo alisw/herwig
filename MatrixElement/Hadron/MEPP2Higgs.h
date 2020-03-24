@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEPP2Higgs.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -21,7 +21,7 @@
 #include "ThePEG/Helicity/Vertex/AbstractVVSVertex.h"
 #include "Herwig/PDT/GenericMassGenerator.h"
 #include "Herwig/MatrixElement/ProductionMatrixElement.h"
-#include "Herwig/Shower/Core/Couplings/ShowerAlpha.h"
+#include "Herwig/Shower/ShowerAlpha.h"
 
 namespace Herwig {
 using namespace ThePEG;
@@ -88,15 +88,24 @@ public:
 
   /**
    * Apply the soft matrix element correction
-   * @param initial The particle from the hard process which started the 
-   * shower
    * @param parent The initial particle in the current branching
-   * @param br The branching struct
+   * @param progenitor The progenitor particle of the jet
+   * @param fs Whether the emission is initial or final-state
+   * @param highestpT The highest pT so far in the shower
+   * @param ids ids of the particles produced in the branching
+   * @param z The momentum fraction of the branching
+   * @param scale the evolution scale of the branching
+   * @param pT The transverse momentum of the branching
    * @return If true the emission should be vetoed
    */
-  virtual bool softMatrixElementVeto(ShowerProgenitorPtr initial,
-				     ShowerParticlePtr parent,
-				     Branching br);
+  virtual bool softMatrixElementVeto(PPtr parent,
+				     PPtr progenitor,
+				     const bool & fs,
+				     const Energy & highestpT,
+				     const vector<tcPDPtr> & ids,
+				     const double & z,
+				     const Energy & scale,
+				     const Energy & pT);
 
   /**
    *  Apply the POWHEG style correction
@@ -387,16 +396,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEPP2Higgs> initMEPP2Higgs;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEPP2Higgs & operator=(const MEPP2Higgs &);
+  MEPP2Higgs & operator=(const MEPP2Higgs &) = delete;
   //@}
 
   /**
@@ -702,40 +705,6 @@ private:
   bool spinCorrelations_;
 
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the base classes of MEPP2Higgs. */
-template <>
-struct BaseClassTrait<Herwig::MEPP2Higgs,1> {
-  /** Typedef of the first base class of MEPP2Higgs. */
-  typedef Herwig::HwMEBase NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEPP2Higgs class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEPP2Higgs>
-  : public ClassTraitsBase<Herwig::MEPP2Higgs> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEPP2Higgs"; }
-  /**
-   * The name of a file containing the dynamic library where the class
-   * MEPP2Higgs is implemented. It may also include several, space-separated,
-   * libraries if the class MEPP2Higgs depends on other classes (base classes
-   * excepted). In this case the listed libraries will be dynamically
-   * linked in the order they are specified.
-   */
-  static string library() { return "HwMEHadron.so"; }
-};
-
-/** @endcond */
 
 }
 

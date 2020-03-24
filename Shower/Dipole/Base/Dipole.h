@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // Dipole.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -51,6 +51,7 @@ public:
 	 const pair<PDF,PDF>& newPDFs,
 	 pair<double,double> newFractions,
 	 const pair<bool,bool> decaying = pair<bool,bool>(false,false),
+	 const pair<bool,bool> offShell = pair<bool,bool>(false,false),
 	 pair<Energy,Energy> newScales = pair<Energy,Energy>(ZERO,ZERO));
 
 
@@ -99,7 +100,6 @@ public:
    * particle, for debugging only.
    */
   bool rightDecaying() { return theDecaying.second; }
-
 
   /**
    * Set the left particle.
@@ -179,6 +179,16 @@ public:
   }
 
   /**
+   * Set the first index
+   */
+  void setFirstIndex(DipoleIndex s){theIndices.first=s;}
+
+  /**
+   * Set the first index
+   */
+  void setSecondIndex(DipoleIndex s){theIndices.second=s;}
+
+  /**
    * Return the emitter particle for the
    * selected configuration.
    */
@@ -249,7 +259,8 @@ public:
    * If colourSpectator is true, do not change the spectator.
    */
   pair<Dipole,Dipole> split (DipoleSplittingInfo& dsplit,
-			     bool colourSpectator) const;
+			     bool colourSpectator,
+			     bool subleadingNc = false) const;
 
   /**
    * As split, but without touching the event record.
@@ -298,16 +309,22 @@ private:
   pair<DipoleIndex,DipoleIndex> theIndices;
 
   /**
-   * The scale associated to the first and second
-   * particle, respectively.
-   */
-  pair<Energy,Energy> theScales;
-
-  /**
    * Indicates if either the first or the second parton 
    * is incoming to a decay.
    */
   pair<bool,bool> theDecaying;
+
+  /** 
+   * Indicates if either the first or second parton
+   * can be off-shell (required for sampling).
+   **/
+  pair<bool,bool> theOffShell;
+  
+  /**
+   * The scale associated to the first and second
+   * particle, respectively.
+   */
+  pair<Energy,Energy> theScales;
 
 };
 

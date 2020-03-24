@@ -102,7 +102,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/Config/config.h
+CONFIG_HEADER = $(top_builddir)/Config/config.h \
+	$(top_builddir)/PDF/SaSPhotonPDF.cc
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -146,12 +147,6 @@ am__v_lt_1 =
 HwMPI_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(HwMPI_la_LDFLAGS) $(LDFLAGS) -o $@
-HwUA5_la_LIBADD =
-am_HwUA5_la_OBJECTS = UA5Handler.lo
-HwUA5_la_OBJECTS = $(am_HwUA5_la_OBJECTS)
-HwUA5_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(HwUA5_la_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -164,7 +159,7 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/Config
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/Config -I$(top_builddir)/PDF
 depcomp = $(SHELL) $(top_srcdir)/Config/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -204,8 +199,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(HwMPI_la_SOURCES) $(HwUA5_la_SOURCES)
-DIST_SOURCES = $(HwMPI_la_SOURCES) $(HwUA5_la_SOURCES)
+SOURCES = $(HwMPI_la_SOURCES)
+DIST_SOURCES = $(HwMPI_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -248,14 +243,8 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
-BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
-BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
 BOOST_LDPATH = @BOOST_LDPATH@
 BOOST_ROOT = @BOOST_ROOT@
-BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
-BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
-BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS = @BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS@
 BOOST_UNIT_TEST_FRAMEWORK_LDPATH = @BOOST_UNIT_TEST_FRAMEWORK_LDPATH@
 BOOST_UNIT_TEST_FRAMEWORK_LIBS = @BOOST_UNIT_TEST_FRAMEWORK_LIBS@
@@ -279,6 +268,7 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DISTCHECK_CONFIGURE_FLAGS = @DISTCHECK_CONFIGURE_FLAGS@
 DLLTOOL = @DLLTOOL@
 DO_GOSAM = @DO_GOSAM@
 DO_MADGRAPH = @DO_MADGRAPH@
@@ -445,6 +435,7 @@ psdir = @psdir@
 pyexecdir = @pyexecdir@
 pythiaconfig = @pythiaconfig@
 pythondir = @pythondir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -453,9 +444,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-pkglib_LTLIBRARIES = HwUA5.la HwMPI.la
-HwUA5_la_SOURCES = UA5Handler.cc  UA5Handler.h UA5Handler.icc
-HwUA5_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 6:0:0
+pkglib_LTLIBRARIES = HwMPI.la
 HwMPI_la_SOURCES = MPISampler.cc MPISampler.h MPISampler.icc \
 	MPISampler.fh MPIHandler.cc \
 	MPIHandler.fh MPIHandler.h \
@@ -464,7 +453,7 @@ HwMPI_la_SOURCES = MPISampler.cc MPISampler.h MPISampler.icc \
 	MPIXSecReweighter.h MPIXSecReweighter.cc \
 	stat.h
 
-HwMPI_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 14:0:0
+HwMPI_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 16:0:0
 HwMPI_la_LIBADD = $(GSLLIBS)
 HwMPI_la_CPPFLAGS = $(AM_CPPFLAGS) $(GSLINCLUDE)
 all: all-am
@@ -539,9 +528,6 @@ clean-pkglibLTLIBRARIES:
 HwMPI.la: $(HwMPI_la_OBJECTS) $(HwMPI_la_DEPENDENCIES) $(EXTRA_HwMPI_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(HwMPI_la_LINK) -rpath $(pkglibdir) $(HwMPI_la_OBJECTS) $(HwMPI_la_LIBADD) $(LIBS)
 
-HwUA5.la: $(HwUA5_la_OBJECTS) $(HwUA5_la_DEPENDENCIES) $(EXTRA_HwUA5_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(HwUA5_la_LINK) -rpath $(pkglibdir) $(HwUA5_la_OBJECTS) $(HwUA5_la_LIBADD) $(LIBS)
-
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -552,7 +538,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HwMPI_la-MPISampler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HwMPI_la-MPIXSecReweighter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HwMPI_la-ProcessHandler.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UA5Handler.Plo@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

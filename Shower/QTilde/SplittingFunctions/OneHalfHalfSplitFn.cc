@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // OneHalfHalfSplitFn.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -67,6 +67,10 @@ double OneHalfHalfSplitFn::integOverP(const double z, const IdList & ids,
     return -colourFactor(ids)*log(1.-z);
   case 3:
     return colourFactor(ids)*log(z/(1.-z));
+  case 4:
+    return colourFactor(ids)*2.*sqrt(z);
+  case 5:
+    return colourFactor(ids)*(2./3.)*z*sqrt(z);
   default:
     throw Exception() << "OneHalfHalfSplitFn::integOverP() invalid PDFfactor = "
 		      << PDFfactor << Exception::runerror;
@@ -85,6 +89,10 @@ double OneHalfHalfSplitFn::invIntegOverP(const double r,
     return 1.-exp(-r/colourFactor(ids));
   case 3:
     return 1./(1.+exp(-r/colourFactor(ids)));
+  case 4:
+    return 0.25*sqr(r/colourFactor(ids));
+  case 5:
+    return pow(1.5*r/colourFactor(ids),2./3.);
   default:
     throw Exception() << "OneHalfHalfSplitFn::integOverP() invalid PDFfactor = "
 		      << PDFfactor << Exception::runerror;
@@ -119,7 +127,7 @@ vector<pair<int, Complex> >
 OneHalfHalfSplitFn::generatePhiBackward(const double, const Energy2, const IdList &,
 					const RhoDMatrix & ) { 
   // no dependance
-  return vector<pair<int, Complex> >(1,make_pair(0,1.));
+  return {{ {0, 1.} }};
 }
 
 DecayMEPtr OneHalfHalfSplitFn::matrixElement(const double z, const Energy2 t, 

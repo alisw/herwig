@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // TensorMesonVectorVectorDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "TensorMesonVectorVectorDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Interface/ParVector.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
@@ -157,9 +158,10 @@ void TensorMesonVectorVectorDecayer::persistentInput(PersistentIStream & is, int
   is >> _incoming >> _outgoing1 >> _outgoing2 >> _maxweight >> iunit(_coupling,1/GeV);
 }
 
-ClassDescription<TensorMesonVectorVectorDecayer> 
-TensorMesonVectorVectorDecayer::initTensorMesonVectorVectorDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<TensorMesonVectorVectorDecayer,DecayIntegrator>
+describeHerwigTensorMesonVectorVectorDecayer("Herwig::TensorMesonVectorVectorDecayer", "HwTMDecay.so");
 
 void TensorMesonVectorVectorDecayer::Init() {
 
@@ -264,7 +266,7 @@ double TensorMesonVectorVectorDecayer::me2(const int,const Particle & inpart,
 	      -p1eps2[iy]*(_vectors[0][ix].dot(pleft[1][inhel]+pright[1][inhel]))
 	      +pboth[inhel]*e1e2
 	      +(p2eps1[ix]*p1eps2[iy]-e1e2*p1p2)*trace[inhel]);
-	(*ME())(inhel,ix,iy)=fact*me;
+	(*ME())(inhel,ix,iy)=Complex(fact*me);
       }    
     }
   }

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEff2ff.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -19,6 +19,7 @@
 #include "ThePEG/Helicity/Vertex/AbstractFFSVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFVVertex.h"
 #include "ThePEG/Helicity/Vertex/AbstractFFTVertex.h"
+#include "ThePEG/Helicity/Vertex/AbstractFFFFVertex.h"
 
 namespace Herwig {
 using namespace ThePEG;
@@ -30,8 +31,6 @@ using Helicity::SpinorBarWaveFunction;
  * a \f$ \Psi \Psi \to \Psi \Psi\f$ process. It inherits from 
  * GeneralHardME and implements the appropriate virtual functions.
  *
- * @see \ref MEff2ffInterfaces "The Interfaces"
- * defined for MEff2ff.
  * @see GeneralHardME
  */
 class MEff2ff: public GeneralHardME {
@@ -43,14 +42,6 @@ public:
 
   /** Vector of SpinorBarWaveFunctions. */
   typedef vector<SpinorBarWaveFunction> SpinorBarVector;
-
-public:
-
-  /**
-   * The default constructor.
-   */
-  MEff2ff() : scalar_(0), vector_(0), tensor_(0), spin_(4), sbar_(4) 
-  {}
 
 public:
 
@@ -186,16 +177,10 @@ protected:
 private:
 
   /**
-   * The static object used to initialize the description of this class.
-   * Indicates that this is a concrete class with persistent data.
-   */
-  static ClassDescription<MEff2ff> initMEff2ff;
-
-  /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  MEff2ff & operator=(const MEff2ff &);
+  MEff2ff & operator=(const MEff2ff &) = delete;
 
 private:
   
@@ -215,42 +200,20 @@ private:
   vector<pair<AbstractFFTVertexPtr, AbstractFFTVertexPtr> > tensor_;
 
   /**
+   *  Store any 4-point vertices
+   */
+  vector<AbstractFFFFVertexPtr> four_;
+
+  /**
    *  Spinors
    */
-  mutable vector<vector<SpinorWaveFunction> > spin_;
+  mutable std::array<SpinorVector,4> spin_;
 
   /**
    *  Barred spinors
    */
-  mutable vector<vector<SpinorBarWaveFunction> > sbar_;
+  mutable std::array<SpinorBarVector,4> sbar_;
 };
-
-}
-
-#include "ThePEG/Utilities/ClassTraits.h"
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the
- *  base classes of MEff2ff. */
-template <>
-struct BaseClassTrait<Herwig::MEff2ff,1> {
-  /** Typedef of the first base class of MEff2ff. */
-  typedef Herwig::GeneralHardME NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of
- *  the MEff2ff class and the shared object where it is defined. */
-template <>
-struct ClassTraits<Herwig::MEff2ff>
-  : public ClassTraitsBase<Herwig::MEff2ff> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::MEff2ff"; }
-};
-
-/** @endcond */
 
 }
 

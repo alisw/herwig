@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // StandardCKM.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -116,43 +116,12 @@ private:
 private:
 
   /**
-   * Describe a concrete class with persistent data.
-   */
-  static ClassDescription<StandardCKM> initStandardCKM;
-  
-  /**
    * Private and non-existent assignment operator.
    */
-  StandardCKM & operator=(const StandardCKM &);
+  StandardCKM & operator=(const StandardCKM &) = delete;
   
 };
 
 }
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the base classes
- *  of StandardCKM. */
-template <>
-struct BaseClassTrait<Herwig::StandardCKM,1> {
-  /** Typedef of the first base class of StandardCKM. */
-  typedef CKMBase NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of the
- *  StandardCKM class and the shared object where it is
- *  defined. */
-template <>
-struct ClassTraits<Herwig::StandardCKM>: public ClassTraitsBase<Herwig::StandardCKM> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::StandardCKM"; }
-};
-
-/** @endcond */
-
-}
-
 
 #endif /* HERWIG_StandardCKM_H */

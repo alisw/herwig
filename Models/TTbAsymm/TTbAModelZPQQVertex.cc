@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // TTbAModelZPQQVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "TTbAModelZPQQVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -36,6 +37,7 @@ TTbAModelZPQQVertex::TTbAModelZPQQVertex()  {
   addToList(-4,4,32);
   orderInGem(1);
   orderInGs(1);
+  colourStructure(ColourStructure::DELTA);
 }
 
 void TTbAModelZPQQVertex::doinit() {
@@ -62,9 +64,10 @@ void TTbAModelZPQQVertex::persistentInput(PersistentIStream & is, int) {
   is >> _cZPTU_R >> _cZPTU_L >> _cZPUU_R >> _cZPUU_L >> _cZPCC_R >> _cZPCC_L >> _models;
 }
 
-ClassDescription<TTbAModelZPQQVertex> 
-TTbAModelZPQQVertex::initTTbAModelZPQQVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<TTbAModelZPQQVertex,FFVVertex>
+describeHerwigTTbAModelZPQQVertex("Herwig::TTbAModelZPQQVertex", "Herwig.so");
 
 
 void TTbAModelZPQQVertex::Init() {

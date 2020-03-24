@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // OniumToOniumPiPiDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "OniumToOniumPiPiDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ParVector.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/PDT/EnumParticles.h"
@@ -172,8 +173,10 @@ void OniumToOniumPiPiDecayer::persistentInput(PersistentIStream & is, int) {
      >> iunit(_imC,1./GeV2) >> iunit(_cC,1./GeV2);
 }
 
-ClassDescription<OniumToOniumPiPiDecayer> OniumToOniumPiPiDecayer::initOniumToOniumPiPiDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<OniumToOniumPiPiDecayer,DecayIntegrator>
+describeHerwigOniumToOniumPiPiDecayer("Herwig::OniumToOniumPiPiDecayer", "HwVMDecay.so");
 
 void OniumToOniumPiPiDecayer::Init() {
 
@@ -329,7 +332,7 @@ double OniumToOniumPiPiDecayer::me2(const int,
 	(_vectors[0][ix]*decay[1]->momentum())*(_vectors[1][iy]*decay[2]->momentum())+
 	(_vectors[0][ix]*decay[2]->momentum())*(_vectors[1][iy]*decay[1]->momentum());
       (*ME())(ix,iy,0,0)= _coupling[imode()/2]*
-	(A*dota*(q2-2.*mpi2)+B*dota*decay[1]->momentum().e()*decay[2]->momentum().e()
+	Complex(A*dota*(q2-2.*mpi2)+B*dota*decay[1]->momentum().e()*decay[2]->momentum().e()
 	 +C*dotb);
     }
   }

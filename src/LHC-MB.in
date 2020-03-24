@@ -20,28 +20,29 @@ cd /Herwig/Generators
 ##################################################
 set EventGenerator:EventHandler:LuminosityFunction:Energy 7000.0
 
+# Intrinsic pT tune extrapolated to LHC energy
+set /Herwig/Shower/ShowerHandler:IntrinsicPtGaussian 2.2*GeV
 
 # Minimum Bias
 read snippets/MB.in
 
-# Read in parameters of the soft model recommended for MB/UE simulations
-read snippets/SoftTune.in
-
-# Diffraction model
+#Diffraction model
 read snippets/Diffraction.in
 
-##################################################
+
+#################################################
 # Analyses
 ##################################################
 
+## Comment these lines out in order to use rivet analyses
 # cd /Herwig/Analysis
 # create ThePEG::RivetAnalysis RivetAnalysis RivetAnalysis.so
-
+ 
 # cd /Herwig/Generators
 # insert EventGenerator:AnalysisHandlers 0 /Herwig/Analysis/RivetAnalysis
-
-# insert /Herwig/Analysis/RivetAnalysis:Analyses 0 ATLAS_20XX_XXXXXXX
-
+## Some example analyses
+# insert /Herwig/Analysis/RivetAnalysis:Analyses 0 ATLAS_2012_I1084540
+# insert /Herwig/Analysis/RivetAnalysis:Analyses 0 ATLAS_2010_S8918562
 
 #set /Herwig/Analysis/Plot:EventNumber 54
 #cd /Herwig/Generators

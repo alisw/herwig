@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // HerwigStrategy.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2008-2017 The Herwig Collaboration
+// Copyright (C) 2008-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -64,41 +64,11 @@ protected:
 private:
 
   /**
-   * Describe concrete class without persistent data.
-   */
-  static NoPIOClassDescription<HerwigStrategy> initHerwigStrategy;
-
-  /**
    *  Private and non-existent assignment operator.
    */
-  HerwigStrategy & operator=(const HerwigStrategy &);
+  HerwigStrategy & operator=(const HerwigStrategy &) = delete;
 
 };
-
-}
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/** This template specialization informs ThePEG about the base classes
- *  of HerwigStrategy. */
-template <>
-struct BaseClassTrait<Herwig::HerwigStrategy,1>: public ClassTraitsType {
-  /** Typedef of the first base class of HerwigStrategy. */
-  typedef Strategy NthBase;
-};
-
-/** This template specialization informs ThePEG about the name of the
- *  HerwigStrategy class and the shared object where it is
- *  defined. */
-template <>
-struct ClassTraits<Herwig::HerwigStrategy>: public ClassTraitsBase<Herwig::HerwigStrategy> {
-  /** Return a platform-independent class name */
-  static string className() { return "Herwig::HerwigStrategy"; }
-};
-
-/** @endcond */
 
 }
 

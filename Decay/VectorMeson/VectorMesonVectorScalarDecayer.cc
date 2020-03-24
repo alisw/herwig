@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // VectorMesonVectorScalarDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -11,6 +11,7 @@
 // functions of the VectorMesonVectorScalarDecayer class.
 //
 #include "VectorMesonVectorScalarDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/PDT/DecayMode.h"
 #include "ThePEG/Interface/ParVector.h"
@@ -141,9 +142,10 @@ void VectorMesonVectorScalarDecayer::persistentInput(PersistentIStream & is, int
   is >> _incoming >> _outgoingV >> _outgoingS >> _maxweight >> iunit(_coupling,1/GeV);
 }
 
-ClassDescription<VectorMesonVectorScalarDecayer> 
-VectorMesonVectorScalarDecayer::initVectorMesonVectorScalarDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<VectorMesonVectorScalarDecayer,DecayIntegrator>
+describeHerwigVectorMesonVectorScalarDecayer("Herwig::VectorMesonVectorScalarDecayer", "HwVMDecay.so");
 
 void VectorMesonVectorScalarDecayer::Init() {
 
@@ -216,8 +218,8 @@ double VectorMesonVectorScalarDecayer::me2(const int,
     else {
       epsdot=_vectors[1][ix]*inpart.momentum();
       for(unsigned int iy=0;iy<3;++iy) {
-	(*ME())(iy,ix,0)=pre*_vectors[0][iy].dot(p0dotpv*_vectors[1][ix]-
-					      epsdot*decay[0]->momentum());
+	(*ME())(iy,ix,0)=Complex(pre*_vectors[0][iy].dot(p0dotpv*_vectors[1][ix]-
+							 epsdot*decay[0]->momentum()));
       }
     }
   }

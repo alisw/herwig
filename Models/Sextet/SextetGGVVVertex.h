@@ -24,7 +24,9 @@ public:
   /**
    * The default constructor.
    */
-  SextetGGVVVertex() {}
+  SextetGGVVVertex() {
+    colourStructure(ColourStructure::SU3TT6);
+  }
 
   /** Calculate the coupling
    *@param q2 The scale at which to evaluate the coupling
@@ -81,7 +83,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  SextetGGVVVertex & operator=(const SextetGGVVVertex &);
+  SextetGGVVVertex & operator=(const SextetGGVVVertex &) = delete;
 
 private:
 

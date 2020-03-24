@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // GoSamAmplitude.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -29,9 +29,7 @@
 #include "ThePEG/Utilities/StringUtils.h"
 
 #include "Herwig/MatrixElement/Matchbox/MatchboxFactory.h"
-
-#include <boost/progress.hpp>
-#include <boost/filesystem.hpp>
+#include "Herwig/API/Filesystem.h"
 
 #include <fstream>
 #include <sstream>
@@ -39,9 +37,9 @@
 #include <cstdlib>
 #include <exception>
 
-using namespace Herwig;
+namespace bfs = Herwig::filesystem;
 
-namespace bfs = boost::filesystem;
+using namespace Herwig;
 
 #ifndef HERWIG_BINDIR
 #error Makefile.am needs to define HERWIG_BINDIR
@@ -327,6 +325,12 @@ void GoSamAmplitude::startOLP(const string& contract, int& status) {
     OLP_SetParameter((char *)"Gf",&in3,&zero,&pStatus);
   }
 	
+  // hand over widths of Z and W
+  double wZ = getParticleData(23)->hardProcessWidth()/GeV;
+  double wW = getParticleData(24)->hardProcessWidth()/GeV;
+  OLP_SetParameter((char*)"width(23)",&wZ,&zero,&pStatus);
+  OLP_SetParameter((char*)"width(24)",&wW,&zero,&pStatus);
+
   // hand over mass and width of the Higgs
   double wH = getParticleData(25)->hardProcessWidth()/GeV;
   double mH = getParticleData(25)->hardProcessMass()/GeV;

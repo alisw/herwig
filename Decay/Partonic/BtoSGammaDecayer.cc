@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // BtoSGammaDecayer.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "BtoSGammaDecayer.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/PDT/EnumParticles.h"
 #include "Herwig/Utilities/Kinematics.h"
 #include "ThePEG/PDT/DecayMode.h"
@@ -92,8 +93,10 @@ void BtoSGammaDecayer::persistentInput(PersistentIStream & is, int) {
   is >> _hadronicmass;
 }
 
-ClassDescription<BtoSGammaDecayer> BtoSGammaDecayer::initBtoSGammaDecayer;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<BtoSGammaDecayer,PartonicDecayerBase>
+describeHerwigBtoSGammaDecayer("Herwig::BtoSGammaDecayer", "HwPartonicDecay.so");
 
 void BtoSGammaDecayer::Init() {
 

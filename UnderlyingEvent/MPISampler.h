@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MPISampler.h is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -262,52 +262,11 @@ protected:
 private:
 
   /**
-   * Describe a concrete class with persistent data.
-   */
-  static ClassDescription<MPISampler> initMPISampler;
-
-  /**
    *  Private and non-existent assignment operator.
    */
-  MPISampler & operator=(const MPISampler &);
+  MPISampler & operator=(const MPISampler &) = delete;
 
 };
-
-}
-
-namespace ThePEG {
-
-/** @cond TRAITSPECIALIZATIONS */
-
-/**
- * The following template specialization informs ThePEG about the
- * base class of MPISampler.
- */
-template <>
-struct BaseClassTrait<Herwig::MPISampler,1>: public ClassTraitsType {
-  /** Typedef of the first base class of ACDCSampler. */
-  typedef SamplerBase NthBase;
-};
-
-/**
- * The following template specialization informs ThePEG about the
- * name of this class and the shared object where it is defined.
- */
-template <>
-struct ClassTraits<Herwig::MPISampler>: public ClassTraitsBase<Herwig::MPISampler> {
-  /**
-   * Return the class name.
-   */
-  static string className() { return "Herwig::MPISampler"; }
-  /** Return the name of the shared library to be loaded to get
-   * access to this class and every other class it uses
-   * (except the base class).
-   */
-  static string library() { return "JetCuts.so SimpleKTCut.so HwMPI.so"; }
-
-};
-
-/** @endcond */
 
 }
 

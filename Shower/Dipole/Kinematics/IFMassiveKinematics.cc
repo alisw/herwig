@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // IFMassiveKinematics.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -72,18 +72,30 @@ Energy IFMassiveKinematics::dipoleScale(const Lorentz5Momentum& pEmitter,
 
 Energy IFMassiveKinematics::ptMax(Energy dScale, 
 				  double emX, double,
-				  const DipoleIndex& ind,
-				  const DipoleSplittingKernel& split) const {
+				  const DipoleSplittingInfo& dInfo,	
+				  const DipoleSplittingKernel&) const {
 
   Energy2 A = sqr(dScale) * (1.-emX)/emX;
-  Energy2 mk2 = sqr(split.spectator(ind)->mass());
+  Energy2 mk2 = sqr(dInfo.spectatorMass());
+  Energy ptMax = 0.5*A/sqrt(mk2+A);
+  return ptMax;
+}
+
+Energy IFMassiveKinematics::ptMax(Energy dScale, 
+				  double emX, double,
+				  const DipoleIndex&,
+				  const DipoleSplittingKernel&,
+				  tPPtr, tPPtr spectator) const {
+
+  Energy2 A = sqr(dScale) * (1.-emX)/emX;
+  Energy2 mk2 = sqr(spectator->mass());
   Energy ptMax = 0.5*A/sqrt(mk2+A);
   return ptMax;
 }
 
 Energy IFMassiveKinematics::QMax(Energy, 
 				 double, double,
-				 const DipoleIndex&,
+				 const DipoleSplittingInfo&,
 				 const DipoleSplittingKernel&) const {
   assert(false && "add this");
   return 0.0*GeV;
@@ -127,7 +139,7 @@ bool IFMassiveKinematics::generateSplitting(double kappa, double xi, double rphi
   // Compute scales required
   Energy2 pt2 = sqr(pt);
   Energy2 saj = sqr(info.scale());
-  Energy2 mk2 = sqr(info.spectatorData()->mass());
+  Energy2 mk2 = sqr(info.spectatorMass());
 
   // Generate z
   double z = 0.;
@@ -200,10 +212,10 @@ bool IFMassiveKinematics::generateSplitting(double kappa, double xi, double rphi
   }
 
 
-  // Jacobian
-  // Jacobian for dpt2 dz -> dx du
-  Energy2 jac = saj*abs( (1.+x*(muk2-1.))*(-u*(1.-u)/sqr(x)) - (1.+u*(muk2-1.))*((1.-2.*u)*(1.-x)/x - 2.*u*muk2) );
-  jacobian( (pt2/(x*u*jac)) * mapZJacobian * 2. * log(0.5 * generator()->maximumCMEnergy()/IRCutoff()));
+  // Compute the Jacobian
+  double jac = 1./(u + x - 2.*u*x*(1.-muk2));
+
+  jacobian( jac * mapZJacobian * 2. * log(0.5 * generator()->maximumCMEnergy()/IRCutoff()));
     
   // Log results
   double phi = 2.*Constants::pi*rphi;
@@ -228,8 +240,6 @@ void IFMassiveKinematics::generateKinematics(const Lorentz5Momentum& pEmitter,
   Lorentz5Momentum emm;
   Lorentz5Momentum spe;
 
-
-  // TODO: adjust phasespace boundary condition
   if (!theCollinearScheme) {
     assert(false);
 
@@ -242,11 +252,11 @@ void IFMassiveKinematics::generateKinematics(const Lorentz5Momentum& pEmitter,
 
     pt = sqrt(sbar*u*(1.-u)*(1.-x));
     Energy magKt = 
-      sqrt(sbar*u*(1.-u)*(1.-x)/x - sqr(u*dInfo.spectatorData()->mass()));
+      sqrt(sbar*u*(1.-u)*(1.-x)/x - sqr(u*dInfo.spectatorMass()));
     Lorentz5Momentum kt =
-      getKt (pEmitter, pSpectator, magKt, dInfo.lastPhi(),true);
+      getKt (pSpectator, pEmitter, magKt, dInfo.lastPhi(),true);
 
-    Energy2 mj2 = dInfo.spectatorData()->mass()*dInfo.spectatorData()->mass();
+    Energy2 mj2 = sqr(dInfo.spectatorMass());
     double alpha = 1. - 2.*mj2/sbar;
 
     if ( x > u && (1.-x)/(x-u) < 1. ) {
@@ -286,16 +296,16 @@ void IFMassiveKinematics::generateKinematics(const Lorentz5Momentum& pEmitter,
     Energy2 pt2 = sqr(pt);
     Energy2 saj = 2.*pEmitter*pSpectator;
 
-    double muk2 = sqr(dInfo.spectatorData()->mass())/saj;
+    double muk2 = sqr(dInfo.spectatorMass())/saj;
     double r = pt2/saj;
-
+    
     // Calculate x and u
     double rho = 1. - 4.*r*(1.-muk2)*z*(1.-z)/sqr(1.-z+r);
     double x = 0.5*((1.-z+r)/(r*(1.-muk2))) * (1. - sqrt(rho));
     double u = x*r / (1.-z);
     
     // Generate kt
-    Lorentz5Momentum kt = getKt (pEmitter, pSpectator, pt, dInfo.lastPhi(), true);
+    Lorentz5Momentum kt = getKt(pEmitter, pSpectator, pt, dInfo.lastPhi(), true);
  
     // Set the momenta  
     em = (1./x)*pEmitter;
@@ -303,20 +313,21 @@ void IFMassiveKinematics::generateKinematics(const Lorentz5Momentum& pEmitter,
     spe = ((1.-x)*u/x + 2.*u*muk2)*pEmitter + (1.-u)*pSpectator - kt;
     
   }
-
+  
   em.setMass(ZERO);
   em.rescaleEnergy();
 
   emm.setMass(ZERO);
   emm.rescaleEnergy();
 
-  spe.setMass(dInfo.spectatorData()->mass());
+  spe.setMass(dInfo.spectatorMass());
   spe.rescaleEnergy();
 
   emitterMomentum(em);
   emissionMomentum(emm);
   spectatorMomentum(spe);
 }
+
 
 // If needed, insert default implementations of function defined
 // in the InterfacedBase class here (using ThePEG-interfaced-impl in Emacs).

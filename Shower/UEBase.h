@@ -116,13 +116,28 @@ public:
   virtual unsigned int softMultiplicity() const {return 0;} 
   //@}
 
+  /**
+   * Return the inelastic cross section ( sigmaND + sigmaDiff )
+   */
+  virtual CrossSection  inelasticXSec() const =0;
+  
+  /**
+   * Return the diffractiv cross section (sigmaDiff) assumed by the model.
+   */
+  virtual CrossSection diffractiveXSec() const =0;
+  
+  /**
+   * Return the non-diffractiv cross section (sigmaND) assumed by the model.
+   */
+  virtual CrossSection nonDiffractiveXSec() const =0;
+
 private:
 
   /**
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  UEBase & operator=(const UEBase &);
+  UEBase & operator=(const UEBase &) = delete;
 
 };
 

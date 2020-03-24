@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // SSHSFSFVertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "SSHSFSFVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -31,6 +32,7 @@ SSHSFSFVertex::SSHSFSFVertex() : theMix(3), theTriC(9, complex<Energy>(ZERO)),
 				 theSF2Last(0) {
   orderInGem(1);
   orderInGs(0);
+  colourStructure(ColourStructure::DELTA);
 }
 
 void SSHSFSFVertex::doinit() {
@@ -163,8 +165,10 @@ void SSHSFSFVertex::persistentInput(PersistentIStream & is, int) {
      >> iunit(theTriC,GeV);
 }
 
-ClassDescription<SSHSFSFVertex> SSHSFSFVertex::initSSHSFSFVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<SSHSFSFVertex,SSSVertex>
+describeHerwigSSHSFSFVertex("Herwig::SSHSFSFVertex", "HwSusy.so");
 
 void SSHSFSFVertex::Init() {
 

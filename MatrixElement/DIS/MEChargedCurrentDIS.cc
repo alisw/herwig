@@ -5,6 +5,7 @@
 //
 
 #include "MEChargedCurrentDIS.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Utilities/SimplePhaseSpace.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
@@ -54,16 +55,21 @@ void MEChargedCurrentDIS::getDiagrams() const {
     quarkpair.push_back(make_pair(ParticleID::s, ParticleID::t));
     quarkpair.push_back(make_pair(ParticleID::d, ParticleID::t));
     quarkpair.push_back(make_pair(ParticleID::b, ParticleID::t));
+    [[fallthrough]];
   case 5:
     quarkpair.push_back(make_pair(ParticleID::b, ParticleID::c));
     quarkpair.push_back(make_pair(ParticleID::b, ParticleID::u));
+    [[fallthrough]];
   case 4:
     quarkpair.push_back(make_pair(ParticleID::s, ParticleID::c));
     quarkpair.push_back(make_pair(ParticleID::d, ParticleID::c));
+    [[fallthrough]];
   case 3:
     quarkpair.push_back(make_pair(ParticleID::s, ParticleID::u));
+    [[fallthrough]];
   case 2:
     quarkpair.push_back(make_pair(ParticleID::d, ParticleID::u));
+    [[fallthrough]];
   default:
     ;
   }
@@ -122,8 +128,10 @@ void MEChargedCurrentDIS::persistentInput(PersistentIStream & is, int) {
   is >> _theFFWVertex >> _maxflavour >> _wp >> _wm >> _massopt;
 }
 
-ClassDescription<MEChargedCurrentDIS> MEChargedCurrentDIS::initMEChargedCurrentDIS;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEChargedCurrentDIS,DISBase>
+describeHerwigMEChargedCurrentDIS("Herwig::MEChargedCurrentDIS", "HwMEDIS.so");
 
 void MEChargedCurrentDIS::Init() {
 

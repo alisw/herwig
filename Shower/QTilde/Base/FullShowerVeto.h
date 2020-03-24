@@ -7,7 +7,7 @@
 
 #include "ThePEG/Interface/Interfaced.h"
 #include "FullShowerVeto.fh"
-#include "Herwig/Shower/Core/Base/ShowerTree.h"
+#include "Herwig/Shower/QTilde/Base/ShowerTree.h"
 
 namespace Herwig {
 
@@ -110,7 +110,7 @@ private:
    * The assignment operator is private and must never be called.
    * In fact, it should not even be implemented.
    */
-  FullShowerVeto & operator=(const FullShowerVeto &);
+  FullShowerVeto & operator=(const FullShowerVeto &) = delete;
 
 private:
 

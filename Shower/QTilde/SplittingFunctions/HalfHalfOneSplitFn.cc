@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // HalfHalfOneSplitFn.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -100,7 +100,7 @@ HalfHalfOneSplitFn::generatePhiForward(const double, const Energy2, const IdList
 				       const RhoDMatrix &) {
   // no dependence on the spin density matrix, dependence on off-diagonal terms cancels
   // and rest = splitting function for Tr(rho)=1 as required by defn
-  return vector<pair<int, Complex> >(1,make_pair(0,1.));
+  return {{ {0, 1.} }};
 }
 
 vector<pair<int, Complex> > 
@@ -108,7 +108,7 @@ HalfHalfOneSplitFn::generatePhiBackward(const double, const Energy2, const IdLis
 					const RhoDMatrix &) {
   // no dependence on the spin density matrix, dependence on off-diagonal terms cancels
   // and rest = splitting function for Tr(rho)=1 as required by defn
-  return vector<pair<int, Complex> >(1,make_pair(0,1.));
+  return {{ {0, 1.} }};
 }
 
 DecayMEPtr HalfHalfOneSplitFn::matrixElement(const double z, const Energy2 t, 

@@ -5,6 +5,7 @@
 //
 
 #include "NMSSMPPHVertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -24,6 +25,7 @@ NMSSMPPHVertex::NMSSMPPHVertex()
     _couplast(0.), _coup(0.), _hlast(0), _recalc(true) {
   orderInGem(3);
   orderInGs(0);
+  colourStructure(ColourStructure::SINGLET);
 }
 
 void NMSSMPPHVertex::doinit()  {
@@ -121,8 +123,10 @@ void NMSSMPPHVertex::persistentInput(PersistentIStream & is, int) {
      >> iunit(_vu,GeV) >> iunit(_vd,GeV) >> iunit(_s,GeV) >> iunit(_theAl,GeV);
 }
 
-ClassDescription<NMSSMPPHVertex> NMSSMPPHVertex::initNMSSMPPHVertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<NMSSMPPHVertex,VVSLoopVertex>
+describeHerwigNMSSMPPHVertex("Herwig::NMSSMPPHVertex", "HwSusy.so HwNMSSM.so");
 
 void NMSSMPPHVertex::Init() {
 
@@ -179,8 +183,8 @@ void NMSSMPPHVertex::setCoupling(Energy2 q2, tcPDPtr p1, tcPDPtr p2,
 	couplings[3+ic] = make_pair(c,c);
       }
       // W boson
-      c = UnitRemoval::InvE*_mw*
-	(_cb*(*_mixS)(iloc,0)+_sb*(*_mixS)(iloc,1));
+      c = Complex(UnitRemoval::InvE*_mw*
+		  (_cb*(*_mixS)(iloc,0)+_sb*(*_mixS)(iloc,1)));
       couplings[5] = make_pair(c,c);
       // charged Higgs
       complex<Energy> cpl;
@@ -199,7 +203,8 @@ void NMSSMPPHVertex::setCoupling(Energy2 q2, tcPDPtr p1, tcPDPtr p2,
 				    (*_mixS)(iloc,0)*sqr(_sb) 
 				    + 2.*(*_mixS)(iloc,1)*_sb*_cb)/_coup);
       cpl /= -_coup;
-      couplings[6] = make_pair(cpl*UnitRemoval::InvE,cpl*UnitRemoval::InvE);
+      couplings[6] = make_pair(Complex(cpl*UnitRemoval::InvE),
+			       Complex(cpl*UnitRemoval::InvE));
       // sbottoms
       double f1 = mb/_mw/_cb;
       complex<Energy>  f2 = 0.5*_mz/_cw*
@@ -213,7 +218,7 @@ void NMSSMPPHVertex::setCoupling(Energy2 q2, tcPDPtr p1, tcPDPtr p2,
 		    +  _triBt*(*_mixS)(iloc,0))*((*_mixQb)(ix, 1)*(*_mixQb)(ix, 0)
 						 + (*_mixQb)(ix, 0)*(*_mixQb)(ix, 1));
 	cpl *= 3.*sqr(_theSM->ed());
-	couplings[7+ix] = make_pair(cpl*UnitRemoval::InvE,cpl*UnitRemoval::InvE); 
+	couplings[7+ix] = make_pair(Complex(cpl*UnitRemoval::InvE),Complex(cpl*UnitRemoval::InvE)); 
       }
       // stop
       f1 = mt/_mw/_sb;
@@ -227,7 +232,8 @@ void NMSSMPPHVertex::setCoupling(Energy2 q2, tcPDPtr p1, tcPDPtr p2,
 		     + _triTp*(*_mixS)(iloc,1))*((*_mixQt)(ix, 1)*(*_mixQt)(ix, 0)
 						 + (*_mixQt)(ix, 0)*(*_mixQt)(ix, 1));
 	cpl *= 3.*sqr(_theSM->eu());
-	couplings[9+ix] = make_pair(cpl*UnitRemoval::InvE,cpl*UnitRemoval::InvE);
+	couplings[9+ix] = make_pair(Complex(cpl*UnitRemoval::InvE),
+				    Complex(cpl*UnitRemoval::InvE));
       } // sbottoms
       f1 = mtau/_mw/_cb;
       for(unsigned int ix=0;ix<2;++ix) {
@@ -239,7 +245,8 @@ void NMSSMPPHVertex::setCoupling(Energy2 q2, tcPDPtr p1, tcPDPtr p2,
 		    +  _triTa*(*_mixS)(iloc,0))*((*_mixLt)(ix, 1)*(*_mixLt)(ix, 0)
 						 + (*_mixLt)(ix, 0)*(*_mixLt)(ix, 1));
 	cpl *= sqr(_theSM->ee());
-	couplings[11+ix] = make_pair(cpl*UnitRemoval::InvE,cpl*UnitRemoval::InvE); 
+	couplings[11+ix] = make_pair(Complex(cpl*UnitRemoval::InvE),
+				     Complex(cpl*UnitRemoval::InvE)); 
       }
     }
     // pseudoscalar higgs bosons	

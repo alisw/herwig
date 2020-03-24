@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // VBFNLOAmplitude.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -216,7 +216,12 @@ void VBFNLOAmplitude::evalSubProcess() const {
     olpId()[ProcessType::treeME2];
 
   if (theRanHelSum) {
-    vector<double> helicityrn = amplitudeRandomNumbers();
+    vector<double> helicityrn;
+    if ( lastHeadMatchboxXComb() ) {
+      helicityrn = lastHeadMatchboxXComb()->amplitudeRandomNumbers();
+    } else {
+      helicityrn = amplitudeRandomNumbers();
+    }
     if (helicityrn.size()>0) {
       setOLPParameter("HelicityRN",helicityrn[0]);
     }
@@ -249,17 +254,15 @@ void VBFNLOAmplitude::evalColourCorrelator(pair<int,int>) const {
 
   int id = olpId()[ProcessType::colourCorrelatedME2];
 
-  if ( theRanHelSum ) { 
+  if (theRanHelSum) {
+    vector<double> helicityrn;
     if ( lastHeadMatchboxXComb() ) {
-      vector<double> helicityrn = lastHeadMatchboxXComb()->amplitudeRandomNumbers();
-      if (helicityrn.size()>0) {
-        setOLPParameter("HelicityRN",helicityrn[0]);
-      }
-    } else if ( amplitudeRandomNumbers().size() > 0 ) {
-      vector<double> helicityrn = amplitudeRandomNumbers();
-      if (helicityrn.size()>0) {
-        setOLPParameter("HelicityRN",helicityrn[0]);
-      }
+      helicityrn = lastHeadMatchboxXComb()->amplitudeRandomNumbers();
+    } else {
+      helicityrn = amplitudeRandomNumbers();
+    }
+    if (helicityrn.size()>0) {
+      setOLPParameter("HelicityRN",helicityrn[0]);
     }
   }
 
@@ -287,8 +290,13 @@ void VBFNLOAmplitude::evalSpinColourCorrelator(pair<int,int>) const {
 
   int id = olpId()[ProcessType::spinColourCorrelatedME2];
 
-  if (theRanHelSum && lastHeadMatchboxXComb()) {
-    vector<double> helicityrn = lastHeadMatchboxXComb()->amplitudeRandomNumbers();
+  if (theRanHelSum) {
+    vector<double> helicityrn;
+    if ( lastHeadMatchboxXComb() ) {
+      helicityrn = lastHeadMatchboxXComb()->amplitudeRandomNumbers();
+    } else {
+      helicityrn = amplitudeRandomNumbers();
+    }
     if (helicityrn.size()>0) {
       setOLPParameter("HelicityRN",helicityrn[0]);
     }
@@ -330,7 +338,12 @@ void VBFNLOAmplitude::evalLargeNSubProcess(Ptr<ColourBasis>::tptr) const {
     olpId()[ProcessType::treeME2];
 
   if (theRanHelSum) {
-    vector<double> helicityrn = amplitudeRandomNumbers();
+    vector<double> helicityrn;
+    if ( lastHeadMatchboxXComb() ) {
+      helicityrn = lastHeadMatchboxXComb()->amplitudeRandomNumbers();
+    } else {
+      helicityrn = amplitudeRandomNumbers();
+    }
     if (helicityrn.size()>0) {
       setOLPParameter("HelicityRN",helicityrn[0]);
     }
@@ -383,8 +396,13 @@ void VBFNLOAmplitude::evalLargeNColourCorrelator(pair<int,int>,
 
   int id = olpId()[ProcessType::colourCorrelatedME2];
 
-  if (theRanHelSum && lastHeadMatchboxXComb()) {
-    vector<double> helicityrn = lastHeadMatchboxXComb()->amplitudeRandomNumbers();
+  if (theRanHelSum) {
+    vector<double> helicityrn;
+    if ( lastHeadMatchboxXComb() ) {
+      helicityrn = lastHeadMatchboxXComb()->amplitudeRandomNumbers();
+    } else {
+      helicityrn = amplitudeRandomNumbers();
+    }
     if (helicityrn.size()>0) {
       setOLPParameter("HelicityRN",helicityrn[0]);
     }

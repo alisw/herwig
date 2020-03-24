@@ -126,7 +126,7 @@ cd /Herwig/MatrixElements/Matchbox/Scales/
 
 set /Herwig/Merging/MergingFactory:ScaleChoice FixedScale
 set FixedScale:FixedScale 125.*GeV
-#set HTPrimeScale:Factory /Herwig/Merging/MergingFactory
+
 ##################################################
 ## Scale uncertainties
 ##################################################
@@ -144,7 +144,7 @@ set FixedScale:FixedScale 125.*GeV
 ##################################################
 ## CMW - Scheme
 ##################################################
-read Merging/Merging-Dipole-FactorCMWSchemeTune.in
+read snippets/Dipole_AutoTunes_gss.in
 
 ### Use factor in alpha_s argument: alpha_s(q) -> alpha_s(fac*q)
 ### with fac=exp(-(67-3pi^2-10/3*Nf)/(33-2Nf))
@@ -160,7 +160,8 @@ read Merging/FactorCMWScheme.in
 ##################################################
 
 read Matchbox/FiveFlavourNoBMassScheme.in
-read Matchbox/MMHT2014.in
+read Matchbox/CT14.in
+#read Matchbox/MMHT2014.in
 
 ##################################################
 ## Analyses

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // UEDF1F0W1Vertex.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "UEDF1F0W1Vertex.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -30,6 +31,7 @@ UEDF1F0W1Vertex::UEDF1F0W1Vertex() : theSinW(0.), theCosW(0.), theSinOne(0.),
 				     theKKlast(0), theSMlast(0) {
   orderInGs(0);
   orderInGem(1);
+  colourStructure(ColourStructure::DELTA);
 }
 
 void UEDF1F0W1Vertex::doinit() {
@@ -103,8 +105,10 @@ void UEDF1F0W1Vertex::persistentInput(PersistentIStream & is, int) {
      >> theSinWmO >> theCosWmO >> theCKM;
 }
 
-ClassDescription<UEDF1F0W1Vertex> UEDF1F0W1Vertex::initUEDF1F0W1Vertex;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<UEDF1F0W1Vertex,FFVVertex>
+describeHerwigUEDF1F0W1Vertex("Herwig::UEDF1F0W1Vertex", "HwUED.so");
 
 void UEDF1F0W1Vertex::Init() {
 

@@ -18,6 +18,7 @@ LHWWWWVertex::LHWWWWVertex() :
   // order in the couplings
   orderInGem(2);
   orderInGs(0);
+  colourStructure(ColourStructure::SINGLET);
 }
 
 IBPtr LHWWWWVertex::clone() const {
@@ -152,6 +153,7 @@ void LHWWWWVertex::doinit() {
   _coup[33] =-xH*vf*(sqr(c)-sqr(s))/s/c-cw/sw2*xB*vf;
   _coup[34] = 1./sw;
   _coup[35] = cw/sw2;
+  VVVVVertex::doinit();
 }
 
 void LHWWWWVertex::setCoupling(Energy2 q2,tcPDPtr a,tcPDPtr b,

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 // MEfv2fs.cc is a part of Herwig - A multi-purpose Monte Carlo event generator
-// Copyright (C) 2002-2017 The Herwig Collaboration
+// Copyright (C) 2002-2019 The Herwig Collaboration
 //
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
@@ -12,6 +12,7 @@
 //
 
 #include "MEfv2fs.h"
+#include "ThePEG/Utilities/DescribeClass.h"
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
@@ -25,6 +26,9 @@ void MEfv2fs::doinit() {
   GeneralHardME::doinit();
   scalar_.resize(numberOfDiags());
   fermion_.resize(numberOfDiags());
+  vector_.resize(numberOfDiags());
+  four_.resize(numberOfDiags());
+  RSfermion_.resize(numberOfDiags());
   initializeMatrixElements(PDT::Spin1Half, PDT::Spin1, 
 			   PDT::Spin1Half, PDT::Spin0);
  for(size_t ix = 0; ix < numberOfDiags(); ++ix) {
@@ -37,19 +41,49 @@ void MEfv2fs::doinit() {
 	 dynamic_ptr_cast<AbstractVSSVertexPtr>(curr.vertices.second);
        scalar_[ix] =  make_pair(ffs, vss); 
      }
-     else {
+     else if ( curr.intermediate->iSpin() == PDT::Spin1Half ) {
        AbstractFFVVertexPtr ffv = 
 	 dynamic_ptr_cast<AbstractFFVVertexPtr>(curr.vertices.second);
        fermion_[ix] = make_pair(ffs, ffv);
      }
+     else if ( curr.intermediate->iSpin() == PDT::Spin1 ) {
+       AbstractFFVVertexPtr ffv = 
+	 dynamic_ptr_cast<AbstractFFVVertexPtr>(curr.vertices.first);
+       AbstractVVSVertexPtr vvs = 
+	 dynamic_ptr_cast<AbstractVVSVertexPtr>(curr.vertices.second);
+       vector_[ix] = make_pair(ffv, vvs);
+     }
+     else if ( curr.intermediate->iSpin() == PDT::Spin3Half ) {
+       AbstractRFSVertexPtr rfs = 
+	 dynamic_ptr_cast<AbstractRFSVertexPtr>(curr.vertices.first);
+       AbstractRFVVertexPtr rfv = 
+	 dynamic_ptr_cast<AbstractRFVVertexPtr>(curr.vertices.second);
+       RSfermion_[ix] = make_pair(rfs, rfv);
+     }
+     else
+       assert(false);
    }
-   else {
-     AbstractFFVVertexPtr ffv = 
-       dynamic_ptr_cast<AbstractFFVVertexPtr>(curr.vertices.first);
-     AbstractFFSVertexPtr ffs = 
-       dynamic_ptr_cast<AbstractFFSVertexPtr>(curr.vertices.second);
-     fermion_[ix] = make_pair(ffs, ffv); 
+   else if(curr.channelType == HPDiagram::sChannel) {
+     if(curr.intermediate->iSpin() == PDT::Spin1Half ) {
+       AbstractFFVVertexPtr ffv = 
+	 dynamic_ptr_cast<AbstractFFVVertexPtr>(curr.vertices.first);
+       AbstractFFSVertexPtr ffs = 
+	 dynamic_ptr_cast<AbstractFFSVertexPtr>(curr.vertices.second);
+       fermion_[ix] = make_pair(ffs, ffv);
+     }
+     else {
+       AbstractRFVVertexPtr rfv = 
+	 dynamic_ptr_cast<AbstractRFVVertexPtr>(curr.vertices.first);
+       AbstractRFSVertexPtr rfs = 
+	 dynamic_ptr_cast<AbstractRFSVertexPtr>(curr.vertices.second);
+       RSfermion_[ix] = make_pair(rfs, rfv);
+     }
    }
+   else if(curr.channelType == HPDiagram::fourPoint) {
+     four_[ix] = dynamic_ptr_cast<AbstractFFVSVertexPtr>(curr.vertices.first);
+   }
+   else
+     assert(false);
  }
 }
 
@@ -120,23 +154,51 @@ MEfv2fs::fv2fbsHeME(const SpinorVector & spIn, const VecWFVector & vecIn,
 		evaluate(q2, vecIn[ihel2], scaOut, interS);
 	    }
 	    else if( offshell->iSpin() == PDT::Spin1Half ) {
+	      if(offshell->CC()) offshell = offshell->CC();
 	      SpinorBarWaveFunction interFB = fermion_[ix].second->
 		evaluate(q2, 3, offshell,spbOut[ohel1],vecIn[ihel2]);
 	      diag = fermion_[ix].first->
 		evaluate(q2, spIn[ihel1], interFB, scaOut);
 	    }
-	    else diag = 0.0;
+	    else if( offshell->iSpin() == PDT::Spin1 ) {
+	      VectorWaveFunction interV = vector_[ix].first->
+		evaluate(q2,3,offshell,spIn[ihel1],spbOut[ohel1]);
+	      diag = vector_[ix].second->
+		evaluate(q2, vecIn[ihel2], interV, scaOut);
+	    }
+	    else if( offshell->iSpin() == PDT::Spin3Half ) {
+	      if(offshell->CC()) offshell = offshell->CC();
+	      RSSpinorBarWaveFunction interFB = RSfermion_[ix].second->
+		evaluate(q2, 3, offshell,spbOut[ohel1],vecIn[ihel2]);
+	      diag = RSfermion_[ix].first->
+		evaluate(q2, spIn[ihel1], interFB, scaOut);
+	    }
 	  }
 	  else if( current.channelType == HPDiagram::sChannel ) {
-	    // check if take intermediate massless
-	    unsigned int propOpt = 
-	      abs(offshell->id()) != abs(spIn[ihel1].particle()->id()) ? 1 : 5;
-	    SpinorWaveFunction interF = fermion_[ix].second->
-	      evaluate(q2, propOpt, offshell, spIn[ihel1], vecIn[ihel2]);
-	    diag = fermion_[ix].first->
-	      evaluate(q2, interF, spbOut[ohel1], scaOut);
+	    if( offshell->iSpin() == PDT::Spin1Half ) {
+	      // check if take intermediate massless
+	      unsigned int propOpt = 
+		abs(offshell->id()) != abs(spIn[ihel1].particle()->id()) ? 1 : 5;
+	      SpinorWaveFunction interF = fermion_[ix].second->
+		evaluate(q2, propOpt, offshell, spIn[ihel1], vecIn[ihel2]);
+	      diag = fermion_[ix].first->
+		evaluate(q2, interF, spbOut[ohel1], scaOut);
+	    }
+	    else if( offshell->iSpin() == PDT::Spin3Half ) {
+	      RSSpinorWaveFunction interF = RSfermion_[ix].second->
+		evaluate(q2, 1, offshell, spIn[ihel1], vecIn[ihel2]);
+	      diag = RSfermion_[ix].first->
+		evaluate(q2, interF, spbOut[ohel1], scaOut);
+	    }
+	    else
+	      assert(false);
 	  }
-	  else diag = 0.0;
+	  else if( current.channelType == HPDiagram::fourPoint) {
+	    diag = four_[ix]-> evaluate(q2, spIn[ihel1], spbOut[ohel1],
+					vecIn[ihel2], scaOut);
+	  }
+	  else
+	    assert(false);
 	  me[ix] += norm(diag);
 	  diagramME()[ix](ihel1, 2*ihel2, ohel1, 0) = diag;
 	  //Compute flows
@@ -198,18 +260,46 @@ MEfv2fs::fbv2fsHeME(const SpinorBarVector & spbIn, const VecWFVector & vecIn,
 	      diag = fermion_[ix].second->
 		evaluate(q2, spOut[ohel1], interFB, vecIn[ihel2]);
 	    }
-	    else diag = 0.0;
+	    else if( offshell->iSpin() == PDT::Spin1 ) {
+	      VectorWaveFunction interV = vector_[ix].first->
+		evaluate(q2,3,offshell, spOut[ohel1], spbIn[ihel1]);
+	      diag = vector_[ix].second->
+		evaluate(q2, vecIn[ihel2], interV, scaOut);
+	    }
+	    else if( offshell->iSpin() == PDT::Spin3Half ) {
+	      RSSpinorBarWaveFunction interFB = RSfermion_[ix].first->
+		evaluate(q2, 3, offshell, spbIn[ihel1], scaOut);
+	      diag = RSfermion_[ix].second->
+		evaluate(q2, spOut[ohel1], interFB, vecIn[ihel2]);
+	    }
+	    else
+	      assert(false);
 	  }
 	  else if( current.channelType == HPDiagram::sChannel ) {
-	    // check if take intermediate massless
-	    unsigned int propOpt = 
-	      abs(offshell->id()) != abs(spbIn[ihel1].particle()->id()) ? 1 : 5;
-	    SpinorBarWaveFunction interFB = fermion_[ix].second->
-	      evaluate(q2, propOpt, offshell, spbIn[ihel1], vecIn[ihel2]);
-	    diag = fermion_[ix].first->
-	      evaluate(q2, spOut[ohel1], interFB, scaOut);
+	    if( offshell->iSpin() == PDT::Spin1Half ) {
+	      // check if take intermediate massless
+	      unsigned int propOpt = 
+		abs(offshell->id()) != abs(spbIn[ihel1].particle()->id()) ? 1 : 5;
+	      SpinorBarWaveFunction interFB = fermion_[ix].second->
+		evaluate(q2, propOpt, offshell, spbIn[ihel1], vecIn[ihel2]);
+	      diag = fermion_[ix].first->
+		evaluate(q2, spOut[ohel1], interFB, scaOut);
+	    }
+	    else if( offshell->iSpin() == PDT::Spin3Half ) {
+	      RSSpinorBarWaveFunction interFB = RSfermion_[ix].second->
+		evaluate(q2, 1, offshell, spbIn[ihel1], vecIn[ihel2]);
+	      diag = RSfermion_[ix].first->
+		evaluate(q2, spOut[ohel1], interFB, scaOut);
+	    }
+	    else
+	      assert(false);
 	  }
-	  else diag = 0.0;
+	  else if( current.channelType == HPDiagram::fourPoint) {
+	    diag = four_[ix]-> evaluate(q2, spOut[ohel1], spbIn[ihel1],
+					vecIn[ihel2], scaOut);
+	  }
+	  else
+	    assert(false);
 	  me[ix] += norm(diag);
 	  diagramME()[ix](ihel1, 2*ihel2, ohel1, 0) = diag;
 	  //Compute flows
@@ -240,17 +330,19 @@ MEfv2fs::fbv2fsHeME(const SpinorBarVector & spbIn, const VecWFVector & vecIn,
 }
 
 void MEfv2fs::persistentOutput(PersistentOStream & os) const {
-  os << scalar_ << fermion_;
+  os << scalar_ << fermion_ << vector_ << four_ << RSfermion_;
 }
 
 void MEfv2fs::persistentInput(PersistentIStream & is, int) {
-  is >> scalar_ >> fermion_;
+  is >> scalar_ >> fermion_ >> vector_ >> four_ >> RSfermion_;
   initializeMatrixElements(PDT::Spin1Half, PDT::Spin1, 
 			   PDT::Spin1Half, PDT::Spin0);
 }
 
-ClassDescription<MEfv2fs> MEfv2fs::initMEfv2fs;
-// Definition of the static class description member.
+// The following static variable is needed for the type
+// description system in ThePEG.
+DescribeClass<MEfv2fs,GeneralHardME>
+describeHerwigMEfv2fs("Herwig::MEfv2fs", "Herwig.so");
 
 void MEfv2fs::Init() {
 
