@@ -412,6 +412,7 @@ MKDIR_VBFNLO = @MKDIR_VBFNLO@
 NJETINCLUDEPATH = @NJETINCLUDEPATH@
 NJETLIBPATH = @NJETLIBPATH@
 NJETPREFIX = @NJETPREFIX@
+NJET_VERSION = @NJET_VERSION@
 NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
@@ -430,6 +431,7 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PERL = @PERL@
 PYTHIA8DATA = @PYTHIA8DATA@
+PYTHIA8LIB = @PYTHIA8LIB@
 PYTHON = @PYTHON@
 PYTHON_EXEC_PREFIX = @PYTHON_EXEC_PREFIX@
 PYTHON_PLATFORM = @PYTHON_PLATFORM@
@@ -522,15 +524,15 @@ pkglib_LTLIBRARIES = HwPomeronPDF.la HwReggeonPDF.la HwPomeronFlux.la \
 HwPomeronPDF_la_SOURCES = \
 PomeronPDF.cc PomeronPDF.h
 
-HwPomeronPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 4:0:0
+HwPomeronPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 5:0:0
 HwReggeonPDF_la_SOURCES = \
 ReggeonPDF.cc ReggeonPDF.h
 
-HwReggeonPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 4:0:0
+HwReggeonPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 5:0:0
 HwPomeronFlux_la_SOURCES = \
 PomeronFlux.h PomeronFlux.cc
 
-HwPomeronFlux_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 5:0:0
+HwPomeronFlux_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 6:0:0
 noinst_LTLIBRARIES = libHwRemDecayer.la libHwMPIPDF.la
 libHwRemDecayer_la_SOURCES = \
 HwRemDecayer.h HwRemDecayer.cc HwRemDecayer.fh
@@ -542,19 +544,19 @@ MinBiasPDF.h MinBiasPDF.cc MinBiasPDF.fh
 HwSatPDF_la_SOURCES = \
 SatPDF.h SatPDF.cc
 
-HwSatPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 7:0:0
+HwSatPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 8:0:0
 HwPartonExtractor_la_SOURCES = \
 MultiPartonExtractor.h MultiPartonExtractor.cc
 
-HwPartonExtractor_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 7:0:0
+HwPartonExtractor_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 8:0:0
 HwIncomingPhotonEvolver_la_SOURCES = \
 IncomingPhotonEvolver.h IncomingPhotonEvolver.cc
 
-HwIncomingPhotonEvolver_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 7:0:0
+HwIncomingPhotonEvolver_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 8:0:0
 HwSaSPhotonPDF_la_SOURCES = \
 SaSGamma.f SaSPhotonPDF.cc SaSPhotonPDF.h
 
-HwSaSPhotonPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 2:0:0
+HwSaSPhotonPDF_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 3:0:0
 all: SaSPhotonPDF.cc
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 

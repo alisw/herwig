@@ -398,6 +398,7 @@ MKDIR_VBFNLO = @MKDIR_VBFNLO@
 NJETINCLUDEPATH = @NJETINCLUDEPATH@
 NJETLIBPATH = @NJETLIBPATH@
 NJETPREFIX = @NJETPREFIX@
+NJET_VERSION = @NJET_VERSION@
 NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
@@ -416,6 +417,7 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PERL = @PERL@
 PYTHIA8DATA = @PYTHIA8DATA@
+PYTHIA8LIB = @PYTHIA8LIB@
 PYTHON = @PYTHON@
 PYTHON_EXEC_PREFIX = @PYTHON_EXEC_PREFIX@
 PYTHON_PLATFORM = @PYTHON_PLATFORM@
@@ -503,7 +505,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = Base Kernels Kinematics Utility AlphaS Merging SpinCorrelations 
 pkglib_LTLIBRARIES = HwDipoleShower.la HwKrknloEventReweight.la
-HwDipoleShower_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 11:0:0
+HwDipoleShower_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 12:0:0
 HwDipoleShower_la_LIBADD = \
 	Base/libHwDipoleShowerBase.la \
 	Kernels/libHwDipoleShowerKernels.la \
@@ -518,7 +520,7 @@ HwDipoleShower_la_SOURCES = \
 HwKrknloEventReweight_la_SOURCES = \
 	KrkNLO/KrknloEventReweight.h KrkNLO/KrknloEventReweight.cc
 
-HwKrknloEventReweight_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 3:0:0
+HwKrknloEventReweight_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 4:0:0
 all: all-recursive
 
 .SUFFIXES:

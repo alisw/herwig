@@ -1,7 +1,7 @@
 # -*- Makefile -*- (for emacs)
 # Models/Feynrules/python/Makefile-FR.  Generated from Makefile-FR.in by configure.
 #
-# Herwig 7.2.0
+# Herwig 7.2.2
 #
 # This Makefile is intended for compiling Herwig plugins
 # You can find example plugins in the Contrib directory
@@ -16,12 +16,12 @@
 .PRECIOUS: %.o
 .PHONY: all clean
 
-CXX = g++
+CXX = g++ -std=c++11
 
 CXXFLAGS = -Wall -Wextra -pedantic -O2 -DBOOST_UBLAS_NDEBUG
 
 # add additional package header directories here
-CPPFLAGS = -I/home/richardn/montecarlo/herwig/release-7.2/include -I/home/richardn/montecarlo/herwig/release-7.2 -I/home/richardn/montecarlo/utilities/include
+CPPFLAGS = -I/home/aidin/Desktop/HerwigRL/include -I/home/aidin/Desktop/HerwigRL/include -I/home/aidin/Desktop/HerwigRL/include
 
 # add additional libraries here
 LDFLAGS = 

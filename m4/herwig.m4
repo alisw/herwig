@@ -165,6 +165,76 @@ if test "x$GCC" = "xyes"; then
 fi
 AC_MSG_RESULT([$enable_looptools])
 
+AC_LANG_PUSH([Fortran])
+AC_MSG_CHECKING([checking if fortran compiler compiles argument mismatches])
+AC_COMPILE_IFELSE(AC_LANG_SOURCE([[
+      program temp
+      call a(1.0D0)
+      end program
+      subroutine a(b)
+      double complex b
+      end]]),
+      [AC_MSG_RESULT([yes])],
+      [oldFCFLAGS="$FCFLAGS"
+      FCFLAGS="-std=legacy"
+      AC_MSG_CHECKING([checking if fortran compiler compiles argument mismatches with -std=legacy])
+      AC_COMPILE_IFELSE(AC_LANG_SOURCE([[
+      program temp
+      double precision b
+      double complex c
+      b = 1.0D0
+      c  =1.0D0
+      call a(b)
+      call a(c)
+      end program
+      subroutine a(b)
+      double complex b
+      end]]),
+      [AC_MSG_RESULT([yes])
+       AM_FCFLAGS="$AM_FCFLAGS -std=legacy"],
+      [AC_MSG_RESULT([no])
+      AC_MSG_ERROR([fortran compiler won't compile LoopTools])])
+     FCFLAGS="$oldFCFLAGS -std=legacy"]
+)
+
+AC_MSG_CHECKING([checking if fortran compiler compiles long lines])
+AC_COMPILE_IFELSE(AC_LANG_SOURCE([[
+       program temp
+       write (*,*) 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+       end program]]),
+       [AC_MSG_RESULT([yes])],
+       [AC_MSG_RESULT([no])
+       oldFCFLAGS="$FCFLAGS"
+       FCFLAGS="-ffixed-line-length-none"
+       AC_MSG_CHECKING([checking if fortran compiler compiles long lines with -ffixed-line-length-none])
+       AC_COMPILE_IFELSE(AC_LANG_SOURCE([[
+       program temp
+       write (*,*) 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+       end program]]),
+       [AC_MSG_RESULT([yes])
+       AM_FCFLAGS="$AM_FCFLAGS -ffixed-line-length-none"
+       FCFLAGS="$oldFCFLAGS -ffixed-line-length-none"],
+       [FCFLAGS="-132"
+       AC_MSG_CHECKING([checking if fortran compiler compiles long lines with -132])
+       AC_COMPILE_IFELSE(AC_LANG_SOURCE([[
+       program temp
+       write (*,*) 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+       end program]]),
+       [AC_MSG_RESULT([yes])
+       AM_FCFLAGS="$AM_FCFLAGS -132"
+       FCFLAGS="$oldFCFLAGS -132"],
+       [AC_MSG_RESULT([no])
+       AC_MSG_ERROR([fortran compiler won't compile LoopTools])])])
+      ]
+)
+
+
+
+
+
+AC_LANG_POP([Fortran])
+
+
 AC_SUBST([F77],[$FC])
 AC_SUBST([FFLAGS],[$FCFLAGS])
 AC_SUBST([AM_FFLAGS],[$AM_FCFLAGS])
@@ -304,6 +374,15 @@ AS_IF([test "x$with_njet" != "xno"  -a "x$have_njet" = "xno"],
 
 AM_CONDITIONAL(HAVE_NJET,[test "x$have_njet" = "xlib" -o "x$have_njet" = "xlib64"])
 
+AS_IF([test "x$with_njet" != "xno"],[AC_MSG_CHECKING([for Njet version])
+tmp_njetversion=[$(${with_njet}/bin/njet.py --version 2>&1 | grep -oE '[0-9]{4}$')]
+AS_IF([test -z "$tmp_njetversion"],
+      [tmp_njetversion=1023])
+      AC_MSG_RESULT([${tmp_njetversion}])
+      NJET_VERSION=${tmp_njetversion}
+      AC_SUBST(NJET_VERSION)
+])
+
 if test "x$have_njet" = "xlib" -o "x$have_njet" = "xlib64" ; then
      	LOAD_NJET="library"
      	CREATE_NJET="create"
@@ -311,7 +390,7 @@ if test "x$have_njet" = "xlib" -o "x$have_njet" = "xlib64" ; then
      	DO_NJET="do"
 else
      	LOAD_NJET="# library"
-	CREATE_NJET="# create"
+      CREATE_NJET="# create"
      	INSERT_NJET="# insert"
      	DO_NJET="# do"
 fi
@@ -624,6 +703,37 @@ AC_SUBST([DO_MADGRAPH])
 ])
 
 
+AC_DEFUN([HERWIG_CHECK_PYTHIA],
+[
+dnl check if a directory is specified for Pythia
+AC_ARG_WITH(pythia,
+            [AC_HELP_STRING([--with-pythia=dir],
+                            [Assume the given directory for Pythia])])
+
+dnl search for the pythia-config script
+if test "$with_pythia" = ""; then
+   AC_PATH_PROG(pythiaconfig, pythia8-config, no)
+else
+   AC_PATH_PROG(pythiaconfig, pythia8-config, no, ${with_pythia}/bin)
+fi
+
+if test "${pythiaconfig}" = "no"; then
+   AC_MSG_CHECKING(Pythia)
+   AC_MSG_RESULT(no);
+   PYTHIA8LIB=
+#   $2
+else
+   PYTHIA8DATA=`${pythiaconfig} --datadir`/xmldoc
+   PYTHIA8LIB="-L`${pythiaconfig} --libdir` -lpythia8"
+fi
+
+AC_SUBST(PYTHIA8DATA)
+AC_SUBST(PYTHIA8LIB)
+
+])
+
+dnl CHECK PYTHIA END
+
 dnl ##### EvtGen #####
 AC_DEFUN([HERWIG_CHECK_EVTGEN],
 [
@@ -672,7 +782,7 @@ if test "x$have_evtgen" = "xlib"  ; then
 elif test "x$have_evtgen" = "xlib64"  ; then
       LOAD_EVTGEN_DECAYS="read EvtGenBDecays.in"
       LOAD_EVTGEN_DECAYER="read EvtGenDecayer.in"
-  EVTGENLIBS="-L$with_evtgen/lib64 -lEvtGen -lEvtGenExternal"
+      EVTGENLIBS="-L$with_evtgen/lib64 -lEvtGen -lEvtGenExternal"
 else
      	LOAD_EVTGEN_DECAYS="read HerwigBDecays.in"
      	LOAD_EVTGEN_DECAYER="#read EvtGenDecayer.in"
@@ -685,36 +795,6 @@ AC_SUBST([EVTGENLIBS])
 
 
 ])
-
-AC_DEFUN([HERWIG_CHECK_PYTHIA],
-[
-dnl check if a directory is specified for Pythia
-AC_ARG_WITH(pythia,
-            [AC_HELP_STRING([--with-pythia=dir], 
-                            [Assume the given directory for Pythia])])
-
-dnl search for the pythia-config script
-if test "$with_pythia" = ""; then
-   AC_PATH_PROG(pythiaconfig, pythia8-config, no)
-else
-   AC_PATH_PROG(pythiaconfig, pythia8-config, no, ${with_pythia}/bin)
-fi
-
-if test "${pythiaconfig}" = "no"; then
-   AC_MSG_CHECKING(Pythia)
-   AC_MSG_RESULT(no);
-#   $2
-else
-
-   PYTHIA8DATA=`${pythiaconfig} --datadir`/xmldoc
-
-fi
-
-AC_SUBST(PYTHIA8DATA)
-
-])
-
-dnl CHECK PYTHIA END
 
 dnl ###### GSL ######
 AC_DEFUN([HERWIG_CHECK_GSL],
@@ -863,6 +943,7 @@ then
 else
    python_was_found="no, requires Python >= 2.6"
 fi
+
 cat << _HW_EOF_ > config.herwig
 *****************************************************
 *** $PACKAGE_STRING configuration summary
@@ -881,7 +962,7 @@ cat << _HW_EOF_ > config.herwig
 *** GoSam:		$with_gosam
 *** GoSam-Contrib:      $with_gosam_contrib
 *** MadGraph:        	$with_madgraph
-*** njet:		$with_njet
+*** njet:		$with_njet ${NJET_VERSION}
 *** OpenLoops:		$with_openloops
 *** VBFNLO:		$with_vbfnlo
 ***
@@ -896,6 +977,7 @@ cat << _HW_EOF_ > config.herwig
 *** FC:			$FCSTRING
 ***
 *** CXXFLAGS:		$CXXFLAGS
+*** FCFLAGS:            $FCFLAGS
 *****************************************************
 _HW_EOF_
 ])

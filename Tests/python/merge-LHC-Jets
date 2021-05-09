@@ -1,10 +1,9 @@
 #! /usr/bin/env python
-import logging
-import sys
-import math
+from __future__ import print_function
+import logging, sys, math
 
 if sys.version_info[:3] < (2,4,0):
-    print "rivet scripts require Python version >= 2.4.0... exiting"
+    print ("rivet scripts require Python version >= 2.4.0... exiting")
     sys.exit(1)
 
 import os, yoda
@@ -18,7 +17,7 @@ def rescale(path,scale) :
 def fillAbove(scale,desthisto, sourcehistosbyptmin) :
     pthigh= 1e100
     ptlow =-1e100
-    for pt, h in sorted(sourcehistosbyptmin.iteritems(),reverse=True):
+    for pt, h in sorted(sourcehistosbyptmin.items(),reverse=True):
         ptlow=pt
         if(type(desthisto)==yoda.core.Scatter2D) :
             for i in range(0,h.numPoints()) :
@@ -39,7 +38,7 @@ def fillAbove(scale,desthisto, sourcehistosbyptmin) :
         elif(type(desthisto)==yoda.core.Counter) :
                     desthisto += h
         else :
-            logging.error("Can't merge %s, unknown type" % desthisto.path)
+            logging.error("Can't merge %s, unknown type" % desthisto.path())
             sys.exit(1)
         pthigh=pt
 
@@ -223,7 +222,7 @@ for f in yodafiles:
         logging.error("%s can not be parsed as YODA" % file)
         continue
     ## Get histos from this YODA file
-    for aopath, ao in aos.iteritems() :
+    for aopath, ao in aos.items() :
         if("RAW" in aopath) :continue
         if(aopath.find("S8924791")>0 or aopath.find("S8971293")>0 or
            aopath.find("S8817804")>0 or aopath.find("I1082936")>0 or
@@ -250,16 +249,18 @@ for f in yodafiles:
            aopath.find("I1605749")>0 or aopath.find("I1682495")>0 or
            aopath.find("I1609253")>0 or aopath.find("1385107" )>0 or
            aopath.find("I1486238")>0 or aopath.find("1634970" )>0 or
+           aopath.find("I1604271")>0 or aopath.find("I1598460")>0 or
+           aopath.find("1724098" )>0 or
            aopath.find("ATLAS_2016_CONF_2016_092")>0 or
            aopath.find("CMS_2012_PAS_QCD_11_010")>0) :
            if("1419070" in aopath and ("forward" in aopath or "central" in aopath )) :
                continue
-           if not inhistos_pt.has_key(aopath):
+           if aopath not in inhistos_pt:
                inhistos_pt[aopath] = {}
            tmpE = inhistos_pt[aopath]
-           if not tmpE.has_key(sqrts):
+           if sqrts not in tmpE:
                tmpE[sqrts] = {}
-           if not tmpE[sqrts].has_key(ptmin):
+           if ptmin not in tmpE[sqrts]:
                tmpE[sqrts][ptmin] = ao
            else:
                tmpE[sqrts][ptmin] += ao
@@ -388,7 +389,7 @@ for f in yodafiles:
         logging.error("%s can not be parsed as YODA" % file)
         continue
     ## Get histos from this YODA file
-    for aopath, ao in aos.iteritems() :
+    for aopath, ao in aos.items() :
         if("RAW" in aopath) :continue
         if(aopath.find("8817804")>0 or aopath.find("8968497")>0 or 
            aopath.find("1082936")>0 or aopath.find("I930220")>0 or
@@ -397,23 +398,23 @@ for f in yodafiles:
            aopath.find("1663452") >0 or
            aopath.find("1634970" )>0 or
            aopath.find("CMS_2013_I1208923")>0) :
-           if not inhistos_mass.has_key(aopath):
+           if aopath not in inhistos_mass:
                inhistos_mass[aopath] = {}
            tmpE = inhistos_mass[aopath]
-           if not tmpE.has_key(sqrts):
+           if sqrts not in tmpE:
                tmpE[sqrts] = {}
            tmpP = tmpE[sqrts]
-           if not tmpP.has_key(mass):
+           if mass not in tmpP:
                tmpP[mass] = ao
            else:
-               print aopath
-               print sqrts,mass,file
+               print (aopath)
+               print (sqrts,mass,file)
                raise Exception("A set with mass = %s already exists" % ( mass))
 
 
         
 ## Make empty output histos if needed
-for hpath,hsets in inhistos_pt.iteritems():
+for hpath,hsets in inhistos_pt.items():
     if( hpath.find("8924791")>0  or 
         hpath.find("8971293")>0 or 
         hpath.find("8817804")>0 or 
@@ -444,6 +445,8 @@ for hpath,hsets in inhistos_pt.iteritems():
         hpath.find("I1419070")>0 or
         hpath.find("I1394679")>0 or
         hpath.find("I1487277")>0 or
+        hpath.find("I1604271")>0 or
+        hpath.find("I1598460")>0 or
         hpath.find("CMS_2013_I1208923")>0 or
         hpath.find("1393758")>0 or
         hpath.find("ATLAS_2016_CONF_2016_092")>0 or
@@ -451,7 +454,7 @@ for hpath,hsets in inhistos_pt.iteritems():
         hpath.find("1459051")>0 or hpath.find("1634970")>0) :
         title=""
         path=""
-        histo = hsets.values()[0].values()[0]
+        histo = list(list(hsets.values())[0].values())[0]
         if hasattr(histo, 'title'):
             title=histo.title()
         if hasattr(histo, 'path'):
@@ -475,12 +478,12 @@ for hpath,hsets in inhistos_pt.iteritems():
             sys.exit(1) 
 
 ## Make empty output histos if needed
-for hpath,hsets in inhistos_mass.iteritems():
+for hpath,hsets in inhistos_mass.items():
     if(hpath.find("1268975")>0 or
        hpath.find("1634970")>0) :
         title=""
         path=""
-        histo = hsets.values()[0].values()[0]
+        histo = list(list(hsets.values())[0].values())[0]
         if hasattr(histo, 'title'):
             title=histo.title()
         if hasattr(histo, 'path'):
@@ -1622,10 +1625,22 @@ for i in range(1,7) :
     mergeByPt("/ATLAS_2018_I1634970/d%02d-x01-y01"%i, "13000")
 for i in range(7,13) :
     mergeByMass("/ATLAS_2018_I1634970/d%02d-x01-y01"%i, "13000", 1.)
-        
-        
 
 
+logging.info("Processing ATLAS_2017_I1604271")
+for i in range(1,13) :
+    mergeByPt("/ATLAS_2017_I1604271/d%02d-x01-y01" % i, "8000")
+    
+logging.info("Processing CMS_2017_I1598460")
+for i in range(1,7) :
+    mergeByPt("/CMS_2017_I1598460/d%02d-x01-y01" % i, "8000")
+
+logging.info("Processing ATLAS_2019_I1724098")
+for i in range(1,45) :
+    if(i<=6 or (i>=23 and i<=28)) :
+        useOnePt("/ATLAS_2019_I1724098/d%02d-x01-y01" % i, "13000", "400")
+    else :
+        useOnePt("/ATLAS_2019_I1724098/d%02d-x01-y01" % i, "13000", "0")
 # rescaling for semi-leptonic top decays (we only simulate 1 charge combination)
 for i in range(96,116,2) :
     rescale("/ATLAS_2018_I1656578/d%s-x01-y01" % i,2.)
