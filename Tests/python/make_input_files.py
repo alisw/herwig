@@ -1,10 +1,10 @@
 #! /usr/bin/env python
+from __future__ import print_function
 import logging,sys,os
-from string import strip, Template
-
+from string import Template
 import sys
 if sys.version_info[:3] < (2,4,0):
-    print "rivet scripts require Python version >= 2.4.0... exiting"
+    print ("rivet scripts require Python version >= 2.4.0... exiting")
     sys.exit(1)
 
 if __name__ == "__main__":
@@ -25,7 +25,7 @@ def addProcess(thefactory,theProcess,Oas,Oew,scale,mergedlegs,NLOprocesses):
     res+="do "+thefactory+":Process "+theProcess+" "
     if ( mergedlegs != 0 ):
       if simulation!="Merging":
-          print "simulation is not Merging, trying to add merged legs."
+          print ("simulation is not Merging, trying to add merged legs.")
           sys.exit(1)
       res+="["
       for j in range(mergedlegs):
@@ -34,7 +34,7 @@ def addProcess(thefactory,theProcess,Oas,Oew,scale,mergedlegs,NLOprocesses):
     res+="\n"
     if (NLOprocesses!=0):
        if simulation!="Merging":
-          print "simulation is not Merging, trying to add NLOProcesses."
+          print ("simulation is not Merging, trying to add NLOProcesses.")
           sys.exit(1)
        res+="set MergingFactory:NLOProcesses %s \n" % NLOprocesses
     if ( scale != "" ):
@@ -165,7 +165,7 @@ if len(args) != 1:
     sys.exit(1)
 
 name = args[0]
-print name
+print (name)
 
 
 # select the template to load
@@ -288,7 +288,7 @@ if simulation=="" :
         elif("Double-Resolved" in name) :
             templateName="EE-Gamma-Double-Resolved.in"
         else :
-            print "Unknown type of EE-Gamma event ",name
+            print ("Unknown type of EE-Gamma event ",name)
             quit()
     elif collider=="GammaGamma" :
         templateName="GammaGamma.in"
@@ -365,21 +365,15 @@ elif(collider=="EE") :
             process = StringBuilder("create Herwig::MEee2Higgs2SM /Herwig/MatrixElements/MEee2Higgs2SM\n")
             process+=insert_ME("MEee2Higgs2SM","Gluon","Allowed")
         else :
-            if(parameterName=="10.58-res") :
-                process += ME_Upsilon
-            elif(parameterName=="10.58") :
-                process += ME_Upsilon
-                process += "set /Herwig/MatrixElements/MEee2gZ2qq:MaximumFlavour 4\n"
-            else :
-                process = StringBuilder(insert_ME("MEee2gZ2qq"))
-                try :
-                    ecms = float(parameterName)
-                    if(ecms<=3.75) :
-                        process+= "set /Herwig/MatrixElements/MEee2gZ2qq:MaximumFlavour 3\n"
-                    elif(ecms<=10.6) :
-                        process+= "set /Herwig/MatrixElements/MEee2gZ2qq:MaximumFlavour 4\n"
-                except :
-                    pass
+            process = StringBuilder(insert_ME("MEee2gZ2qq"))
+            try :
+                ecms = float(parameterName)
+                if(ecms<=3.75) :
+                    process+= "set /Herwig/MatrixElements/MEee2gZ2qq:MaximumFlavour 3\n"
+                elif(ecms<=10.6) :
+                    process+= "set /Herwig/MatrixElements/MEee2gZ2qq:MaximumFlavour 4\n"
+            except :
+                pass
     elif(simulation=="Powheg") :
         process = StringBuilder()
         try :
@@ -436,10 +430,10 @@ elif(collider=="EE-Gamma") :
             process+="insert /Herwig/Cuts/Cuts:OneCuts[0] /Herwig/Cuts/JetKtCut"
             process+="set  /Herwig/Cuts/JetKtCut:MinKT 3."
         else :
-            print "process not supported for Gamma Gamma processes at EE"
+            print ("process not supported for Gamma Gamma processes at EE")
             quit()
     else :
-        print "Only internal matrix elements currently supported for Gamma Gamma processes at EE"
+        print ("Only internal matrix elements currently supported for Gamma Gamma processes at EE")
         quit()
 elif(collider=="GammaGamma") :
     if(simulation=="") :
@@ -448,10 +442,10 @@ elif(collider=="GammaGamma") :
             process +="set /Herwig/MatrixElements/MEgg2ff:Process Muon\n"
             process +="set /Herwig/Cuts/Cuts:MHatMin 3.\n"
         else :
-            print "process not supported for Gamma Gamma processes at EE"
+            print ("process not supported for Gamma Gamma processes at EE")
             quit()
     else :
-        print "Only internal matrix elements currently supported for Gamma Gamma processes at EE"
+        print ("Only internal matrix elements currently supported for Gamma Gamma processes at EE")
         quit()
 # TVT
 elif(collider=="TVT") :
@@ -980,25 +974,37 @@ elif(collider=="LHC") :
             process+=insert_ME("MEqq2gZ2ff","Muon")
             process+=mhat_minm_maxm(10,10,70)
         elif "Z-Mass1" in parameterName :
-            process+=mhat_minm_maxm(10,10,35)
+            if parameterName.startswith("13-") : 
+                process+=mhat_minm_maxm(10,10,35)
+            else :
+                process+=mhat_minm_maxm(10,10,30)
             if "-e" in parameterName :
                 process+=insert_ME("MEqq2gZ2ff","Electron")
             else :
                 process+=insert_ME("MEqq2gZ2ff","Muon")
         elif "Z-Mass2" in parameterName :
-            process+=mhat_minm_maxm(25,25,70)
+            if parameterName.startswith("13-") : 
+                process+=mhat_minm_maxm(25,25,70)
+            else :
+                process+=mhat_minm_maxm(30,30,65)
             if "-e" in parameterName :
                 process+=insert_ME("MEqq2gZ2ff","Electron")
             else :
                 process+=insert_ME("MEqq2gZ2ff","Muon")
         elif "Z-Mass3" in parameterName :
-            process+=mhat_minm_maxm(60,60,120)
+            if parameterName.startswith("13-") : 
+                process+=mhat_minm_maxm(60,60,120)
+            else :
+                process+=mhat_minm_maxm(65,65,115)
             if "-e" in parameterName :
                 process+=insert_ME("MEqq2gZ2ff","Electron")
             else :
                 process+=insert_ME("MEqq2gZ2ff","Muon")
         elif "Z-Mass4" in parameterName :
-            process+=mhat_minm_maxm(110,110,8000)
+            if parameterName.startswith("13-") : 
+                process+=mhat_minm_maxm(110,110,8000)
+            else :
+                process+=mhat_minm_maxm(115,115,8000)
             if "-e" in parameterName :
                 process+=insert_ME("MEqq2gZ2ff","Electron")
             else :
@@ -1251,25 +1257,37 @@ elif(collider=="LHC") :
             process+=insert_ME("PowhegMEqq2gZ2ff","Muon")
             process+=mhat_minm_maxm(10,10,70)
         elif "Z-Mass1" in parameterName :
-            process+=mhat_minm_maxm(10,10,35)
+            if parameterName.startswith("13-") : 
+                process+=mhat_minm_maxm(10,10,35)
+            else :
+                process+=mhat_minm_maxm(10,10,30)
             if "-e" in parameterName :
                 process+=insert_ME("PowhegMEqq2gZ2ff","Electron")
             else :
                 process+=insert_ME("PowhegMEqq2gZ2ff","Muon")
         elif "Z-Mass2" in parameterName :
-            process+=mhat_minm_maxm(25,25,70)
+            if parameterName.startswith("13-") : 
+                process+=mhat_minm_maxm(25,25,70)
+            else :
+                process+=mhat_minm_maxm(30,30,65)
             if "-e" in parameterName :
                 process+=insert_ME("PowhegMEqq2gZ2ff","Electron")
             else :
                 process+=insert_ME("PowhegMEqq2gZ2ff","Muon")
         elif "Z-Mass3" in parameterName :
-            process+=mhat_minm_maxm(60,60,120)
+            if parameterName.startswith("13-") : 
+                process+=mhat_minm_maxm(60,60,120)
+            else :
+                process+=mhat_minm_maxm(65,65,115)
             if "-e" in parameterName :
                 process+=insert_ME("PowhegMEqq2gZ2ff","Electron")
             else :
                 process+=insert_ME("PowhegMEqq2gZ2ff","Muon")
         elif "Z-Mass4" in parameterName :
-            process+=mhat_minm_maxm(110,110,8000)
+            if parameterName.startswith("13-") : 
+                process+=mhat_minm_maxm(110,110,8000)
+            else:
+                process+=mhat_minm_maxm(115,115,8000)
             if "-e" in parameterName :
                 process+=insert_ME("PowhegMEqq2gZ2ff","Electron")
             else :
@@ -1736,7 +1754,10 @@ elif(collider=="LHC") :
                 process+=addProcess(thefactory,"p p mu+ mu-","0","2","LeptonPairMassScale",2,2)
             process+=addLeptonPairCut("10","70")
         elif "Z-Mass1" in parameterName :
-            process+=addLeptonPairCut("10","35")
+            if parameterName.startswith("13-") : 
+                process+=addLeptonPairCut("10","35")
+            else :
+                process+=addLeptonPairCut("10","30")
             if "-e" in parameterName :
                 if(simulation=="Matchbox"):
                     process+=addProcess(thefactory,"p p e+ e-","0","2","LeptonPairMassScale",0,0)
@@ -1748,7 +1769,10 @@ elif(collider=="LHC") :
                 elif(simulation=="Merging"):
                     process+=addProcess(thefactory,"p p mu+ mu-","0","2","LeptonPairMassScale",2,2)
         elif "Z-Mass2" in parameterName :
-            process+=addLeptonPairCut("25","70")
+            if parameterName.startswith("13-") : 
+                process+=addLeptonPairCut("25","70")
+            else :
+                process+=addLeptonPairCut("30","75")
             if "-e" in parameterName :
                 if(simulation=="Matchbox"):
                     process+=addProcess(thefactory,"p p e+ e-","0","2","LeptonPairMassScale",0,0)
@@ -1760,7 +1784,10 @@ elif(collider=="LHC") :
                 elif(simulation=="Merging"):
                     process+=addProcess(thefactory,"p p mu+ mu-","0","2","LeptonPairMassScale",2,2)
         elif "Z-Mass3" in parameterName :
-            process+=addLeptonPairCut("60","120")
+            if parameterName.startswith("13-") : 
+                process+=addLeptonPairCut("60","125")
+            else :
+                process+=addLeptonPairCut("65","120")
             if "-e" in parameterName :
                 if(simulation=="Matchbox"):
                     process+=addProcess(thefactory,"p p e+ e-","0","2","LeptonPairMassScale",0,0)
@@ -1772,7 +1799,10 @@ elif(collider=="LHC") :
                 elif(simulation=="Merging"):
                     process+=addProcess(thefactory,"p p mu+ mu-","0","2","LeptonPairMassScale",2,2)
         elif "Z-Mass4" in parameterName :
-            process+=addLeptonPairCut("115","8000")
+            if parameterName.startswith("13-") : 
+                process+=addLeptonPairCut("115","8000")
+            else :
+                process+=addLeptonPairCut("120","8000")
             if "-e" in parameterName :
                 if(simulation=="Matchbox"):
                   process+=addProcess(thefactory,"p p e+ e-","0","2","LeptonPairMassScale",0,0)
@@ -1904,8 +1934,9 @@ elif(collider=="LHC-GammaGamma" ) :
         logging.error("LHC-GammaGamma not supported for %s " % simulation)
         sys.exit(1)
 
+with open(os.path.join("Rivet",os.path.join(collider,"{c}-{pn}.in".format(c=collider, pn=parameterName))), 'r') as f:
+    parameters['parameterFile'] = f.read()
 
-parameters['parameterFile'] = os.path.join(collider,"{c}-{pn}.in".format(c=collider, pn=parameterName))
 parameters['runname'] = 'Rivet-%s' % name
 parameters['process'] = str(process)
 if have_hadronic_collider :

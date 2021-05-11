@@ -495,6 +495,7 @@ MKDIR_VBFNLO = @MKDIR_VBFNLO@
 NJETINCLUDEPATH = @NJETINCLUDEPATH@
 NJETLIBPATH = @NJETLIBPATH@
 NJETPREFIX = @NJETPREFIX@
+NJET_VERSION = @NJET_VERSION@
 NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
@@ -513,6 +514,7 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PERL = @PERL@
 PYTHIA8DATA = @PYTHIA8DATA@
+PYTHIA8LIB = @PYTHIA8LIB@
 PYTHON = @PYTHON@
 PYTHON_EXEC_PREFIX = @PYTHON_EXEC_PREFIX@
 PYTHON_PLATFORM = @PYTHON_PLATFORM@
@@ -669,13 +671,13 @@ pkglib_LTLIBRARIES = Hw64Decay.la HwMamboDecay.la HwFormFactors.la \
 	HwPerturbativeDecay.la HwWeakCurrents.la HwSMDecay.la \
 	HwTMDecay.la HwPartonicDecay.la HwSOPHTY.la
 Hw64Decay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 11:0:0
+$(AM_LDFLAGS) -module -version-info 12:0:0
 
 Hw64Decay_la_SOURCES = \
 Hw64Decayer.h Hw64Decayer.cc
 
 HwMamboDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 12:0:0
+$(AM_LDFLAGS) -module -version-info 13:0:0
 
 HwMamboDecay_la_SOURCES = \
 MamboDecayer.h MamboDecayer.cc
@@ -692,7 +694,7 @@ FormFactors/BtoSGammaHadronicMass.h \
 FormFactors/BtoSGammaHadronicMass.fh
 
 HwFormFactors_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 12:0:0
+$(AM_LDFLAGS) -module -version-info 13:0:0
 
 HwFormFactors_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/FormFactors
@@ -701,13 +703,13 @@ nodist_HwFormFactors_la_SOURCES = \
 FormFactors/Formfactor__all.cc
 
 HwTauDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 12:0:0
+$(AM_LDFLAGS) -module -version-info 13:0:0
 
 HwTauDecay_la_SOURCES = \
 Tau/TauDecayer.cc
 
 HwBaryonDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 11:0:0
+$(AM_LDFLAGS) -module -version-info 12:0:0
 
 HwBaryonDecay_la_LIBADD = \
 $(top_builddir)/PDT/libHwBaryonWidth.la
@@ -719,7 +721,7 @@ nodist_HwBaryonDecay_la_SOURCES = \
 Baryon/BaryonDecayer__all.cc
 
 HwVMDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 11:0:0
+$(AM_LDFLAGS) -module -version-info 12:0:0
 
 HwVMDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/VectorMeson
@@ -728,7 +730,7 @@ nodist_HwVMDecay_la_SOURCES = \
 VectorMeson/VMDecayer__all.cc
 
 HwPerturbativeDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 12:0:0
+$(AM_LDFLAGS) -module -version-info 13:0:0
 
 HwPerturbativeDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/Perturbative
@@ -745,7 +747,7 @@ WeakCurrents/LeptonNeutrinoCurrent.fh \
 WeakCurrents/LeptonNeutrinoCurrent.h
 
 HwWeakCurrents_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 12:0:0
+$(AM_LDFLAGS) -module -version-info 13:0:0
 
 HwWeakCurrents_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/WeakCurrents
@@ -754,7 +756,7 @@ nodist_HwWeakCurrents_la_SOURCES = \
 WeakCurrents/WeakCurrents__all.cc
 
 HwSMDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 13:0:0
+$(AM_LDFLAGS) -module -version-info 14:0:0
 
 HwSMDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/ScalarMeson
@@ -763,7 +765,7 @@ nodist_HwSMDecay_la_SOURCES = \
 ScalarMeson/SMDecayer__all.cc
 
 HwTMDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 11:0:0
+$(AM_LDFLAGS) -module -version-info 12:0:0
 
 HwTMDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/TensorMeson
@@ -772,7 +774,7 @@ nodist_HwTMDecay_la_SOURCES = \
 TensorMeson/TMDecayer__all.cc
 
 HwPartonicDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 12:0:0
+$(AM_LDFLAGS) -module -version-info 13:0:0
 
 HwPartonicDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/Partonic
@@ -789,7 +791,7 @@ Radiation/QEDRadiationHandler.fh \
 Radiation/QEDRadiationHandler.h
 
 HwSOPHTY_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 6:0:0
+$(AM_LDFLAGS) -module -version-info 7:0:0
 
 HwSOPHTY_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/Radiation

@@ -406,6 +406,7 @@ MKDIR_VBFNLO = @MKDIR_VBFNLO@
 NJETINCLUDEPATH = @NJETINCLUDEPATH@
 NJETLIBPATH = @NJETLIBPATH@
 NJETPREFIX = @NJETPREFIX@
+NJET_VERSION = @NJET_VERSION@
 NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
@@ -424,6 +425,7 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PERL = @PERL@
 PYTHIA8DATA = @PYTHIA8DATA@
+PYTHIA8LIB = @PYTHIA8LIB@
 PYTHON = @PYTHON@
 PYTHON_EXEC_PREFIX = @PYTHON_EXEC_PREFIX@
 PYTHON_PLATFORM = @PYTHON_PLATFORM@
@@ -511,7 +513,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = Matching
 pkglib_LTLIBRARIES = HwShower.la
-HwShower_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 27:0:0
+HwShower_la_LDFLAGS = $(AM_LDFLAGS) -module -version-info 28:0:0
 HwShower_la_SOURCES = \
 Couplings/ShowerAlphaQCD.h Couplings/ShowerAlphaQCD.cc \
 Couplings/ShowerAlphaQED.h Couplings/ShowerAlphaQED.cc\
