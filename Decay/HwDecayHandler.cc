@@ -26,7 +26,7 @@
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
 #include "DecayIntegrator.h"
-#include "DecayPhaseSpaceMode.h"
+#include "PhaseSpaceMode.h"
 #include "ThePEG/PDT/MixedParticleData.h"
 #include "Herwig/Utilities/EnumParticles.h"
 

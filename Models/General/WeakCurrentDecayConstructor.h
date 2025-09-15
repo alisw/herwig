@@ -14,11 +14,9 @@
 
 #include "NBodyDecayConstructorBase.h"
 #include "ThePEG/Helicity/Vertex/VertexBase.h"
-#include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
 #include "Herwig/Decay/General/GeneralCurrentDecayer.fh"
 #include "Herwig/Models/StandardModel/StandardModel.h"
-#include "Herwig/Decay/WeakCurrents/WeakDecayCurrent.h"
+#include "Herwig/Decay/WeakCurrents/WeakCurrent.h"
 #include "Herwig/Decay/General/GeneralCurrentDecayer.h"
 #include "TwoBodyDecay.h"
 
@@ -39,14 +37,14 @@ public:
   /**
    * The default constructor.
    */
-  WeakCurrentDecayConstructor() : _masscut(5.*GeV) {}
+  WeakCurrentDecayConstructor() : massCut_(5.*GeV) {}
   
   /**
    * Function used to determine allowed decaymodes, to be implemented
    * in derived class.
    *@param part vector of ParticleData pointers containing particles in model
    */
-  virtual void DecayList(const set<PDPtr> & part);
+  virtual void DecayList(const set<PDPtr,MassOrdering> & part);
 
   /**
    * Number of outgoing lines. Required for correct ordering (do this one last)
@@ -56,7 +54,7 @@ public:
   /**
    *  Cut off
    */
-  Energy massCut() const { return _masscut;}
+  Energy massCut() const { return massCut_;}
 
 public:
 
@@ -139,7 +137,7 @@ private:
   GeneralCurrentDecayerPtr createDecayer(PDPtr in, PDPtr out1,
 					 vector<tPDPtr> outCurrent,
 					 VertexBasePtr vertex,
-					 WeakDecayCurrentPtr current);
+					 WeakCurrentPtr current);
 
   /**
    * Create decay mode(s) from given part and decay modes
@@ -163,12 +161,12 @@ private:
   /**
    * Model Pointer
    */
-  Ptr<Herwig::StandardModel>::pointer _theModel;
+  Ptr<Herwig::StandardModel>::pointer model_;
 
   /**
    *  Cut-off on the mass difference
    */
-  Energy _masscut;
+  Energy massCut_;
 
   /**
    *  Tags for the modes
@@ -188,7 +186,7 @@ private:
   /**
    *  The current for the mode
    */
-  vector<WeakDecayCurrentPtr> _current;
+  vector<WeakCurrentPtr> _current;
 };
 
 }

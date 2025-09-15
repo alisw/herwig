@@ -41,17 +41,18 @@ void ShowerParticle::vetoEmission(ShowerPartnerType, Energy scale) {
   scales_.QCD_c_noAO  = min(scale,scales_.QCD_c_noAO );
   scales_.QCD_ac      = min(scale,scales_.QCD_ac     );
   scales_.QCD_ac_noAO = min(scale,scales_.QCD_ac_noAO);
+  scales_.EW          = min(scale,scales_.EW         );
   if(spinInfo()) spinInfo()->undecay();
 }
 
 void ShowerParticle::addPartner(EvolutionPartner in ) {
-  partners_.push_back(in); 
+  partners_.push_back(in);
 }
 
 namespace {
 
 LorentzRotation boostToShower(Lorentz5Momentum & porig, tShowerBasisPtr basis) {
-  LorentzRotation output; 
+  LorentzRotation output;
   assert(basis);
   if(basis->frame()==ShowerBasis::BackToBack) {
     // we are doing the evolution in the back-to-back frame
@@ -183,6 +184,16 @@ VectorSpinPtr createVectorSpinInfo(ShowerParticle & particle,
   // and rotate back to construct the basis states
   LorentzRotation rinv = rot.inverse();
   bool massless(particle.id()==ParticleID::g||particle.id()==ParticleID::gamma);
+
+  Energy mass = porig.mass();
+  bool EWGVB(abs(particle.id())==ParticleID::Wplus||particle.id()==ParticleID::Z0);
+  if(EWGVB&&mass<1E-6*MeV) {
+    massless = true;
+    if(Debug::level>=1)
+      cerr << "Warning: ignoting the longitudinal polarization of "<< particle.id()
+           << " with mass "<< mass/GeV <<".\n";
+  }
+
   VectorWaveFunction wave(porig,particle.dataPtr(),dir);
   VectorSpinPtr vspin = new_ptr(VectorSpinInfo(particle.momentum(),dir==outgoing));
   for(unsigned int ix=0;ix<3;++ix) {
@@ -220,7 +231,7 @@ RhoDMatrix ShowerParticle::extractRhoMatrix(bool forward) {
   inspin->decay();
   // get the spin density matrix
   RhoDMatrix rho = forward ? inspin->rhoMatrix() : inspin->DMatrix();
-  // map to the shower basis if needed  
+  // map to the shower basis if needed
   if(needMapping) {
     RhoDMatrix rhop(rho.iSpin(),false);
     for(int ixb=0;ixb<rho.iSpin();++ixb) {
@@ -306,7 +317,7 @@ bool ShowerParticle::getMapping(SpinPtr & output, RhoDMatrix & mapping) {
       if(vspin) {
 	output=vspin;
 	mapping = bosonMapping(*this,porig,vspin,rot,outgoing);
-	return true; 
+	return true;
       }
       else {
 	output = createVectorSpinInfo(*this,porig,rot,outgoing);
@@ -365,7 +376,7 @@ bool ShowerParticle::getMapping(SpinPtr & output, RhoDMatrix & mapping) {
     assert(false);
   }
   // incoming to decay
-  else if(this->perturbative() == 2 && !this->isFinalState()) { 
+  else if(this->perturbative() == 2 && !this->isFinalState()) {
     // get the basis vectors
     Lorentz5Momentum porig;
     //LorentzRotation rot=boostToShower(porig,showerBasis());
@@ -445,7 +456,7 @@ void ShowerParticle::constructSpinInfo(bool timeLike) {
     VectorWaveFunction::constructSpinInfo(vtemp,this,outgoing,timeLike,massless);
   }
   else {
-    throw Exception() << "Spins higher than 1 are not yet implemented in " 
+    throw Exception() << "Spins higher than 1 are not yet implemented in "
 		      << "FS_QtildaShowerKinematics1to2::constructVertex() "
 		      << Exception::runerror;
   }
@@ -464,7 +475,7 @@ void ShowerParticle::initializeDecay() {
     pcm=ppartner;
     Boost boost(p.findBoostToCM());
     pcm.boost(boost);
-    n = Lorentz5Momentum( ZERO,0.5*p.mass()*pcm.vect().unit()); 
+    n = Lorentz5Momentum( ZERO,0.5*p.mass()*pcm.vect().unit());
     n.boost( -boost);
     newBasis = new_ptr(ShowerBasis());
     newBasis->setBasis(p,n,ShowerBasis::Rest);
@@ -515,7 +526,7 @@ void ShowerParticle::initializeInitialState(PPtr parent) {
     newBasis = new_ptr(ShowerBasis());
     newBasis->setBasis(p,n,ShowerBasis::BackToBack);
     showerBasis(newBasis,false);
-  } 
+  }
   else {
     showerBasis(dynamic_ptr_cast<ShowerParticlePtr>(children()[0])->showerBasis(),true);
   }
@@ -553,9 +564,9 @@ void ShowerParticle::initializeFinalState() {
 	Boost boost=ppartner.findBoostToCM();
 	pcm = p;
 	pcm.boost(boost);
-	n = Lorentz5Momentum( ZERO, -pcm.vect()); 
+	n = Lorentz5Momentum( ZERO, -pcm.vect());
 	n.boost( -boost);
-      } 
+      }
     }
     newBasis = new_ptr(ShowerBasis());
     newBasis->setBasis(p,n,ShowerBasis::BackToBack);

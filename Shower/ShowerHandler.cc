@@ -36,7 +36,7 @@
 #include <cassert>
 #include "ThePEG/Utilities/DescribeClass.h"
 #include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 
 using namespace Herwig;
 
@@ -49,7 +49,7 @@ tShowerHandlerPtr ShowerHandler::currentHandler_ = tShowerHandlerPtr();
 
 void ShowerHandler::doinit() {
   CascadeHandler::doinit();
-  // copy particles to decay before showering from input vector to the 
+  // copy particles to decay before showering from input vector to the
   // set used in the simulation
   if ( particlesDecayInShower_.empty() ) {
     for(unsigned int ix=0;ix<inputparticlesDecayInShower_.size();++ix)
@@ -75,18 +75,18 @@ IBPtr ShowerHandler::fullclone() const {
   return new_ptr(*this);
 }
 
-ShowerHandler::ShowerHandler() : 
+ShowerHandler::ShowerHandler() :
   maxtry_(10),maxtryMPI_(10),maxtryDP_(10),maxtryDecay_(100),
   factorizationScaleFactor_(1.0),
   renormalizationScaleFactor_(1.0),
   hardScaleFactor_(1.0),
-  restrictPhasespace_(true), maxPtIsMuF_(false), 
+  restrictPhasespace_(true), maxPtIsMuF_(false),
   spinOpt_(1), pdfFreezingScale_(2.5*GeV),
   doFSR_(true), doISR_(true),
   splitHardProcess_(true),
   includeSpaceTime_(false), vMin_(0.1*GeV2),
   reweight_(1.0) {
-  inputparticlesDecayInShower_.push_back( 6  ); //  top 
+  inputparticlesDecayInShower_.push_back( 6  ); //  top
   inputparticlesDecayInShower_.push_back( 23 ); // Z0
   inputparticlesDecayInShower_.push_back( 24 ); // W+/-
   inputparticlesDecayInShower_.push_back( 25 ); // h0
@@ -95,7 +95,7 @@ ShowerHandler::ShowerHandler() :
 void ShowerHandler::doinitrun(){
   CascadeHandler::doinitrun();
   //can't use isMPIOn here, because the EventHandler is not set at that stage
-  if(MPIHandler_) { 
+  if(MPIHandler_) {
     MPIHandler_->initialize();
     if(MPIHandler_->softInt())
       remDec_->initSoftInteractions(MPIHandler_->Ptmin(), MPIHandler_->beta());
@@ -108,8 +108,8 @@ void ShowerHandler::dofinish() {
 }
 
 void ShowerHandler::persistentOutput(PersistentOStream & os) const {
-  os << remDec_ << ounit(pdfFreezingScale_,GeV) << maxtry_ 
-     << maxtryMPI_ << maxtryDP_ << maxtryDecay_ 
+  os << remDec_ << ounit(pdfFreezingScale_,GeV) << maxtry_
+     << maxtryMPI_ << maxtryDP_ << maxtryDecay_
      << inputparticlesDecayInShower_
      << particlesDecayInShower_ << MPIHandler_ << PDFA_ << PDFB_
      << PDFARemnant_ << PDFBRemnant_
@@ -118,11 +118,11 @@ void ShowerHandler::persistentOutput(PersistentOStream & os) const {
      << hardScaleFactor_
      << restrictPhasespace_ << maxPtIsMuF_ << hardScaleProfile_
      << showerVariations_ << doFSR_ << doISR_ << splitHardProcess_
-     << spinOpt_ << useConstituentMasses_;
+     << spinOpt_ << useConstituentMasses_ << tagIntermediates_;
 }
 
 void ShowerHandler::persistentInput(PersistentIStream & is, int) {
-  is >> remDec_ >> iunit(pdfFreezingScale_,GeV) >> maxtry_ 
+  is >> remDec_ >> iunit(pdfFreezingScale_,GeV) >> maxtry_
      >> maxtryMPI_ >> maxtryDP_ >> maxtryDecay_
      >> inputparticlesDecayInShower_
      >> particlesDecayInShower_ >> MPIHandler_ >> PDFA_ >> PDFB_
@@ -132,7 +132,7 @@ void ShowerHandler::persistentInput(PersistentIStream & is, int) {
      >> hardScaleFactor_
      >> restrictPhasespace_ >> maxPtIsMuF_ >> hardScaleProfile_
      >> showerVariations_ >> doFSR_ >> doISR_ >> splitHardProcess_
-     >> spinOpt_ >> useConstituentMasses_;
+     >> spinOpt_ >> useConstituentMasses_ >> tagIntermediates_;
 }
 
 void ShowerHandler::Init() {
@@ -140,9 +140,9 @@ void ShowerHandler::Init() {
   static ClassDocumentation<ShowerHandler> documentation
     ("Main driver class for the showering.");
 
-  static Reference<ShowerHandler,HwRemDecayer> 
-    interfaceRemDecayer("RemDecayer", 
-			"A reference to the Remnant Decayer object", 
+  static Reference<ShowerHandler,HwRemDecayer>
+    interfaceRemDecayer("RemDecayer",
+			"A reference to the Remnant Decayer object",
 			&Herwig::ShowerHandler::remDec_,
 			false, false, true, false);
 
@@ -219,7 +219,7 @@ void ShowerHandler::Init() {
      "No",
      "Only include the displacement from the particle-s lifetime for decaying particles",
      false);
-  
+
   static Parameter<ShowerHandler,Energy2> interfaceMinimumVirtuality
     ("MinimumVirtuality",
      "The minimum virtuality for the space-time model",
@@ -289,7 +289,7 @@ void ShowerHandler::Init() {
     ("AddVariation",
      "Add a shower variation.",
      &ShowerHandler::doAddVariation, false);
- 
+
   static Switch<ShowerHandler,bool> interfaceDoFSR
     ("DoFSR",
      "Switch on or off final state radiation.",
@@ -319,7 +319,7 @@ void ShowerHandler::Init() {
      "No",
      "Switch off initial state radiation.",
      false);
- 
+
   static Switch<ShowerHandler,bool> interfaceSplitHardProcess
     ("SplitHardProcess",
      "Whether or not to try and split the hard process into production and decay processes",
@@ -349,7 +349,7 @@ void ShowerHandler::Init() {
      "Yes",
      "Include the azimuthal spin correlations",
      1);
-  
+
   static Switch<ShowerHandler,bool> interfaceUseConstituentMasses
   ("UseConstituentMasses",
    "Whether or not to use constituent masses for the reconstruction of the particle after showering.",
@@ -364,6 +364,12 @@ void ShowerHandler::Init() {
    "No",
    "Don't use constituent masses.",
    false);
+
+  static Parameter<ShowerHandler,int> interfaceTagIntermediates
+    ("TagIntermediates",
+     "Tag particles after shower with the given status code; if zero, no tagging will be performed.",
+     &ShowerHandler::tagIntermediates_, 0, 0, 0,
+     false, false, Interface::lowerlim);
 
 }
 
@@ -388,21 +394,21 @@ void ShowerHandler::cascade() {
   if( ! rempdfs_.second)
     rempdfs_.second = PDFBRemnant_ ? PDFPtr(PDFBRemnant_) : const_ptr_cast<PDFPtr>(second);
   // get the incoming partons
-  tPPair  incomingPartons = 
+  tPPair  incomingPartons =
     eventHandler()->currentCollision()->primarySubProcess()->incoming();
   // and the parton bins
-  PBIPair incomingBins    = 
+  PBIPair incomingBins    =
     make_pair(lastExtractor()->partonBinInstance(incomingPartons.first),
 	      lastExtractor()->partonBinInstance(incomingPartons.second));
   // and the incoming hadrons
-  tPPair incomingHadrons = 
+  tPPair incomingHadrons =
     eventHandler()->currentCollision()->incoming();
   remnantDecayer()->setHadronContent(incomingHadrons);
   // check if incoming hadron == incoming parton
   // and get the incoming hadron if exists or parton otherwise
-  incoming_ = make_pair(incomingBins.first  ? 
+  incoming_ = make_pair(incomingBins.first  ?
 			incomingBins.first ->particle() : incomingPartons.first,
-			incomingBins.second ? 
+			incomingBins.second ?
 			incomingBins.second->particle() : incomingPartons.second);
   // check the collision is of the beam particles
   // and if not boost collision to the right frame
@@ -428,6 +434,15 @@ void ShowerHandler::cascade() {
                       << Exception::eventerror;
   }
   if(showerHardProcessVeto()) throw Veto();
+  // tag particles as after shower
+  if ( tagIntermediates_ > 0 ) {
+    ParticleSet original = newStep()->particles();
+    for ( auto p : original ) {
+      //if ( !p->data().coloured() ) continue;
+      newStep()->copyParticle(p);
+      p->status(tagIntermediates_);
+    }
+  }
   // if a non-hadron collision return (both incoming non-hadronic)
   if( ( !incomingBins.first||
         !isResolvedHadron(incomingBins.first ->particle()))&&
@@ -451,8 +466,9 @@ void ShowerHandler::cascade() {
   }
   catch (ExtraScatterVeto) {
     throw Exception() << "Remnant extraction failed in "
-                      << "ShowerHandler::cascade() from primary interaction" 
-                      << Exception::eventerror;   
+                      << "ShowerHandler::cascade() from primary interaction. "
+                      << "Please check the PDFs you are using and set/unset them if necessary."
+                      << Exception::eventerror;
   }
   // perform the reweighting for the hard process shower
   combineWeights();
@@ -476,7 +492,7 @@ void ShowerHandler::cascade() {
 	unsigned int multSecond = 0;
     // generate the additional scatters
     while( multSecond < getMPIHandler()->multiplicity(i) ) {
-      // generate the hard scatter 
+      // generate the hard scatter
       tStdXCombPtr lastXC = getMPIHandler()->generate(i);
       SubProPtr sub = lastXC->construct();
       // add to the Step
@@ -485,7 +501,7 @@ void ShowerHandler::cascade() {
       tries++;
       multSecond++;
       if(tries == maxtryDP_)
-	throw Exception() << "Failed to establish the requested number " 
+	throw Exception() << "Failed to establish the requested number "
 			  << "of additional hard processes. If this error "
 			  << "occurs often, your selection of additional "
 			  << "scatter is probably unphysical"
@@ -493,9 +509,9 @@ void ShowerHandler::cascade() {
       // Generate the shower. If not possible veto the event
       try {
 	incomingPartons = cascade(sub,lastXC);
-      } 
+      }
       catch(ShowerTriesVeto &veto){
-	throw Exception() << "Failed to generate the shower of " 
+	throw Exception() << "Failed to generate the shower of "
 			  << "a secondary hard process after "
 			  << veto.tries
 			  << " attempts in Evolver::showerHardProcess()"
@@ -504,7 +520,7 @@ void ShowerHandler::cascade() {
       try {
 	// do the forcedSplitting
 	remnantDecayer()->doSplit(incomingPartons, make_pair(remmpipdfs_.first,remmpipdfs_.second), false);
-      } 
+      }
       catch(ExtraScatterVeto){
 	//remove all particles associated with the subprocess
 	newStep()->removeParticle(incomingPartons.first);
@@ -520,7 +536,7 @@ void ShowerHandler::cascade() {
       if ( !remnants.first ->extract(incomingPartons.first , false) ||
 	   !remnants.second->extract(incomingPartons.second, false) )
 	throw Exception() << "Remnant extraction failed in "
-			  << "ShowerHandler::cascade() for additional scatter" 
+			  << "ShowerHandler::cascade() for additional scatter"
 			  << Exception::runerror;
     }
     // perform the reweighting for the additional hard scatter shower
@@ -545,21 +561,21 @@ void ShowerHandler::cascade() {
         ptveto++;
         i--;
         continue;
-      } 
+      }
     }
     // add to the SubProcess to the step
     newStep()->addSubProcess(sub);
     // Run the Shower. If not possible veto the scattering
     try {
       incomingPartons = cascade(sub,lastXC);
-    } 
+    }
     // discard this extra scattering, but try the next one
     catch(ShowerTriesVeto) {
       newStep()->removeSubProcess(sub);
       //regenerate the scattering
       veto++;
       i--;
-      continue;      
+      continue;
     }
     try{
       //do the forcedSplitting
@@ -574,14 +590,14 @@ void ShowerHandler::cascade() {
       //regenerate the scattering
       veto++;
       i--;
-      continue;      
+      continue;
     }
     //connect with the remnants but don't set Remnant colour,
     //because that causes problems due to the multiple colour lines.
     if ( !remnants.first ->extract(incomingPartons.first , false) ||
 	 !remnants.second->extract(incomingPartons.second, false) )
       throw Exception() << "Remnant extraction failed in "
-			<< "ShowerHandler::cascade() for MPI hard scattering" 
+			<< "ShowerHandler::cascade() for MPI hard scattering"
 			<< Exception::runerror;
     //reset veto counter
     veto = 0;
@@ -589,7 +605,7 @@ void ShowerHandler::cascade() {
     combineWeights();
   }
   // finalize the remnants
-  remnantDecayer()->finalize(getMPIHandler()->colourDisrupt(), 
+  remnantDecayer()->finalize(getMPIHandler()->colourDisrupt(),
 		    getMPIHandler()->softMultiplicity());
   // boost back to lab if needed
   if(btotal) boostCollision(true);
@@ -610,7 +626,7 @@ void ShowerHandler::initializeWeights() {
 
       // Check that this is behaving as intended
       //map<string,double>::iterator wi = event->optionalWeights().find(var->first);
-      //assert(wi == event->optionalWeights().end() ); 
+      //assert(wi == event->optionalWeights().end() );
 
       event->optionalWeights()[var->first] = 1.0;
       currentWeights_[var->first] = 1.0;
@@ -629,7 +645,7 @@ void ShowerHandler::resetWeights() {
 
 void ShowerHandler::combineWeights() {
   tEventPtr event = eventHandler()->currentEvent();
-  for ( map<string,double>::const_iterator w = 
+  for ( map<string,double>::const_iterator w =
 	  currentWeights_.begin(); w != currentWeights_.end(); ++w ) {
     map<string,double>::iterator ew = event->optionalWeights().find(w->first);
     if ( ew != event->optionalWeights().end() )
@@ -640,7 +656,7 @@ void ShowerHandler::combineWeights() {
     }
   }
   if ( reweight_ != 1.0 ) {
-    Ptr<StandardEventHandler>::tptr eh = 
+    Ptr<StandardEventHandler>::tptr eh =
       dynamic_ptr_cast<Ptr<StandardEventHandler>::tptr>(eventHandler());
     if ( !eh ) {
       throw Exception() << "ShowerHandler::combineWeights() : Cross section reweighting "
@@ -662,7 +678,7 @@ string ShowerHandler::doAddVariation(string in) {
       // TODO what about decay showers?
       return "variation does not apply to any shower";
     }
-    if ( var.renormalizationScaleFactor == 1.0 && 
+    if ( var.renormalizationScaleFactor == 1.0 &&
 	 var.factorizationScaleFactor == 1.0 ) {
       return "variation does not vary anything";
     }
@@ -686,7 +702,7 @@ tPPair ShowerHandler::cascade(tSubProPtr, XCPtr) {
   return tPPair();
 }
 
-ShowerHandler::RemPair 
+ShowerHandler::RemPair
 ShowerHandler::getRemnants(PBIPair incomingBins) {
   RemPair remnants;
   // first beam particle
@@ -696,30 +712,30 @@ ShowerHandler::getRemnants(PBIPair incomingBins) {
     if(remnants.first) {
       ParticleVector children=remnants.first->children();
       for(unsigned int ix=0;ix<children.size();++ix) {
-	if(children[ix]->dataPtr()==remnants.first->dataPtr()) 
+	if(children[ix]->dataPtr()==remnants.first->dataPtr())
 	  remnants.first = dynamic_ptr_cast<RemPPtr>(children[ix]);
-      } 
+      }
       //remove existing colour lines from the remnants
-      if(remnants.first->colourLine()) 
+      if(remnants.first->colourLine())
 	remnants.first->colourLine()->removeColoured(remnants.first);
-      if(remnants.first->antiColourLine()) 
+      if(remnants.first->antiColourLine())
 	remnants.first->antiColourLine()->removeAntiColoured(remnants.first);
     }
   }
   // seconnd beam particle
   if(incomingBins.second&&!incomingBins. second->remnants().empty()) {
-    remnants.second = 
+    remnants.second =
       dynamic_ptr_cast<tRemPPtr>(incomingBins.second->remnants()[0] );
     if(remnants.second) {
       ParticleVector children=remnants.second->children();
       for(unsigned int ix=0;ix<children.size();++ix) {
-	if(children[ix]->dataPtr()==remnants.second->dataPtr()) 
+	if(children[ix]->dataPtr()==remnants.second->dataPtr())
 	  remnants.second = dynamic_ptr_cast<RemPPtr>(children[ix]);
-      } 
+      }
       //remove existing colour lines from the remnants
-      if(remnants.second->colourLine()) 
+      if(remnants.second->colourLine())
 	remnants.second->colourLine()->removeColoured(remnants.second);
-      if(remnants.second->antiColourLine()) 
+      if(remnants.second->antiColourLine())
 	remnants.second->antiColourLine()->removeAntiColoured(remnants.second);
     }
   }
@@ -748,7 +764,7 @@ void ShowerHandler::boostCollision(bool boost) {
     }
   }
   // first call performs the boost and second inverse
-  // get the particles to be boosted 
+  // get the particles to be boosted
   set<tPPtr> particles;
   addChildren(incoming_.first,particles);
   addChildren(incoming_.second,particles);
@@ -840,7 +856,7 @@ bool decayProduct(tSubProPtr subProcess,
   return true;
 }
 
-PPtr findParent(PPtr original, bool & isHard, 
+PPtr findParent(PPtr original, bool & isHard,
 			       set<PPtr> outgoingset,
 			       tSubProPtr subProcess) {
   PPtr parent=original;
@@ -923,18 +939,18 @@ void ShowerHandler::splitHardProcess(tPVector tagged, PerturbativeProcessPtr & h
       if (isDecayProd)
 	hardParticles.insert(findParent(parent,isHard,outgoingset,subProcess_));
     }
-    if (!isDecayProd) 
+    if (!isDecayProd)
       hardParticles.insert(*taggedP);
   }
   // there must be something to shower
-  if(hardParticles.empty()) 
+  if(hardParticles.empty())
     throw Exception() << "No particles to shower in "
-		      << "ShowerHandler::splitHardProcess()" 
+		      << "ShowerHandler::splitHardProcess()"
 		      << Exception::eventerror;
   // must be a hard process
   if(!isHard)
     throw Exception() << "Starting on decay not yet implemented in "
-		      << "ShowerHandler::splitHardProcess()" 
+		      << "ShowerHandler::splitHardProcess()"
 		      << Exception::runerror;
   // create the hard process
   hard = new_ptr(PerturbativeProcess());
@@ -949,7 +965,7 @@ void ShowerHandler::splitHardProcess(tPVector tagged, PerturbativeProcessPtr & h
     if(!orig->children().empty()) {
       // remove d,u,s,c,b quarks and leptons other than on-shell taus
       if( StandardQCDPartonMatcher::Check(orig->id()) ||
-	  ( LeptonMatcher::Check(orig->id()) && 
+	  ( LeptonMatcher::Check(orig->id()) &&
 	    !(abs(orig->id())==ParticleID::tauminus && abs(orig->mass()-orig->dataPtr()->mass())<MeV))) {
 	radiates = true;
       }
@@ -1050,16 +1066,16 @@ tDMPtr ShowerHandler::decay(PerturbativeProcessPtr process,
     if (++ntry>=maxtryDecay_)
       throw Exception() << "Failed to perform decay in ShowerHandler::decay()"
  			<< " after " << maxtryDecay_
- 			<< " attempts for " << parent->PDGName() 
+ 			<< " attempts for " << parent->PDGName()
  			<< Exception::eventerror;
     // select decay mode
     dm = parent->data().selectMode(*parent);
 
-    if(!dm) 
+    if(!dm)
       throw Exception() << "Failed to select decay  mode in ShowerHandler::decay()"
 			<< "for " << parent->PDGName()
 			<< Exception::eventerror;
-    if(!dm->decayer()) 
+    if(!dm->decayer())
       throw Exception() << "No Decayer for selected decay mode "
  			<< " in ShowerHandler::decay()"
  			<< Exception::runerror;
@@ -1109,7 +1125,7 @@ tDMPtr ShowerHandler::findDecayMode(const string & tag) const {
   static map<string,DMPtr> cache;
   map<string,DMPtr>::const_iterator pos = cache.find(tag);
 
-  if ( pos != cache.end() ) 
+  if ( pos != cache.end() )
     return pos->second;
 
   tDMPtr dm = CurrentGenerator::current().findDecayMode(tag);
@@ -1129,4 +1145,3 @@ bool ShowerHandler::ParticleOrdering::operator() (tcPDPtr p1, tcPDPtr p2) const 
     ( abs(p1->id()) == abs(p2->id()) && p1->id() > p2->id() ) ||
     ( p1->id() == p2->id() && p1->fullName() > p2->fullName() );
 }
-

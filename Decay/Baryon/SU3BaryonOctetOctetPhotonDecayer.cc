@@ -51,18 +51,15 @@ void SU3BaryonOctetOctetPhotonDecayer::doinit() {
   // set up the decay modes
   setupModes(1);
   // set up the phase space and the couplings
-  tPDVector extpart(3);
-  DecayPhaseSpaceModePtr mode;
-  double wgtmax;
-  vector<double> wgt(0);
   for(unsigned int ix=0;ix<_incomingB.size();++ix) {
-    extpart[0]=getParticleData(_incomingB[ix]);
-    extpart[1]=getParticleData(_outgoingB[ix]);
-    extpart[2]=getParticleData(ParticleID::gamma);
-    mode=new_ptr(DecayPhaseSpaceMode(extpart,this));
-    wgtmax = _maxweight.size()>numberModes() ? 
+    tPDPtr    in  =  getParticleData(_incomingB[ix]);
+    tPDVector out = {getParticleData(_outgoingB[ix]),
+    		     getParticleData(ParticleID::gamma)};
+    double wgtmax = _maxweight.size()>numberModes() ? 
       _maxweight[numberModes()] : 1.;
-    addMode(mode,wgtmax,wgt);
+    PhaseSpaceModePtr mode =
+      new_ptr(PhaseSpaceMode(in,out,wgtmax));
+    addMode(mode);
     // testing code
 //     Energy MR = extpart[0]->mass();
 //     Energy MB = extpart[1]->mass();
@@ -368,7 +365,7 @@ void SU3BaryonOctetOctetPhotonDecayer::setupModes(unsigned int iopt) const {
 	  factor[ix] *=2.;
 	  if(inspin==2&&outspin==2)      _prefactor.push_back(2.*factor[ix]);
 	  else if(inspin==4&&outspin==2) _prefactor.push_back(factor[ix]);
-	  else throw DecayIntegratorError() 
+	  else throw Exception() 
 	    << "Invalid combination of spins in "
 	    << "SU3BaryonOctetOctetPhotonDecayer::" 
 	    << "setupModes()" << Exception::abortnow;}

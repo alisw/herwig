@@ -11,7 +11,7 @@
 // This is the declaration of the PScalar4FermionsDecayer class.
 
 #include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 #include "ThePEG/Helicity/LorentzSpinorBar.h"
 
 namespace Herwig {
@@ -63,12 +63,21 @@ public:
    * Return the matrix element squared for a given mode and phase-space channel.
    * @param ichan The channel we are calculating the matrix element for. 
    * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
    * @param meopt Option for the calculation of the matrix element
    * @return The matrix element squared for the phase-space configuration.
    */
   double me2(const int ichan,const Particle & part,
-	     const ParticleVector & decay, MEOption meopt) const;
+	     const tPDVector & outgoing,
+	     const vector<Lorentz5Momentum> & momenta,
+	     MEOption meopt) const;
+
+  /**
+   *   Construct the SpinInfos for the particles produced in the decay
+   */
+  virtual void constructSpinInfo(const Particle & part,
+				 ParticleVector outgoing) const;
 
   /**
    * Output the setup information for the particle database
@@ -142,72 +151,69 @@ private:
    */
   PScalar4FermionsDecayer & operator=(const PScalar4FermionsDecayer &) = delete;
 
+public:
+
+  /**
+   *   Set the parameters for a decay mode
+   */
+  string setUpDecayMode(string arg);
+
 private:
 
   /**
    * coupling for a decay
    */
-  vector<InvEnergy> _coupling;
+  vector<InvEnergy> coupling_;
 
   /**
    * the PDG codes for the incoming particle
    */
-  vector<int> _incoming;
+  vector<int> incoming_;
 
   /**
    * the PDG codes for the first outgoing fermion
    */
-  vector<int> _outgoing1;
-
-  /**
-   * the PDG codes for the second outgoing
-   */
-  vector<int> _outgoing2;
+  vector<pair<long,long> > outgoing_;
 
   /**
    * maximum weight for a decay
    */
-  vector<double> _maxweight;
+  vector<double> maxweight_;
 
   /**
    * Include the VMD factor
    */
-  vector<int> _includeVMD;
+  vector<int> includeVMD_;
 
   /**
    * PDG code of the particle for the VMD factor
    */
-  vector<int> _VMDid;
+  vector<int> VMDid_;
 
   /**
    * Mass of the particle for the VMD factor
    */
-  vector<Energy> _VMDmass;
+  vector<Energy> VMDmass_;
 
   /**
    * Width of the particle for the VMD factor
    */
-  vector<Energy> _VMDwidth;
-
-  /**
-   *  initial number of modes
-   */
-  unsigned int _initsize;
+  vector<Energy> VMDwidth_;
 
   /**
    *  Spin density matrix
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 
   /**
    *  Spinors for the decay products
    */
-  mutable vector<Helicity::LorentzSpinor   <SqrtEnergy> > _wave[2];
+  mutable vector<Helicity::LorentzSpinor   <SqrtEnergy> > wave_[2];
 
   /**
    *  Barred spinors for the decay products
    */
-  mutable vector<Helicity::LorentzSpinorBar<SqrtEnergy> > _wavebar[2];
+  mutable vector<Helicity::LorentzSpinorBar<SqrtEnergy> > wavebar_[2];
 };
 
 }

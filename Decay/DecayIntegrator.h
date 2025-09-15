@@ -6,22 +6,21 @@
 // Herwig is licenced under version 3 of the GPL, see COPYING for details.
 // Please respect the MCnet academic guidelines, see GUIDELINES for details.
 //
-#ifndef HERWIG_DecayIntegrator_H
-#define HERWIG_DecayIntegrator_H
+#ifndef Herwig_DecayIntegrator_H
+#define Herwig_DecayIntegrator_H
 //
 // This is the declaration of the DecayIntegrator class.
 //
-#include <ThePEG/PDT/Decayer.h>
-#include "DecayPhaseSpaceChannel.h"
-#include <ThePEG/PDT/EnumParticles.h>
-#include <Herwig/Decay/DecayVertex.h>
-#include "DecayPhaseSpaceMode.fh"
+
+#include "DecayIntegrator.fh"
+#include "HwDecayerBase.h"
+#include "PhaseSpaceMode.fh"
 #include "Herwig/PDT/WidthCalculatorBase.fh"
 #include "Radiation/DecayRadiationGenerator.h"
-#include "HwDecayerBase.h"
-#include "DecayIntegrator.fh"
+#include <Herwig/Decay/DecayVertex.h>
 
 namespace Herwig {
+
 using namespace ThePEG;
 
   /** \ingroup Decay
@@ -33,7 +32,7 @@ using namespace ThePEG;
    *  the implementation of a multichannel decayer or n-body phase space decays.
    *
    *  The <code>DecayIntegrator</code> class inherits from ThePEG's Decayer class
-   *  and makes use of the <code>DecayPhaseSpaceMode</code> class to specify a number
+   *  and makes use of the <code>PhaseSpaceMode</code> class to specify a number
    *  of decay modes.
    *
    *  Additional modes can be added using the addMode method. In practice the 
@@ -58,20 +57,14 @@ using namespace ThePEG;
    * @see \ref DecayIntegratorInterfaces "The interfaces"
    * defined for DecayIntegrator.
    */
-
 class DecayIntegrator: public HwDecayerBase {
 
 public:
-
-  /**
-   *  The output operator is a friend, this is mainly for debugging
-   */    
-  friend ostream & operator<<(ostream &, const DecayIntegrator &);
-
+  
   /**
    *  and DecayPhaseMode
    */
-  friend class DecayPhaseSpaceMode;
+  friend class PhaseSpaceMode;
 
   /**
    *  Enum for the matrix element option
@@ -81,11 +74,14 @@ public:
 public:
 
   /**
-   * Default constructor.
+   * The default constructor.
    */
-  DecayIntegrator() : _niter(10), _npoint(10000), _ntry(500),
-		      _generateinter(false), _imode(-1),
-		      _realME(false), _virtualME(false), _eps(ZERO) {}
+  DecayIntegrator() : nIter_(10), nPoint_(10000), nTry_(500),
+		       generateInter_(false), iMode_(-1),
+		       realME_(false), virtualME_(false), eps_(ZERO), warnings_(false)
+  {}
+
+public:
   
   /**
    * Check if this decayer can perfom the decay for a particular mode.
@@ -119,35 +115,48 @@ public:
   /**
    * The mode being used for this decay
    */
-  int imode() const {return _imode;}
+  int imode() const {return iMode_;}
 
   /**
    * Add a phase-space mode to the list
    * @param mode The mode being added.
-   * @param maxwgt The maximum weight for the phase space integration.
-   * @param wgts The weights of the different channels in the multichannel approach.
    */
-  void addMode(DecayPhaseSpaceModePtr mode,double maxwgt,
-	       const vector<double> wgts) const;
+  void addMode(PhaseSpaceModePtr mode) const;
 
   /**
    * Return the matrix element squared for a given mode and phase-space channel.
-   * This function is purely virtual and must be implemented in classes inheriting
-   * from DecayIntegrator.
    * @param ichan The channel we are calculating the matrix element for. 
    * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
-   * @param opt Option for the calculation of the matrix element
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
+   * @param meopt Option for the calculation of the matrix element
    * @return The matrix element squared for the phase-space configuration.
    */
   virtual double me2(const int ichan, const Particle & part,
-		     const ParticleVector & decay,MEOption opt) const=0;
+		     const tPDVector & outgoing,
+		     const vector<Lorentz5Momentum> & momenta,
+		     MEOption meopt) const = 0;
+
+  /**
+   *   Construct the SpinInfos for the particles produced in the decay
+   */
+  virtual void constructSpinInfo(const Particle & part,
+				 ParticleVector outgoing) const = 0;
   
   /**
-   * The helicity amplitude matrix element for spin correlations.
+   * Output the setup information for the particle database
+   * @param os The stream to output the information to
+   * @param header Whether or not to output the information for MySQL
    */
-  DecayMEPtr ME() const {return _matrixelement;}
-
+  virtual void dataBaseOutput(ofstream & os,bool header) const;
+  
+  /**
+   * Set the code for the partial width. Finds the partial width in the
+   * GenericWidthGenerator class which corresponds to the decay mode.
+   * @param dm The DecayMode
+   * @param imode The mode. 
+   */
+  void setPartialWidth(const DecayMode & dm, int imode);
   /**
    * Specify the \f$1\to2\f$ matrix element to be used in the running width calculation.
    * @param mecode The code for the matrix element as described
@@ -160,7 +169,7 @@ public:
     coupling = 1.;
     mecode   = -1;
     return false;
-  }						     
+  }				     
   
   /**
    * Method to return an object to calculate the 3 (or higher body) partial width
@@ -201,33 +210,13 @@ public:
 				      const Energy2 s,
 				      const Energy m1, const Energy m2, 
 				      const Energy m3) const;
-  
-  /**
-   * Set the code for the partial width. Finds the partial width in the
-   * GenericWidthGenerator class which corresponds to the decay mode.
-   * @param dm The DecayMode
-   * @param imode The mode. 
-   */
-  void setPartialWidth(const DecayMode & dm, int imode);
 
   /**
    * Finds the phase-space mode corresponding to a given decay mode
    * @param dm The DecayMode
    */
   int findMode(const DecayMode & dm);
-
-  /**
-   * Output the setup information for the particle database
-   * @param os The stream to output the information to
-   * @param header Whether or not to output the information for MySQL
-   */
-  virtual void dataBaseOutput(ofstream & os,bool header) const;
-
-  /**
-   *  Access to the epsilon parameter
-   */
-  Energy epsilonPS() const {return _eps;}
-
+  
 public:
 
   /**
@@ -242,13 +231,13 @@ public:
    * of photons.
    */
   ParticleVector generatePhotons(const Particle & p,ParticleVector children) {
-    return _photongen->generatePhotons(p,children,this);
+    return photonGen_->generatePhotons(p,children,this);
   }
 
   /**
    *  check if photons can be generated in the decay
    */
-  bool canGeneratePhotons() {return _photongen;}
+  bool canGeneratePhotons() {return photonGen_;}
 
   /**
    *  The one-loop virtual correction.
@@ -264,7 +253,7 @@ public:
   /**
    *  Whether or not the one loop matrix element is implemented
    */
-  bool hasOneLoopME() {return _virtualME;}
+  bool hasOneLoopME() {return virtualME_;}
   
   /**
    *  The real emission matrix element
@@ -290,10 +279,19 @@ public:
   /**
    *  Whether or not the real emission matrix element is implemented
    */
-  bool hasRealEmissionME() {return _realME;}
+  bool hasRealEmissionME() {return realME_;}
   //@}
-public:
   
+public:
+
+  /**
+   *  The output operator is a friend, this is mainly for debugging
+   */    
+  friend ostream & operator<<(ostream & os, const DecayIntegrator & decay);
+
+  
+public:
+
   /** @name Functions used by the persistent I/O system. */
   //@{
   /**
@@ -309,11 +307,26 @@ public:
    */
   void persistentInput(PersistentIStream & is, int version);
   //@}
-  
+
   /**
-   * Standard Init function used to initialize the interfaces.
+   * The standard Init function used to initialize the interfaces.
+   * Called exactly once for each class by the class description system
+   * before the main function starts or
+   * when this class is dynamically loaded.
    */
   static void Init();
+
+  
+protected:
+
+  /** @name Standard Interfaced functions. */
+  //@{
+  /**
+   * Initialize this object. Called in the run phase just before
+   * a run begins.
+   */
+  virtual void doinitrun();
+  //@}
 
 protected:
 
@@ -327,17 +340,22 @@ protected:
    * @return The particles produced inthe decay.
    */
   ParticleVector generate(bool inter,bool cc, const unsigned int & imode,
-			  const Particle & inpart) const;  
+			  const Particle & inpart) const;
 
   /**
    * Set the mode being use for this decay.
    */
-  void imode(int in) {_imode=in;}
+  void imode(int in) { iMode_ = in;}
   
   /**
    * Set the helicity matrix element for the decay.
    */
-  void ME(DecayMEPtr in) const { _matrixelement = in;}
+  void ME(DecayMEPtr in) const { matrixElement_ = in;}
+  
+  /**
+   * The helicity amplitude matrix element for spin correlations.
+   */
+  DecayMEPtr ME() const {return matrixElement_;}
    
   /**
    * Reset the properities of all intermediates.
@@ -348,143 +366,161 @@ protected:
   void resetIntermediate(tcPDPtr part, Energy mass, Energy width);
 
   /**
-   * Number of decay modes
-   */
-  unsigned int numberModes() const {return _modes.size();}
-
-  /**
-   * Pointer to a mode
-   */
-  tDecayPhaseSpaceModePtr mode(unsigned int);
-  
-  /**
-   * Pointer to a mode
-   */
-  tcDecayPhaseSpaceModePtr mode(unsigned int) const;
-
-  /**
-   * Get whether or not the intermediates are included
-   */
-  bool generateIntermediates() const {return _generateinter;}
-
-  /**
-   * Set whether or not the intermediates are included 
-   */ 
-  void generateIntermediates(bool in) {_generateinter=in;}
-
-  /**
    * Initialize the phase-space mode
    * @param imode The mode
    * @param init Whether or not to perform the initialization
    */
   Energy initializePhaseSpaceMode(unsigned int imode,bool init, bool onShell=false) const;
+  
+protected:
+  
+  /**
+   *    Methods to set variables in inheriting classes
+   */
+  //@{
+  /**
+   * Set whether or not the intermediates are included 
+   */ 
+  void generateIntermediates(bool in) {generateInter_=in;}
 
+  /**
+   * Set whether or not the intermediates are included 
+   */ 
+  bool generateIntermediates() const {return generateInter_;}
+  
   /**
    *  Whether or not the one loop matrix element is implemented
    */
-  void hasOneLoopME(bool in) {_virtualME=in;}
+  void hasOneLoopME(bool in) {virtualME_=in;}
 
   /**
    *  Whether or not the real emission matrix element is implemented
    */
-  void hasRealEmissionME(bool in) {_realME=in;}
+  void hasRealEmissionME(bool in) {realME_=in;}
 
   /**
    * Set the epsilon parameter
    */
-  void epsilonPS(Energy in) {_eps=in;}
+  void epsilonPS(Energy in) {eps_=in;}
 
   /**
    *  Clear the models
    */
-  void clearModes() {_modes.clear();}
+  void clearModes() {modes_.clear();}
 
 protected:
   
-  /** @name Standard Interfaced functions. */
-  //@{
   /**
-   * Initialize this object to the begining of the run phase.
+   * Number of decay modes
    */
-  virtual void doinitrun();
-  //@}
+  unsigned int numberModes() const {return modes_.size();}
+
+  /**
+   * Pointer to a mode
+   */
+  tPhaseSpaceModePtr mode(unsigned int ix) {
+    return modes_[ix];
+  }
+  /**
+   * Pointer to a mode
+   */
+  tcPhaseSpaceModePtr mode(unsigned int ix) const {
+    return modes_[ix];
+  }
+  
+public:
+
+bool warnings() const {
+  return warnings_;
+}
 
 private:
-  
+
   /**
    * Private and non-existent assignment operator.
    */
   DecayIntegrator & operator=(const DecayIntegrator &) = delete;
 
-private:
-
+  /**
+   *  Parameters for the integration
+   */
+  //@{
   /**
    * Number of iterations for th initialization.
    */
-  int _niter;
+  unsigned int nIter_;
 
   /**
    * Number of points for initialisation
    */
-  int _npoint;
+  unsigned int nPoint_;
 
   /**
    * number of attempts to generate the decay
    */
-  int _ntry;
+  unsigned int nTry_;
   
   /**
    * List of the decay modes
    */
-  mutable vector<DecayPhaseSpaceModePtr> _modes;
+  mutable vector<PhaseSpaceModePtr> modes_;
 
+  //@}
+  
   /**
    *  Whether to include the intermediates whne outputing the results.
    */
-  bool _generateinter;
-
+  bool generateInter_;
+  
   /**
    *  Pointer to the object generating the QED radiation in the decay
    */
-  DecayRadiationGeneratorPtr _photongen;
+  DecayRadiationGeneratorPtr photonGen_;
 
   /**
    * mode currently being generated  
    */
-  mutable int _imode;
+  mutable int iMode_;
 
   /**
    * The helicity matrix element for the current decay
    */
-  mutable DecayMEPtr _matrixelement;
+  mutable DecayMEPtr matrixElement_;
 
   /**
    *  Whether or not the real photon emission matrix element exists
    */
-  bool _realME;
+  bool realME_;
 
   /**
    *  Whether or not the one-loop matrix element exists
    */
-  bool _virtualME;
+  bool virtualME_;
 
   /**
    *   Epsilon parameter for phase-space integration
    */
-  Energy _eps;
-  
-};
+  Energy eps_;
+
   /**
-   * Output information on the DecayIntegrator for debugging purposes
+   * option for turinh on/off log warnings in Phase class
    */
-  ostream & operator<<(ostream &, const DecayIntegrator &);
+  bool warnings_;
+
+protected:
 
   /**
    * Exception for this class and those inheriting from it
    */
   class DecayIntegratorError: public Exception {};
 
+};
+  
+/**
+ * Output information on the DecayIntegrator for debugging purposes
+ */
+ostream & operator<<(ostream &, const DecayIntegrator &);
+
 }
 
-
-#endif /* HERWIG_DecayIntegrator_H */
+#endif /* Herwig_DecayIntegrator_H */

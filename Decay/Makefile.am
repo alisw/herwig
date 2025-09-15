@@ -1,5 +1,5 @@
-SUBDIRS = FormFactors Tau Baryon VectorMeson Perturbative \
-	  WeakCurrents ScalarMeson TensorMeson Partonic General Radiation
+SUBDIRS = FormFactors Tau Baryon VectorMeson HeavyMeson Perturbative \
+	  WeakCurrents ScalarMeson TensorMeson Dalitz Partonic General Radiation
 
 if HAVE_EVTGEN
 SUBDIRS += EvtGen
@@ -25,8 +25,7 @@ EXTRA_DIST = $(ALL_H_FILES) $(ALL_CC_FILES)
 DIR_H_FILES = $(addprefix $(srcdir)/,$(ALL_H_FILES))
 ALL_H_FILES = \
 DecayIntegrator.fh DecayIntegrator.h \
-DecayPhaseSpaceChannel.fh DecayPhaseSpaceChannel.h \
-DecayPhaseSpaceMode.fh DecayPhaseSpaceMode.h \
+PhaseSpaceMode.fh PhaseSpaceMode.h \
 HwDecayerBase.fh HwDecayerBase.h \
 HwDecayHandler.h \
 DecayVertex.fh DecayVertex.h \
@@ -34,13 +33,14 @@ DecayMatrixElement.fh DecayMatrixElement.h \
 TwoBodyDecayMatrixElement.h \
 GeneralDecayMatrixElement.fh GeneralDecayMatrixElement.h \
 BranchingRatioReweighter.h\
-PerturbativeDecayer.h
+PerturbativeDecayer.h \
+ResonanceHelpers.h PhaseSpaceChannel.h IsoSpin.h
 
 DIR_CC_FILES = $(addprefix $(srcdir)/,$(ALL_CC_FILES))
 ALL_CC_FILES = \
 DecayIntegrator.cc \
-DecayPhaseSpaceChannel.cc \
-DecayPhaseSpaceMode.cc \
+PhaseSpaceChannel.cc \
+PhaseSpaceMode.cc \
 HwDecayerBase.cc \
 HwDecayHandler.cc \
 DecayVertex.cc \
@@ -55,7 +55,7 @@ PerturbativeDecayer.cc
 pkglib_LTLIBRARIES = Hw64Decay.la
 
 Hw64Decay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 12:0:0
+$(AM_LDFLAGS) -module -version-info 13:0:0
 
 Hw64Decay_la_SOURCES = \
 Hw64Decayer.h Hw64Decayer.cc
@@ -65,7 +65,7 @@ Hw64Decayer.h Hw64Decayer.cc
 pkglib_LTLIBRARIES += HwMamboDecay.la
 
 HwMamboDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 13:0:0
+$(AM_LDFLAGS) -module -version-info 14:0:0
 
 HwMamboDecay_la_SOURCES = \
 MamboDecayer.h MamboDecayer.cc
@@ -78,17 +78,26 @@ libHwFormFactor_la_SOURCES = \
 FormFactors/BaryonFormFactor.cc \
 FormFactors/ScalarFormFactor.cc \
 FormFactors/BtoSGammaHadronicMass.cc \
+FormFactors/KMatrix.cc \
+FormFactors/ScalarAmplitude.cc \
 FormFactors/BaryonFormFactor.fh \
 FormFactors/BaryonFormFactor.h \
 FormFactors/ScalarFormFactor.fh \
 FormFactors/ScalarFormFactor.h \
 FormFactors/BtoSGammaHadronicMass.h \
-FormFactors/BtoSGammaHadronicMass.fh
+FormFactors/BtoSGammaHadronicMass.fh \
+FormFactors/KMatrix.h \
+FormFactors/KMatrix.fh \
+FormFactors/ScalarAmplitude.h \
+FormFactors/ScalarAmplitude.fh\
+FormFactors/OmnesFunction.h\
+FormFactors/OmnesFunction.fh\
+FormFactors/OmnesFunction.cc
 
 pkglib_LTLIBRARIES += HwFormFactors.la
 
 HwFormFactors_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 13:0:0
+$(AM_LDFLAGS) -module -version-info 14:0:0
 
 HwFormFactors_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/FormFactors
@@ -101,7 +110,7 @@ FormFactors/Formfactor__all.cc
 pkglib_LTLIBRARIES += HwTauDecay.la
 
 HwTauDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 13:0:0
+$(AM_LDFLAGS) -module -version-info 14:0:0
 
 HwTauDecay_la_SOURCES = \
 Tau/TauDecayer.cc
@@ -111,7 +120,7 @@ Tau/TauDecayer.cc
 pkglib_LTLIBRARIES += HwBaryonDecay.la
 
 HwBaryonDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 12:0:0
+$(AM_LDFLAGS) -module -version-info 13:0:0
 
 HwBaryonDecay_la_LIBADD = \
 $(top_builddir)/PDT/libHwBaryonWidth.la
@@ -127,7 +136,7 @@ Baryon/BaryonDecayer__all.cc
 pkglib_LTLIBRARIES += HwVMDecay.la
 
 HwVMDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 12:0:0
+$(AM_LDFLAGS) -module -version-info 13:0:0
 
 HwVMDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/VectorMeson
@@ -140,7 +149,7 @@ VectorMeson/VMDecayer__all.cc
 pkglib_LTLIBRARIES += HwPerturbativeDecay.la 
 
 HwPerturbativeDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 13:0:0
+$(AM_LDFLAGS) -module -version-info 14:0:0
 
 HwPerturbativeDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/Perturbative
@@ -152,17 +161,19 @@ Perturbative/Perturbative__all.cc
 
 noinst_LTLIBRARIES += libHwWeakCurrent.la
 libHwWeakCurrent_la_SOURCES = \
-WeakCurrents/WeakDecayCurrent.cc \
+WeakCurrents/WeakCurrent.cc \
 WeakCurrents/LeptonNeutrinoCurrent.cc \
-WeakCurrents/WeakDecayCurrent.fh \
-WeakCurrents/WeakDecayCurrent.h \
+WeakCurrents/WeakCurrent.fh \
+WeakCurrents/WeakCurrent.h \
 WeakCurrents/LeptonNeutrinoCurrent.fh \
-WeakCurrents/LeptonNeutrinoCurrent.h
+WeakCurrents/LeptonNeutrinoCurrent.h \
+WeakCurrents/WeakBaryonCurrent.cc \
+WeakCurrents/WeakBaryonCurrent.h
 
 pkglib_LTLIBRARIES += HwWeakCurrents.la
 
 HwWeakCurrents_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 13:0:0
+$(AM_LDFLAGS) -module -version-info 14:0:0
 
 HwWeakCurrents_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/WeakCurrents
@@ -172,10 +183,26 @@ WeakCurrents/WeakCurrents__all.cc
 
 ##################
 
+pkglib_LTLIBRARIES += HwHMDecay.la
+
+HwHMDecay_la_LDFLAGS = \
+$(AM_LDFLAGS) -module -version-info 12:0:0
+
+HwHMDecay_la_LIBADD = \
+$(top_builddir)/PDT/libHwHeavyMesonWidth.la
+
+HwHMDecay_la_CPPFLAGS = \
+$(AM_CPPFLAGS) -I$(srcdir)/HeavyMeson
+
+nodist_HwHMDecay_la_SOURCES = \
+HeavyMeson/HMDecayer__all.cc
+
+##################
+
 pkglib_LTLIBRARIES += HwSMDecay.la
 
 HwSMDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 14:0:0
+$(AM_LDFLAGS) -module -version-info 15:0:0
 
 HwSMDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/ScalarMeson
@@ -185,10 +212,23 @@ ScalarMeson/SMDecayer__all.cc
 
 ##################
 
+pkglib_LTLIBRARIES += HwDalitzDecay.la
+
+HwDalitzDecay_la_LDFLAGS = \
+$(AM_LDFLAGS) -module -version-info 15:0:0
+
+HwDalitzDecay_la_CPPFLAGS = \
+$(AM_CPPFLAGS) -I$(srcdir)/Dalitz
+
+nodist_HwDalitzDecay_la_SOURCES = \
+Dalitz/DalitzDecay__all.cc
+
+##################
+
 pkglib_LTLIBRARIES += HwTMDecay.la
 
 HwTMDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 12:0:0
+$(AM_LDFLAGS) -module -version-info 13:0:0
 
 HwTMDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/TensorMeson
@@ -201,7 +241,7 @@ TensorMeson/TMDecayer__all.cc
 pkglib_LTLIBRARIES += HwPartonicDecay.la
 
 HwPartonicDecay_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 13:0:0
+$(AM_LDFLAGS) -module -version-info 14:0:0
 
 HwPartonicDecay_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/Partonic
@@ -225,7 +265,7 @@ Radiation/QEDRadiationHandler.h
 pkglib_LTLIBRARIES += HwSOPHTY.la
 
 HwSOPHTY_la_LDFLAGS = \
-$(AM_LDFLAGS) -module -version-info 7:0:0
+$(AM_LDFLAGS) -module -version-info 8:0:0
 
 HwSOPHTY_la_CPPFLAGS = \
 $(AM_CPPFLAGS) -I$(srcdir)/Radiation

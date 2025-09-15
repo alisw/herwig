@@ -43,18 +43,15 @@ void SU3BaryonSingletOctetScalarDecayer::doinit() {
   // set up the decay modes
   setupModes(1);
   // set up the phase space and the couplings
-  tPDVector extpart(3);
-  DecayPhaseSpaceModePtr mode;
-  double wgtmax;
-  vector<double> wgt(0);
   for(unsigned int ix=0;ix<_outgoingB.size();++ix) {
-    extpart[0]=getParticleData(_elambda);
-    extpart[1]=getParticleData(_outgoingB[ix]);
-    extpart[2]=getParticleData(_outgoingM[ix]);
-    mode=new_ptr(DecayPhaseSpaceMode(extpart,this));
-    wgtmax = _maxweight.size()>numberModes() 
+    tPDPtr    in  =  getParticleData(_elambda);
+    tPDVector out = {getParticleData(_outgoingB[ix]),
+    		     getParticleData(_outgoingM[ix])};
+    double wgtmax = _maxweight.size()>numberModes() 
       ? _maxweight[numberModes()] : 1.;
-    addMode(mode,wgtmax,wgt);
+    PhaseSpaceModePtr mode = 
+      new_ptr(PhaseSpaceMode(in,out,wgtmax));
+    addMode(mode);
   }
 }
 
@@ -258,7 +255,7 @@ void SU3BaryonSingletOctetScalarDecayer::setupModes(unsigned int iopt) const {
   vector<int> outtemp,mestemp;
   double rt(sqrt(2.));
   if(_elambda==0)
-    throw DecayIntegratorError() << "Invalid incoming particle in "
+    throw Exception() << "Invalid incoming particle in "
 				 << "SU3BaryonSingletOctetScalarDecayer::" 
 				 << "setupModes()" << Exception::abortnow;
   // decays of the excited lambda
@@ -284,7 +281,7 @@ void SU3BaryonSingletOctetScalarDecayer::setupModes(unsigned int iopt) const {
 	  outspin = extpart[1]->iSpin();
 	  if(inspin==2&&outspin==2)      _prefactor.push_back(_c*rt/_fpi);
 	  else if(inspin==4&&outspin==2) _prefactor.push_back(_c*rt/_fpi);
-	  else throw DecayIntegratorError() 
+	  else throw Exception() 
 	    << "Invalid combination of spins in "
 	    << "SU3BaryonSingletOctetScalarDecayer::" 
 	    << "setupModes()" << Exception::abortnow;

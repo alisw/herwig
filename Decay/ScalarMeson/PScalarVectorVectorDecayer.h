@@ -9,7 +9,7 @@
 #ifndef HERWIG_PScalarVectorVectorDecayer_H
 #define HERWIG_PScalarVectorVectorDecayer_H
 // This is the declaration of the PScalarVectorVectorDecayer class.
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 #include "Herwig/Decay/DecayIntegrator.h"
 #include "ThePEG/Helicity/LorentzPolarizationVector.h"
 
@@ -34,6 +34,9 @@ using namespace ThePEG;
  *  where \f$p_{1,2}\f$ and \f$\epsilon_{1,2}\f$ are the momenta and polarzation
  *  vectors of the outgoing vectors.
  *
+ *  While this Lorentz structure always applies for pseudoscalar to two pseudovectors or scalar to 
+ *  vector pseudovector decays, in practice it is only used for pseudoscalar to two vector decays.
+ *
  *  The incoming pseudoscalar meson, the outgoing vectors and the coupling can
  *  be specified using the relevant interfaces.
  *
@@ -47,11 +50,6 @@ using namespace ThePEG;
 class PScalarVectorVectorDecayer: public DecayIntegrator {
 
 public:
-
-  /**
-   * Default constructor.
-   */
-  PScalarVectorVectorDecayer();
   
   /**
    * Which of the possible decays is required
@@ -66,12 +64,21 @@ public:
    * Return the matrix element squared for a given mode and phase-space channel.
    * @param ichan The channel we are calculating the matrix element for. 
    * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
    * @param meopt Option for the calculation of the matrix element
    * @return The matrix element squared for the phase-space configuration.
    */
-  double me2( const int ichan,const Particle & part,
-	     const ParticleVector & decay, MEOption meopt) const;
+  double me2(const int ichan,const Particle & part,
+	     const tPDVector & outgoing,
+	     const vector<Lorentz5Momentum> & momenta,
+	     MEOption meopt) const;
+
+  /**
+   *   Construct the SpinInfos for the particles produced in the decay
+   */
+  virtual void constructSpinInfo(const Particle & part,
+				 ParticleVector outgoing) const;
 
   /**
    * Specify the \f$1\to2\f$ matrix element to be used in the running width calculation.
@@ -154,47 +161,44 @@ private:
    */
   PScalarVectorVectorDecayer & operator=(const PScalarVectorVectorDecayer &) = delete;
 
+public:
+
+  /**
+   *   Set the parameters for a decay mode
+   */
+  string setUpDecayMode(string arg);
+
 private:
 
   /**
    * the PDG code for the incoming particle
    */
-  vector<int> _incoming;
+  vector<long> incoming_;
 
   /**
-   * the PDG code for the first outgoing particle
+   * the PDG code for the outgoing particles
    */
-  vector<int> _outgoing1;
-
-  /**
-   * the PDG code for the second outgoing particle
-   */
-  vector<int> _outgoing2;
+  vector<pair<long,long> > outgoing_;
 
   /**
    * the coupling for the decay, \f$g\f$.
    */
-  vector<InvEnergy> _coupling;
+  vector<InvEnergy> coupling_;
 
   /**
    * the maximum weight for the decay
    */
-  vector<double> _maxweight;
-
-  /**
-   *  initial number of modes
-   */
-  unsigned int _initsize;
+  vector<double> maxweight_;
 
   /**
    *  Spin density matrix
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 
   /**
    *  Polarization vectors for the decay products
    */
-  mutable vector<Helicity::LorentzPolarizationVector> _vectors[2];
+  mutable vector<Helicity::LorentzPolarizationVector> vectors_[2];
 };
 
 }

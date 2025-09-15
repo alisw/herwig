@@ -11,9 +11,9 @@
 // This is the declaration of the TauDecayer class.
 
 #include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 #include "ThePEG/Helicity/LorentzPolarizationVector.h"
-#include "Herwig/Decay/WeakCurrents/WeakDecayCurrent.h"
+#include "Herwig/Decay/WeakCurrents/WeakCurrent.h"
 #include "ThePEG/Helicity/LorentzSpinor.h"
 #include "ThePEG/Helicity/LorentzSpinorBar.h"
 
@@ -39,12 +39,12 @@ using ThePEG::Helicity::LorentzPolarizationVector;
  * - \f$ J_\mu\f$ is the hadronic current.
  *
  *  The leptonic part of this matrix element is implemented in this class 
- *  together with a WeakDecayCurrent member which calculates the hadronic
+ *  together with a WeakCurrent member which calculates the hadronic
  *  current  \f$ J_\mu\f$. This allows a range of \f$\tau\f$ decays to be
  *  constructed via the repository using the interfaces.
  *
  * @see DecayIntegrator.
- * @see WeakDecayCurrent
+ * @see WeakCurrent
  * 
  */
 class TauDecayer: public DecayIntegrator {
@@ -54,7 +54,7 @@ public:
   /**
    * Default constructor.
    */
-  TauDecayer() : _polOpt(false), _tauMpol(0.), _tauPpol(0.) {
+  TauDecayer() : polOpt_(false), tauMpol_(0.), tauPpol_(0.) {
     generateIntermediates(true);
   }
 
@@ -76,16 +76,23 @@ public:
 
   /**
    * Return the matrix element squared for a given mode and phase-space channel.
-   * This method combines the leptonic current and the hadronic current to 
-   * calculate the matrix element.
    * @param ichan The channel we are calculating the matrix element for. 
    * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
    * @param meopt Option for the calculation of the matrix element
    * @return The matrix element squared for the phase-space configuration.
    */
-  virtual double me2(const int ichan, const Particle & part,
-		     const ParticleVector & decay,MEOption meopt) const;
+  double me2(const int ichan,const Particle & part,
+	     const tPDVector & outgoing,
+	     const vector<Lorentz5Momentum> & momenta,
+	     MEOption meopt) const;
+
+  /**
+   *   Construct the SpinInfos for the particles produced in the decay
+   */
+  virtual void constructSpinInfo(const Particle & part,
+				 ParticleVector outgoing) const;
 
   /**
    * Output the setup information for the particle database.
@@ -162,70 +169,70 @@ private:
   /**
    * mapping of the modes to the currents
    */
-  vector<unsigned int> _modemap;
+  vector<unsigned int> modeMap_;
 
   /**
    * the hadronic current
    */
-  WeakDecayCurrentPtr _current;
+  WeakCurrentPtr current_;
 
   /**
    * location of the weights
    */
-  vector<int> _wgtloc;
+  vector<int> wgtLoc_;
 
   /**
    * the maximum weight
    */
-  vector<double> _wgtmax;
+  vector<double> wgtMax_;
 
   /**
    *  The weights for the different channels
    */
-  vector<double> _weights;
+  vector<double> weights_;
 
   /**
    *  The spinors for the decaying particle
    */
-  mutable vector<LorentzSpinor   <SqrtEnergy> > _inspin;
+  mutable vector<LorentzSpinor   <SqrtEnergy> > inSpin_;
 
   /**
    *  Barred spinors for the deaying particle
    */
-  mutable vector<LorentzSpinorBar<SqrtEnergy> > _inbar ;
+  mutable vector<LorentzSpinorBar<SqrtEnergy> > inBar_ ;
 
   /**
    *  Rho matrix
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 
   /**
    *  Maps for the vectors
    */
-  mutable vector<unsigned int> _constants;
+  mutable vector<unsigned int> constants_;
 
   /**
    *  Spins of the particles
    */
-  mutable vector<PDT::Spin> _ispin; 
+  mutable vector<PDT::Spin> iSpin_; 
 
   /**
    *  Option to force the polarizations of the tau leptons
    */
-  bool _polOpt;
+  bool polOpt_;
 
   /**
    *  Polarization for \f$\tau^-\f$
    */
-  double _tauMpol;
+  double tauMpol_;
 
   /**
    *  Polarization of \f$\tau^+\f$
    */
-  double _tauPpol;
+  double tauPpol_;
 };
 
 }
 
 
-#endif /* THEPEG_TauDecayer_H */
+#endif /* HERWIG_TauDecayer_H */

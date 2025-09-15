@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#! /usr/bin/python
+# -*- mode: python -*-
 from __future__ import print_function
 import glob,subprocess,os,optparse
 
@@ -11,11 +12,22 @@ op.add_option("--print-descriptions", dest="output" , default=False, action="sto
 opts, args = op.parse_args()
 
 # analyses to skip
-skip = [ "ATLAS_2010_I849050", # alias
-         "TOTEM_2012_002"    , # alias
-         "TEST"              , # test analysis
-         "ATLAS_2015_I1351916", # same as _EL version
-         "ATLAS_2015_CONF_2015_041", # superseeded
+skip = [ "ATLAS_2010_I849050",        # alias
+         "TOTEM_2012_002"    ,        # alias
+         "TEST"              ,        # test analysis
+         "ATLAS_2015_I1351916",       # same as _EL version
+         "ATLAS_2015_CONF_2015_041",  # superseeded
+         "ALICE_2012_I1127497",       # lead-lead
+         "ALICE_2012_I930312",        # lead-lead
+         "ALICE_2015_PBPBCentrality", # lead-lead
+         "ATLAS_PBPB_CENTRALITY",     # lead-lead
+         "ALICE_2015_PPBCentrality",  # lead-p
+         "ATLAS_pPb_Calib",           # lead-p
+         "BRAHMS_2004_AUAUCentrality",# heavy ion
+         "STAR_2008_S7993412",        # heavy ion
+         "STAR_BES_CALIB",            # heavy ion
+         "DELPHI_2002_069_CONF_603",  # superseeded
+         "CMS_2015_I1370682_PARTON",  # parton-level version
         ]
 searches=["ALEPH_2016_I1492968","ATLAS_2019_I1725190"]
 
@@ -57,13 +69,23 @@ for idir in glob.glob("Rivet/*") :
             line=file.readline()
             
 # low energy herwig analysis
-p = subprocess.Popen(["./python/LowEnergy.py","--list","--process","All"],stdout=subprocess.PIPE)
-lowEnergy = p.communicate()[0]
-hw_low_energy_analyses=lowEnergy.strip().split()
+hw_low_energy_analyses=[]
+for executable in ["LowEnergy-EE","LowEnergy-Photon"] :
+    p = subprocess.Popen(["./python/%s.py"%executable,"--list","--process","All"],stdout=subprocess.PIPE)
+    lowEnergy = p.communicate()[0]
+    if not isinstance(lowEnergy, bytes) :
+        lowEnergy = lowEnergy.encode("UTF-8")
+    else :
+        lowEnergy = lowEnergy.decode("utf-8")
+    hw_low_energy_analyses+=lowEnergy.strip().split()
 # R analyses
 p = subprocess.Popen(["./python/R.py","--list"],stdout=subprocess.PIPE)
 Rlist = p.communicate()[0]
-hw_R_analyses=Rlist.strip().split()
+if not isinstance(Rlist, bytes) :
+    Rlist = Rlist.encode("UTF-8")
+else :
+    Rlist = Rlist.decode("utf-8")
+hw_low_energy_analyses += Rlist.strip().split()
 
 anatohepmc = open("anatohepmc.txt",'w')
 hepmctoana = open("hepmctoana.txt",'w')
@@ -80,8 +102,7 @@ for analysis in sorted(analyses.keys()) :
         if(analysis in not_in_rivet) :
             not_in_rivet.remove(analysis)
     # we have it low energy or R or skipping
-    elif (analysis in hw_low_energy_analyses or analysis in skip or
-          analysis in hw_R_analyses ) :
+    elif (analysis in hw_low_energy_analyses or analysis in skip) :
         if(analysis in not_in_rivet) :
             not_in_rivet.remove(analysis)
         continue
@@ -111,7 +132,7 @@ for analysis in sorted(analyses.keys()) :
         else :
             print ("MISSING ANALYSIS",analysis,analyses[analysis])
             if(opts.output) : print (desc)
-# outout analyses missing from rivet
+# output analyses missing from rivet
 for val in not_in_rivet:
     print ("NOT IN RIVET ",val)
 # output second file for rivet

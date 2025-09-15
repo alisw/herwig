@@ -37,18 +37,10 @@ class SubtractedME:
 
 public:
 
-  /** @name Standard constructors and destructors. */
-  //@{
   /**
    * The default constructor.
    */
   SubtractedME();
-
-  /**
-   * The destructor.
-   */
-  virtual ~SubtractedME();
-  //@}
 
 public:
 
@@ -202,6 +194,14 @@ public:
    * Return true, if the loopsim matched virtual contribution should be subtracted.
    */
   bool loopSimSubtraction() const { return theLoopSimSubtraction; }
+
+  /**
+   * Return true, if this configuration of cross sections should not
+   * be included due to their relative magnitude. Arguments are head
+   * cross section and dependent cross section, including all
+   * reweights.
+   */
+  virtual bool discard(const CrossSection&, const CrossSection&) const { return false; }
 
   //@}
 

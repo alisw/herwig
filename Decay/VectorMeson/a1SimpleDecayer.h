@@ -13,8 +13,9 @@
 //
 
 #include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 #include "ThePEG/Helicity/LorentzPolarizationVector.h"
+#include "Herwig/Decay/ResonanceHelpers.h"
 
 namespace Herwig {
 
@@ -44,17 +45,26 @@ public:
    */
   virtual int modeNumber(bool & cc, tcPDPtr parent, 
 			 const tPDVector & children) const;
-  
+
   /**
    * Return the matrix element squared for a given mode and phase-space channel.
    * @param ichan The channel we are calculating the matrix element for. 
    * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
    * @param meopt Option for the calculation of the matrix element
    * @return The matrix element squared for the phase-space configuration.
    */
   double me2(const int ichan,const Particle & part,
-	     const ParticleVector& decay, MEOption meopt) const;
+	     const tPDVector & outgoing,
+	     const vector<Lorentz5Momentum> & momenta,
+	     MEOption meopt) const;
+
+  /**
+   *   Construct the SpinInfos for the particles produced in the decay
+   */
+  virtual void constructSpinInfo(const Particle & part,
+				 ParticleVector outgoing) const;
 
   /**
    * Method to return an object to calculate the 3 body partial width.
@@ -151,28 +161,26 @@ protected:
   //@}
 
 private:
-
-  /**
-   * Breit-Wigner for the \f$\rho\f$
-   * @param q2 The scale \f$q^2\f$ for the Breit-Wigner.
-   * @param ires Which multiplet to use.
-   */
-  Complex rhoBreitWigner(Energy2 q2, unsigned int ires) const {
-    Energy q(sqrt(q2));
-    Energy mass  = _rhomass[ires], width = _rhowidth[ires];
-    Energy pcm0(Kinematics::pstarTwoBodyDecay(mass,_mpi,_mpi));
-    Energy pcm = 2.*_mpi<q ? Kinematics::pstarTwoBodyDecay(q,_mpi,_mpi) : ZERO;
-    Energy gamrun(width*mass*Math::Pow<3>(pcm/pcm0)/q);
-    return -sqr(mass)/complex<Energy2>(q2-mass*mass,mass*gamrun);
-  }
-
+  
   /**
    * The \f$\rho\f$ form factors
    * @param q2 The scale \f$q^2\f$ for the Breit-Wigner
    * @param ires Which \f$\rho\f$ multiplet
    * @return The form factor
    */
-  Complex rhoFormFactor(Energy2 q2,int ires) const;
+  Complex rhoFormFactor(Energy2 q2,int ires) const {
+    Complex output(0.),norm(0.);
+    for(unsigned int ix=0;ix<3;++ix) norm += _rhowgts[ix];
+    if(ires<0) {
+      for(unsigned int ix=0;ix<3;++ix)
+	output+=_rhowgts[ix]*Resonance::BreitWignerPWave(q2,_rhomass[ix],_rhowidth[ix],_mpi,_mpi);
+    }
+    else {
+      assert(ires<3);
+      output=_rhowgts[ires]*Resonance::BreitWignerPWave(q2,_rhomass[ires],_rhowidth[ires],_mpi,_mpi);
+    }
+    return output/norm;
+  }
 
 private:
 
@@ -212,32 +220,32 @@ private:
   /**
    * Maximum weight for the one charged pion channel.
    */
-  mutable double _onemax;
+  double _onemax;
 
   /**
    * Maximum weight for the two charged pion channel.
    */
-  mutable double _twomax;
+  double _twomax;
 
   /**
    * Maximum weight for the three charged pion channel.
    */
-  mutable double _threemax;
+  double _threemax;
   
   /**
    * Weights for the channels for the one charged pion channel.
    */
-  mutable vector<double> _onewgts;
+  vector<double> _onewgts;
   
   /**
    * Weights for the channels for the two charged pion channel.
    */
-  mutable vector<double> _twowgts;
+  vector<double> _twowgts;
   
   /**
    * Weights for the channels for the three charged pion channel.
    */
-  mutable vector<double> _threewgts;
+  vector<double> _threewgts;
 
   /**
    * The pion mass

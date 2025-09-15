@@ -12,7 +12,7 @@
 // This is the declaration of the VectorMesonVectorVectorDecayer class.
 //
 #include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 #include "ThePEG/Helicity/LorentzPolarizationVector.h"
 
 namespace Herwig {
@@ -80,12 +80,21 @@ public:
    * Return the matrix element squared for a given mode and phase-space channel.
    * @param ichan The channel we are calculating the matrix element for. 
    * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
    * @param meopt Option for the calculation of the matrix element
    * @return The matrix element squared for the phase-space configuration.
    */
   double me2(const int ichan,const Particle & part,
-	     const ParticleVector & decay, MEOption meopt) const;
+	     const tPDVector & outgoing,
+	     const vector<Lorentz5Momentum> & momenta,
+	     MEOption meopt) const;
+
+  /**
+   *   Construct the SpinInfos for the particles produced in the decay
+   */
+  virtual void constructSpinInfo(const Particle & part,
+				 ParticleVector outgoing) const;
 
   /**
    * Output the setup information for the particle database
@@ -158,48 +167,44 @@ private:
    */
   VectorMesonVectorVectorDecayer & operator=(const VectorMesonVectorVectorDecayer &) = delete;
 
+public:
+
+  /**
+   *   Set the parameters for a decay mode
+   */
+  string setUpDecayMode(string arg);
+
 private:
 
   /**
    * the coupling for the decay
    */
-  vector<double> _coupling;
+  vector<double> coupling_;
 
   /**
    * the PDG codes for the incoming particles
    */
-  vector<int> _incoming;
+  vector<int> incoming_;
 
   /**
    * the PDG codes for the 1st outgoing particle
    */
-  vector<int> _outgoing1;
-
-  /**
-   * the PDG codes for the 2nd outgoing particle
-   */
-  vector<int> _outgoing2;
+  vector<pair<long,long> > outgoing_;
 
   /**
    * maximum weight for a decay
    */
-  vector<double> _maxweight;
-
-  /**
-   *  Initial size of the vectors
-   */
-  unsigned int _initsize;
+  vector<double> maxweight_;
 
   /**
    *  Spin density matrix
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 
   /**
    *  Polarization vectors
    */
-  mutable vector<Helicity::LorentzPolarizationVector> _vectors[3];
-
+  mutable vector<Helicity::LorentzPolarizationVector> vectors_[3];
 
 };
 

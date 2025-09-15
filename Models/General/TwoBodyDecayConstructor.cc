@@ -33,6 +33,7 @@
 #include "ThePEG/Helicity/Vertex/AbstractVVVVertex.fh"
 #include "ThePEG/Helicity/Vertex/AbstractRFSVertex.fh"
 #include "ThePEG/Helicity/Vertex/AbstractRFVVertex.fh"
+#include "VectorCurrentDecayConstructor.h"
 
 using namespace Herwig;
 using ThePEG::Helicity::VertexBasePtr;
@@ -92,16 +93,24 @@ void TwoBodyDecayConstructor::Init() {
     (interfaceInteractions,
      "QCDandQED",
      "Both QCD and QED",
-     ShowerInteraction::Both);
+     ShowerInteraction::QEDQCD);
 
 }
 
-void TwoBodyDecayConstructor::DecayList(const set<PDPtr> & particles) {
+void TwoBodyDecayConstructor::DecayList(const set<PDPtr,MassOrdering> & particles) {
+  // special for weak decays
+  for(unsigned int ix=0;ix<decayConstructor()->decayConstructors().size();++ix) {
+    Ptr<Herwig::VectorCurrentDecayConstructor>::pointer 
+      weak = dynamic_ptr_cast<Ptr<Herwig::VectorCurrentDecayConstructor>::pointer >
+      (decayConstructor()->decayConstructors()[ix]);
+    if(!weak) continue;
+    weakMassCut_ = max(weakMassCut_,weak->massCut());
+  }
   if( particles.empty() ) return;
   tHwSMPtr model = dynamic_ptr_cast<tHwSMPtr>(generator()->standardModel());
   unsigned int nv(model->numberOfVertices());
   
-  for(set<PDPtr>::const_iterator ip=particles.begin();
+  for(set<PDPtr,MassOrdering>::const_iterator ip=particles.begin();
       ip!=particles.end();++ip) {
     tPDPtr parent = *ip;
     if ( Debug::level > 0 )
@@ -134,6 +143,11 @@ createModes(tPDPtr inpart, VertexBasePtr vertex,
     if( pc->id() == id ) swap(pa, pc);
     //allowed on-shell decay?
     if( m1 <= pb->mass() + pc->mass() ) continue;
+    // double counting with current decays?
+    if(inpart->iSpin()==PDT::Spin1 && inpart->iCharge()==0 &&
+       pb->id()==-pc->id() && abs(pb->id())<=3 && inpart->mass() <= weakMassCut_ ) {
+      continue;
+    }
     //vertices are defined with all particles incoming
     modes.insert( TwoBodyDecay(inpart,pb, pc, vertex) );
   }

@@ -169,7 +169,7 @@ protected:
   /**
    *  Outgoing particles
    */
-  const vector<PDPtr> & outgoing() const {  return outgoing_; }
+  const vector<tPDPtr> & outgoing() const {  return outgoing_; }
  
   /**
    *  Number of colour flows
@@ -260,7 +260,7 @@ private:
   /**
    *  Outgoing particles
    */
-  vector<PDPtr> outgoing_;
+  vector<tPDPtr> outgoing_;
 
   /**
    *  Store the diagrams for the decay

@@ -22,7 +22,7 @@
 #include "ThePEG/Handlers/EventHandler.h"
 #include "ThePEG/Repository/EventGenerator.h"
 #include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 #include "ThePEG/PDT/DecayMode.h"
 
 using namespace Herwig;
@@ -113,10 +113,13 @@ handle(EventHandler & eh, const tPVector & tagged,
       decayer = dynamic_ptr_cast<tDecayIntegratorPtr>(dtemp);
       bool cc;
       tPDVector ctemp;
-      for(unsigned int ix=0;ix<children.size();++ix) 
+      vector<Lorentz5Momentum> momenta;
+      for(unsigned int ix=0;ix<children.size();++ix) { 
 	ctemp.push_back(const_ptr_cast<tPDPtr>(children[ix]->dataPtr()));
+	momenta.push_back(children[ix]->momentum());
+      }
       unsigned int imode = decayer->modeNumber(cc,(**sit).dataPtr(),ctemp);
-      decayer->me2(imode,**sit,children,DecayIntegrator::Initialize);
+      decayer->me2(imode,**sit,ctemp,momenta,DecayIntegrator::Initialize);
     }
     // generate photons
     ParticleVector newchildren =

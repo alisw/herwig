@@ -1,5 +1,8 @@
+# -*- ThePEG-repository -*-
 ##################################################
 # select the analyses
 ##################################################
 # CMS W+jets
 insert /Herwig/Analysis/RivetAnalysis:Analyses 0 CMS_2017_I1610623
+# CMS W+charm
+insert /Herwig/Analysis/RivetAnalysis:Analyses 0 CMS_2019_I1705068

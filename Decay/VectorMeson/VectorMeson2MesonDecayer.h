@@ -12,7 +12,7 @@
 // This is the declaration of the VectorMeson2MesonDecayer class.
 //
 #include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 #include "ThePEG/Helicity/LorentzPolarizationVector.h"
 
 namespace Herwig {
@@ -65,17 +65,26 @@ public:
    */
   virtual int modeNumber(bool & cc, tcPDPtr parent, 
 			 const tPDVector & children) const;
-  
+
   /**
    * Return the matrix element squared for a given mode and phase-space channel.
    * @param ichan The channel we are calculating the matrix element for. 
    * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
    * @param meopt Option for the calculation of the matrix element
    * @return The matrix element squared for the phase-space configuration.
    */
   double me2(const int ichan,const Particle & part,
-	     const ParticleVector & decay, MEOption meopt) const;
+	     const tPDVector & outgoing,
+	     const vector<Lorentz5Momentum> & momenta,
+	     MEOption meopt) const;
+
+  /**
+   *   Construct the SpinInfos for the particles produced in the decay
+   */
+  virtual void constructSpinInfo(const Particle & part,
+				 ParticleVector outgoing) const;
 
   /**
    * Specify the \f$1\to2\f$ matrix element to be used in the running width calculation.
@@ -157,6 +166,13 @@ private:
    * Private and non-existent assignment operator.
    */
   VectorMeson2MesonDecayer & operator=(const VectorMeson2MesonDecayer &) = delete;
+
+public:
+
+  /**
+   *   Set the parameters for a decay mode
+   */
+  string setUpDecayMode(string arg);
   
 private:
   
@@ -164,43 +180,33 @@ private:
   /**
    * the PDG codes for the incoming particles
    */
-  vector<int> _incoming;
+  vector<long> incoming_;
 
   /**
-   * the PDG codes for the first outgoing meson
+   * The PDG codes for the outgoing mesons
    */
-  vector<int> _outgoing1;
-
-  /**
-   * the PDG codes for the second outgoing meson 
-   */
-  vector<int> _outgoing2;
+  vector<pair<long,long> > outgoing_;
 
   /**
    * the maximum weight for the integration
    */
-  vector<double> _maxweight;
+  vector<double> maxWeight_;
 
   /**
    * the coupling for the decay
    */
-  vector<double> _coupling;
-
-  /**
-   *  Initial size of the vectors
-   */
-  unsigned int _initsize;
+  vector<double> coupling_;
 
   /**
    *  Storage of polarization tensors to try and increase
    *  speed
    */
-  mutable vector<Helicity::LorentzPolarizationVector> _vectors;
+  mutable vector<Helicity::LorentzPolarizationVector> vectors_;
   
   /**
    *   Storage of the \f$\rho\f$ matrix
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 };
   
 }

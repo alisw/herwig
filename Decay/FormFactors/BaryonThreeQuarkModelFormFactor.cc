@@ -260,12 +260,14 @@ void BaryonThreeQuarkModelFormFactor::doinit() {
 void BaryonThreeQuarkModelFormFactor::persistentOutput(PersistentOStream & os) const {
   os << _initialize << _order << ounit(_mlight,MeV) << ounit(_mstrange,MeV) 
      << ounit(_LambdaQ,MeV) << ounit(_Lambdaqq,MeV) 
-     << ounit(_Lambdasq,MeV) << ounit(_Lambdass,MeV) << _C0 << _C1 << _C2;}
+     << ounit(_Lambdasq,MeV) << ounit(_Lambdass,MeV) << _C0 << _C1 << _C2;
+}
 
 void BaryonThreeQuarkModelFormFactor::persistentInput(PersistentIStream & is, int) {
   is >> _initialize >> _order >> iunit(_mlight,MeV) >> iunit(_mstrange,MeV) 
      >> iunit(_LambdaQ,MeV) >> iunit(_Lambdaqq,MeV)
-     >> iunit(_Lambdasq,MeV) >> iunit(_Lambdass,MeV) >> _C0 >> _C1 >> _C2;}
+     >> iunit(_Lambdasq,MeV) >> iunit(_Lambdass,MeV) >> _C0 >> _C1 >> _C2;
+}
 
 // The following static variable is needed for the type
 // description system in ThePEG.
@@ -368,7 +370,10 @@ void BaryonThreeQuarkModelFormFactor::Init() {
 void BaryonThreeQuarkModelFormFactor::
 SpinHalfSpinHalfFormFactor(Energy2 q2,int,int id0,int id1,Energy m0,Energy m1,
 			   Complex & f1v,Complex & f2v,Complex & f3v,
-			   Complex & f1a,Complex & f2a,Complex & f3a) {
+			   Complex & f1a,Complex & f2a,Complex & f3a,
+			   FlavourInfo ,
+			   Virtuality virt) {
+  assert(virt==SpaceLike);
   useMe();
   // this model is based on heavy quark theory
   // therefore most of the factors are zero
@@ -433,7 +438,10 @@ void  BaryonThreeQuarkModelFormFactor::
 SpinHalfSpinThreeHalfFormFactor(Energy2 q2,int,int,int id1,Energy m0,
 				Energy m1, Complex & f1v,Complex & f2v,
 				Complex & f3v,Complex & f4v,Complex & f1a,
-				Complex & f2a,Complex & f3a,Complex & f4a ) {
+				Complex & f2a,Complex & f3a,Complex & f4a,
+				FlavourInfo ,
+				Virtuality virt) {
+  assert(virt==SpaceLike);
   useMe();
   // work out which light quark constant to use
   double lambdabar;unsigned int ioff(0);
@@ -588,7 +596,7 @@ Energy BaryonThreeQuarkModelFormFactor::widthIntegrand(double omega,Energy m0,
   Energy2 q2 = sqr(m0)+sqr(m1)-2.*m0*m1*omega;
   if(type<=2) {
     Complex f1v,f2v,f3v,f1a,f2a,f3a;
-    SpinHalfSpinHalfFormFactor(q2,0,id0,id1,m0,m1,f1v,f2v,f3v,f1a,f2a,f3a);
+    SpinHalfSpinHalfFormFactor(q2,0,id0,id1,m0,m1,f1v,f2v,f3v,f1a,f2a,f3a,FlavourInfo());
     Complex left  =f1v-f1a-f2v-double((m0-m1)/(m0+m1))*f2a;
     Complex right =f1v+f1a-f2v+double((m0-m1)/(m0+m1))*f2a;
     double g1v = 0.5*( left+right).real();
@@ -612,7 +620,7 @@ Energy BaryonThreeQuarkModelFormFactor::widthIntegrand(double omega,Energy m0,
     double  g1v,g2v,g3v,g4v,g1a,g2a,g3a,g4a;
     SpinHalfSpinThreeHalfFormFactor(q2,0,id0,id1,m0,m1,
 				    f1v,f2v,f3v,f4v,
-				    f1a,f2a,f3a,f4a);
+				    f1a,f2a,f3a,f4a,FlavourInfo());
     g1v = f1v.real();
     g1a = -f1a.real();
     g2v = m0/(m0+m1)*f2v.real();

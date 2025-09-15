@@ -22,7 +22,7 @@
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
 #include "YFSFormFactors.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 #include "Herwig/Decay/DecayIntegrator.h"
 
 using namespace Herwig;
@@ -38,8 +38,6 @@ void FFDipole::persistentInput(PersistentIStream & is, int) {
      >> _maxwgt >> _weightOutput
      >> _mode >> _maxtry >> _energyopt >> _betaopt >> _dipoleopt;
 }
-
-FFDipole::~FFDipole() {}
 
 // The following static variable is needed for the type
 // description system in ThePEG.

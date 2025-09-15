@@ -13,7 +13,6 @@
 //
 
 #include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
 #include "ThePEG/Helicity/LorentzPolarizationVector.h"
 
 namespace Herwig {
@@ -49,7 +48,10 @@ public:
   /**
    * The default constructor.
    */
-  OniumToOniumPiPiDecayer();
+  OniumToOniumPiPiDecayer() {
+    // don't generate the intermediates in the phase-space
+    generateIntermediates(false);
+  }
 
   /**
    * Which of the possible decays is required
@@ -59,17 +61,26 @@ public:
    */
   virtual int modeNumber(bool & cc, tcPDPtr parent, 
 			 const tPDVector & children) const;
-  
+
   /**
    * Return the matrix element squared for a given mode and phase-space channel.
    * @param ichan The channel we are calculating the matrix element for. 
    * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
    * @param meopt Option for the calculation of the matrix element
    * @return The matrix element squared for the phase-space configuration.
    */
   double me2(const int ichan,const Particle & part,
-	     const ParticleVector & decay, MEOption meopt) const;
+	     const tPDVector & outgoing,
+	     const vector<Lorentz5Momentum> & momenta,
+	     MEOption meopt) const;
+
+  /**
+   *   Construct the SpinInfos for the particles produced in the decay
+   */
+  virtual void constructSpinInfo(const Particle & part,
+				 ParticleVector outgoing) const;
 
   /**
    * Method to return an object to calculate the 3 body partial width.
@@ -171,27 +182,29 @@ private:
    */
   OniumToOniumPiPiDecayer & operator=(const OniumToOniumPiPiDecayer &) = delete;
 
+public:
+
+  /**
+   *   Set the parameters for a decay mode
+   */
+  string setUpDecayMode(string arg);
+
 private:
 
   /**
    * the PDG codes for the incoming onium resonace
    */
-  vector<long> _incoming;
+  vector<long> incoming_;
 
   /**
    * the PDG codes for the outgoing onium resonance
    */
-  vector<long> _outgoing;
+  vector<long> outgoing_;
 
   /**
    * the maximum weight for the integration
    */
-  vector<double> _maxweight;
-
-  /**
-   *  Initial size of the vectors
-   */
-  unsigned int _initsize;
+  vector<double> maxWeight_;
 
   /**
    *  The couplings for the decays
@@ -200,62 +213,33 @@ private:
   /**
    *  Overall normalisation
    */
-  vector<double> _coupling;
-  /**
-   *  The real part of \f$A\f$
-   */
-  vector<InvEnergy2> _reA;
-
-  /**
-   *  The imaginary part of \f$A\f$
-   */
-  vector<InvEnergy2> _imA;
+  vector<double> coupling_;
 
   /**
    *  The complex \f$A\f$ coupling
    */
-  vector<complex<InvEnergy2> > _cA;
-
-  /**
-   *  The real part of \f$B\f$
-   */
-  vector<InvEnergy2> _reB;
-
-  /**
-   *  The imaginary part of \f$B\f$
-   */
-  vector<InvEnergy2> _imB;
+  vector<complex<InvEnergy2> > cA_;
 
   /**
    *  The complex \f$B\f$ coupling
    */
-  vector<complex<InvEnergy2> > _cB;
-
-  /**
-   *  The real part of \f$C\f$
-   */
-  vector<InvEnergy2> _reC;
-
-  /**
-   *  The imaginary part of \f$C\f$
-   */
-  vector<InvEnergy2> _imC;
+  vector<complex<InvEnergy2> > cB_;
 
   /**
    *  The complex \f$C\f$ coupling
    */
-  vector<complex<InvEnergy2> > _cC;
+  vector<complex<InvEnergy2> > cC_;
   //@}
 
   /**
    *  Spin density matrix
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 
   /**
    *  Polarization vectors for the incomng and outgoing onium resonances
    */
-  mutable vector<Helicity::LorentzPolarizationVector> _vectors[2];
+  mutable vector<Helicity::LorentzPolarizationVector> vectors_[2];
 
 };
 

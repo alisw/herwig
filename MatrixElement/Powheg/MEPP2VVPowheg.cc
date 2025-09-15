@@ -64,7 +64,7 @@ void MEPP2VVPowheg::persistentInput(PersistentIStream & is, int) {
      >> showerAlphaS_ >> power_ 
      >> preqqbar_ >> preqg_ >> pregqbar_ >> prefactor_
      >> b0_ >> iunit(LambdaQCD_,GeV)
-     >> iunit( min_pT_, GeV );
+     >> iunit( min_pT_,GeV );
 }
 
 // The following static variable is needed for the type
@@ -3751,7 +3751,10 @@ double MEPP2VVPowheg::lo_me() const {
 
 RealEmissionProcessPtr MEPP2VVPowheg::generateHardest(RealEmissionProcessPtr born,
 						      ShowerInteraction inter) {
-  if(inter==ShowerInteraction::QED) return RealEmissionProcessPtr();
+  // check if generating QCD radiation
+  if(inter!=ShowerInteraction::QCD && inter!=ShowerInteraction::QEDQCD &&
+     inter!=ShowerInteraction::ALL)
+    return RealEmissionProcessPtr();
   // Now we want to set these data vectors according to the particles we've
   // received from the current 2->2 hard collision:
   vector<PPtr> particlesToShower;

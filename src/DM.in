@@ -1,0 +1,96 @@
+# -*- ThePEG-repository -*-
+
+
+##################################################
+# Read the model parameters
+##################################################
+read DM.model
+
+##################################################
+# Set the beams
+##################################################
+
+read snippets/EECollider.in
+cd /Herwig/EventHandlers
+set EventHandler:BeamA /Herwig/Particles/chi
+set EventHandler:BeamB /Herwig/Particles/chi
+set /Herwig/Particles/chi:PDF /Herwig/Partons/NoPDF
+
+##################################################
+# Set long-lived hadrons/muon to be unstable
+##################################################
+set /Herwig/Particles/pi0:Stable Unstable
+set /Herwig/Particles/pi+:Stable Unstable
+set /Herwig/Particles/mu-:Stable Unstable
+set /Herwig/Particles/n0:Stable Unstable
+set /Herwig/Particles/K_L0:Stable Unstable
+set /Herwig/Particles/K+:Stable Unstable
+
+##################################################
+# Selected the hard processes
+##################################################
+cd /Herwig/MatrixElements
+
+# using currents
+insert SubProcess:MatrixElements 0 MEDM2Kaons
+insert SubProcess:MatrixElements 0 MEDM2Pions
+insert SubProcess:MatrixElements 0 MEDM2Kaons
+insert SubProcess:MatrixElements 0 MEDM3Pions
+insert SubProcess:MatrixElements 0 MEDM4Pions
+insert SubProcess:MatrixElements 0 MEDM2EtaPiPi
+insert SubProcess:MatrixElements 0 MEDM2EtaPrimePiPi
+insert SubProcess:MatrixElements 0 MEDM2OmegaPiPi
+insert SubProcess:MatrixElements 0 MEDM2OmegaPi
+insert SubProcess:MatrixElements 0 MEDM2PiGamma
+insert SubProcess:MatrixElements 0 MEDM2EtaPhoton
+insert SubProcess:MatrixElements 0 MEDM2EtaPhi
+insert SubProcess:MatrixElements 0 MEDM2EtaOmega
+insert SubProcess:MatrixElements 0 MEDM2ppbar
+insert SubProcess:MatrixElements 0 MEDM2KKPi
+insert SubProcess:MatrixElements 0 MEDM2PhiPi
+# using standard matrix elements and hadronization
+# cd /Herwig/NewPhysics
+# insert HPConstructor:Incoming 0 /Herwig/Particles/chi
+# insert HPConstructor:Incoming 1 /Herwig/Particles/chi
+# insert HPConstructor:Outgoing 0 /Herwig/Particles/u
+# insert HPConstructor:Outgoing 1 /Herwig/Particles/d
+# insert HPConstructor:Outgoing 2 /Herwig/Particles/s
+
+##################################################
+# LEP physics parameters (override defaults) 
+##################################################
+cd /Herwig/Generators
+# must be slightly greater than 2 x DM mass
+set EventGenerator:EventHandler:LuminosityFunction:Energy  2.0001
+# mass of the DM particle
+set /Herwig/Particles/chi:NominalMass 1.0
+# mass of the mediator
+set /Herwig/Particles/Zp:NominalMass 2.0
+# mediator couplings
+# DM
+set /Herwig/NewPhysics/DM/Model:cDMmed 1.
+# quark-anti-quark
+set /Herwig/NewPhysics/DM/Model:cSMmed 0 1.0
+set /Herwig/NewPhysics/DM/Model:cSMmed 1 1.0
+set /Herwig/NewPhysics/DM/Model:cSMmed 2 1.0
+# cut-off for partonic mediator decays
+set /Herwig/NewPhysics/VectorDecayConstructor:MassCut 2.
+# limit for isr
+set /Herwig/Generators/EventGenerator:EventHandler:Cuts:MHatMin 0.2
+cd /Herwig/Generators
+##################################################
+## prepare for Rivet analysis or HepMC output
+## when running with parton shower
+##################################################
+# create ThePEG::RivetAnalysis /Herwig/Analysis/Rivet RivetAnalysis.so
+# insert EventGenerator:AnalysisHandlers 0 /Herwig/Analysis/Rivet
+# insert /Herwig/Analysis/Rivet:Analyses 0 ANALYSIS
+
+
+###################################################
+# Save run for later usage with 'Herwig run'
+##################################################
+set EventGenerator:MaxErrors 10000
+set EventGenerator:EventHandler:StatLevel Full
+set EventGenerator:EventHandler:CascadeHandler NULL
+saverun DM EventGenerator

@@ -25,7 +25,14 @@ MelikhovFormFactor.h \
 MelikhovStechFormFactor.h \
 BtoSGammaFlatEnergy.h \
 BtoSGammaKagan.h \
-HQETFormFactor.h
+HQETFormFactor.h \
+CzyzNucleonFormFactor.h \
+KornerKurodaFormFactor.h \
+KPiIThreeHalfFOCUSKMatrix.h \
+KPiIHalfFOCUSKMatrix.h\
+PiPiAnisovichKMatrix.h\
+AnalyticOmnesFunction.h\
+ExperimentalOmnesFunction.h
 
 DIR_CC_FILES = $(addprefix $(srcdir)/,$(ALL_CC_FILES))
 ALL_CC_FILES = \
@@ -45,4 +52,11 @@ MelikhovFormFactor.cc \
 MelikhovStechFormFactor.cc \
 BtoSGammaFlatEnergy.cc \
 BtoSGammaKagan.cc \
-HQETFormFactor.cc
+HQETFormFactor.cc \
+CzyzNucleonFormFactor.cc \
+KornerKurodaFormFactor.cc \
+KPiIThreeHalfFOCUSKMatrix.cc \
+KPiIHalfFOCUSKMatrix.cc\
+PiPiAnisovichKMatrix.cc\
+AnalyticOmnesFunction.cc\
+ExperimentalOmnesFunction.cc

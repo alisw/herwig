@@ -147,16 +147,19 @@ void BaryonSimpleFormFactor::doinit() {
 
 void BaryonSimpleFormFactor::persistentOutput(PersistentOStream & os) const {
   os << _gA << _alphaD << _etaV << _etaA << _rhoE << _rhoM 
-     << _f1 << _f2 << _g1 << _g2;}
+     << _f1 << _f2 << _g1 << _g2;
+}
 
 void BaryonSimpleFormFactor::persistentInput(PersistentIStream & is, int) {
   is >> _gA >> _alphaD >> _etaV >> _etaA >> _rhoE >> _rhoM 
-     >> _f1 >> _f2 >> _g1 >> _g2;}
+     >> _f1 >> _f2 >> _g1 >> _g2;
+}
 
 // The following static variable is needed for the type
 // description system in ThePEG.
 DescribeClass<BaryonSimpleFormFactor,BaryonFormFactor>
-describeHerwigBaryonSimpleFormFactor("Herwig::BaryonSimpleFormFactor", "HwFormFactors.so");
+describeHerwigBaryonSimpleFormFactor("Herwig::BaryonSimpleFormFactor",
+				     "HwFormFactors.so");
 
 void BaryonSimpleFormFactor::Init() {
 
@@ -210,7 +213,10 @@ void BaryonSimpleFormFactor::Init() {
 void BaryonSimpleFormFactor::
 SpinHalfSpinHalfFormFactor(Energy2,int iloc, int,int,Energy,Energy,
 			   Complex & f1v,Complex & f2v,Complex & f3v,
-			   Complex & f1a,Complex & f2a,Complex & f3a) {
+			   Complex & f1a,Complex & f2a,Complex & f3a,
+			   FlavourInfo,
+			   Virtuality virt) {
+  assert(virt==SpaceLike);
   useMe();
   f1v =  _f1[iloc];
   f1a = -_g1[iloc];

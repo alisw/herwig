@@ -11,7 +11,6 @@
 // This is the declaration of the PScalarLeptonNeutrinoDecayer class.
 
 #include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
 #include "ThePEG/Helicity/LorentzSpinorBar.h"
 
 namespace Herwig {
@@ -37,13 +36,6 @@ using namespace ThePEG;
  * 
  */
 class PScalarLeptonNeutrinoDecayer: public DecayIntegrator {
-
-public:
-
-  /**
-   * Default constructor.
-   */
-  PScalarLeptonNeutrinoDecayer();
   
   /**
    * Which of the possible decays is required
@@ -58,12 +50,21 @@ public:
    * Return the matrix element squared for a given mode and phase-space channel.
    * @param ichan The channel we are calculating the matrix element for. 
    * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
    * @param meopt Option for the calculation of the matrix element
    * @return The matrix element squared for the phase-space configuration.
    */
-  double me2( const int ichan,const Particle & part,
-	     const ParticleVector & decay, MEOption meopt) const;
+  double me2(const int ichan,const Particle & part,
+	     const tPDVector & outgoing,
+	     const vector<Lorentz5Momentum> & momenta,
+	     MEOption meopt) const;
+
+  /**
+   *   Construct the SpinInfos for the particles produced in the decay
+   */
+  virtual void constructSpinInfo(const Particle & part,
+				 ParticleVector outgoing) const;
 
   /**
    * Output the setup information for the particle database
@@ -130,6 +131,13 @@ protected:
   virtual void doinitrun();
   //@}
 
+public:
+
+  /**
+   *   Set the parameters for a decay mode
+   */
+  string setUpDecayMode(string arg);
+
 private:
 
   /**
@@ -142,53 +150,38 @@ private:
   /**
    * the PDG code for the incoming particle
    */
-  vector<int> _incoming;
+  vector<int> incoming_;
 
   /**
    * the meson decay constant for a particular particle multiplied by the CKM matrix
    * element, \e i.e. \f$f_pV_{CKM}\f$
    */
-  vector<Energy> _decayconstant;
+  vector<Energy> decayConstant_;
 
   /**
    * which outgoing leptons are allowed for a particular decay
    */
-  vector<unsigned int> _leptons;
+  vector<unsigned int> leptons_;
 
   /**
-   * the maximum weight for the integration of a given decay to \f$e\nu_e\f$.
+   * The maximum weight for the integration of decay to (\f$e\nu_e\f$, \f$\mu\nu_\mu\f$,\f$\tau\nu_\tau\f$).
    */
-  vector<double> _maxweighte;
-
-  /**
-   * the maximum weight for the integration of a given decay to \f$\mu\nu_\mu\f$.
-   */
-  vector<double> _maxweightmu;
-
-  /**
-   * the maximum weight for the integration of a given decay to \f$\tau\nu_\tau\f$.
-   */
-  vector<double> _maxweighttau;
-
-  /**
-   *  initial number of modes
-   */
-  unsigned int _initsize;
+  vector<array<double,3> > maxWeight_;
 
   /**
    *  Spin density matrix
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 
   /**
    *  Spinors for the decay products
    */
-  mutable vector<Helicity::LorentzSpinor   <SqrtEnergy> > _wave;
+  mutable vector<Helicity::LorentzSpinor   <SqrtEnergy> > wave_;
 
   /**
    *  barred spinors for the decay products
    */
-  mutable vector<Helicity::LorentzSpinorBar<SqrtEnergy> > _wavebar;
+  mutable vector<Helicity::LorentzSpinorBar<SqrtEnergy> > wavebar_;
 
 };
 

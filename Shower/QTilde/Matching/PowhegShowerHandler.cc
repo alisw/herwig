@@ -111,11 +111,10 @@ HardTreePtr PowhegShowerHandler::generateCKKW(ShowerTreePtr showerTree) const {
 	outgoing     .erase (decayProd);
 	decayProducts.insert(decayProd);
       }
-      bool coloured = false, foundParent = true;
+      bool foundParent = true;
       tPPtr parent,emitted;
       unsigned int nprod(0);
       for( set<tPPtr>::const_iterator it = decayProducts.begin(); it != decayProducts.end(); ++it ) {
-	coloured |= (**it).dataPtr()->coloured();
 	tPPtr newParent = !(**it).parents().empty() ? (**it).parents()[0] : tPPtr();
 	++nprod;
 	// check if from emission
@@ -760,7 +759,7 @@ tProtoBranchingPtr PowhegShowerHandler::getCluster( tProtoBranchingPtr b1,
 
   // get the ParticleData object for the new branching
   tcPDPtr particle_data = incoming ? theBranching.particles[1] : theBranching.particles[0];
- 
+
   // create clustered ProtoBranching
   ProtoBranchingPtr clusteredBranch;
 
@@ -859,6 +858,7 @@ tProtoBranchingPtr PowhegShowerHandler::getCluster( tProtoBranchingPtr b1,
 					     pairMomentum,theBranching.sudakov));
     // work out the type of branching
     if(b1->particle()->iColour()==PDT::Colour3) {
+      if(b2->particle()->iColour()==PDT::Colour0) return ProtoBranchingPtr();
       b1->type(ShowerPartnerType::QCDColourLine);
       if(b2->particle()->iColour()==PDT::Colour3 &&
 	 particle_data->iColour()==PDT::Colour8) {
@@ -877,6 +877,7 @@ tProtoBranchingPtr PowhegShowerHandler::getCluster( tProtoBranchingPtr b1,
 	assert(false);
     }
     else if(b1->particle()->iColour()==PDT::Colour3bar) {
+      if(b2->particle()->iColour()==PDT::Colour0) return ProtoBranchingPtr();
       b1->type(ShowerPartnerType::QCDAntiColourLine);
       if(b2->particle()->iColour()==PDT::Colour3bar &&
 	 particle_data->iColour()==PDT::Colour8) {
@@ -980,6 +981,7 @@ BranchingElement PowhegShowerHandler::allowedInitialStateBranching( tProtoBranch
   //iterates over this range
   for( multimap< long, BranchingElement >::const_iterator it = location.first;
        it != location.second; ++it ) {
+    //test id for second particle in pair
     long idtest = cc ?  it->second.conjugateParticles[2]->id() : it->second.particles[2]->id();
     // does second id match the test
     if( idtest == b2->id() ) return it->second;

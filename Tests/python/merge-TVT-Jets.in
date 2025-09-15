@@ -1,0 +1,234 @@
+#! @PYTHON@
+from __future__ import print_function
+import logging, sys, math, subprocess, time
+
+if sys.version_info[:3] < (2,4,0):
+    print ( "rivet scripts require Python version >= 2.4.0... exiting")
+    sys.exit(1)
+
+import os, yoda
+
+# Divide two profile histograms with different nos of bins
+def divide(name,numer,denom) :
+    output = yoda.Scatter2D(name,name)
+    size = min(numer.numBins(),denom.numBins())
+    for i in range(0,size) :
+        b1 = numer.bin(i)
+        b2 = denom.bin(i)
+        # Assemble the x value and error
+        x = b1.xMid()
+        exminus = x - b1.xMin()
+        explus  = b1.xMax() - x
+        # Assemble the y value and error
+        # numerator
+        yupp=0.
+        relerr_1=0.
+        try :
+            yupp = b1.mean()
+            try :
+                if b1.stdErr() != 0 :
+                    relerr_1 =  b1.stdErr()/b1.mean()
+            except:
+                relerr_1=0.
+        except :
+            yupp = 0.
+            relerr_1 =0.
+        # denominator
+        ylow=0.
+        relerr_2 = 0.
+        try :
+            ylow = b2.mean()
+            try :
+                if b2.stdErr() != 0 :
+                    relerr_2 =  b2.stdErr()/b2.mean()
+            except:
+                relerr_2=0.
+        except :
+            ylow = 0.
+            relerr_2 = 0.
+        if yupp==0. or ylow== 0. :
+            y=0.
+            ey=0.
+        else :
+            y = yupp / ylow
+            ey = y * math.sqrt(relerr_1**2 + relerr_2**2)
+        output.addPoint(x, y, (exminus,explus), (ey,ey))
+    return output
+
+def mergeHistos(histUE, histJet):
+    title=""
+    path=""
+    if hasattr(histUE, 'title'):
+        title=histUE.title()
+    if hasattr(histUE, 'path'):
+        path=histUE.path()
+    if(type(histUE)==yoda.core.Counter) :
+        newHisto = yoda.core.Counter(path,title)
+    elif(type(histUE)==yoda.core.Scatter2D) :
+        newHisto = yoda.core.Scatter2D(path,title)
+    elif(type(histUE)==yoda.core.Profile1D) :
+        newHisto = yoda.core.Profile1D(path,title)
+        for i in range(0,histUE.numBins()) :
+            newHisto.addBin(histUE.bins()[i].xMin(),
+                            histUE.bins()[i].xMax())
+    elif(type(histUE)==yoda.core.Histo1D) :
+        newHisto = yoda.core.HistoUE1D(path,title)
+        for i in range(0,histUE.numBins()) :
+            newHisto.addBin(histUE.bins()[i].xMin(),
+                            histUE.bins()[i].xMax())
+    else :
+        logging.error("Histogram %s is of unknown type" % hpath)
+        print (hpath,type(histUE))
+        sys.exit(1)
+    pTMerge=10.    
+
+    if type(newHisto)==yoda.core.Profile1D or type(newHisto)==yoda.core.Histo1D  :
+        for i in range(0,newHisto.numBins()) :
+            if newHisto.bins()[i].xMin() > pTMerge :
+                newHisto.bins()[i] += histJet.bins()[i]
+            else :
+                newHisto.bins()[i] += histUE.bins()[i]
+    else :
+        print(path,title,newHisto)
+        print(histUE, histJet)
+        quit()
+    return newHisto
+
+# #######################################
+
+if __name__ == "__main__":
+    import logging
+    from optparse import OptionParser, OptionGroup
+    parser = OptionParser(usage="%progbase")
+    verbgroup = OptionGroup(parser, "Verbosity control")
+    verbgroup.add_option("-v", "--verbose", action="store_const", const=logging.DEBUG, dest="LOGLEVEL",
+                         default=logging.INFO, help="print debug (very verbose) messages")
+    verbgroup.add_option("-q", "--quiet", action="store_const", const=logging.WARNING, dest="LOGLEVEL",
+                         default=logging.INFO, help="be very quiet")
+    parser.add_option("--with-ue",
+                      action='store_true' ,
+                      dest="ue",
+                      default=True,
+                      help="Include UE analyses")
+    parser.add_option("--without-ue",
+                      action='store_false',
+                      dest="ue",
+                      default=True,
+                      help="Don\'t include UE analyses")
+    parser.add_option_group(verbgroup)
+    (opts, args) = parser.parse_args()
+    logging.basicConfig(level=opts.LOGLEVEL, format="%(message)s")
+
+    ## Check args
+    if len(args) < 1:
+        logging.error("Must specify at least the name of the files")
+        sys.exit(1)
+
+yodafiles=[]
+for en in ["300","630","900","Run-I","Run-II"] :
+    if not opts.ue and (en == "300" or en =="900") : continue
+    energy = en
+    if en=="Run-I" : energy="1800"
+    elif en=="Run-II" : energy="1960"
+    for proc in ["Jets","DiJets"] :
+        mergeargs=["rivet-merge"]
+        for i in range(1,10) :
+            fname = "Rivet-%s-%s-%s-%s.yoda" % (args[0], en ,proc,i)
+            if(os.path.isfile(fname)) :
+                mergeargs.append(fname)
+        if len(mergeargs)==1 : continue
+        if en != "Run-I" and en!="630":
+            mergeargs.append("-a")
+            mergeargs.append("CDF_2012_NOTE10874:ENERGY=%s"%energy)
+        else :
+            mergeargs.append("-a")
+            mergeargs.append("CDF_2004_S5839831:ENERGY=%s"%energy)
+        mergeargs.append("-o")
+        mergeargs.append("Rivet-%s-%s-%s.yoda" % (args[0], en ,proc))
+        #print(" ".join(mergeargs))
+        yodafiles.append("-%s-%s.yoda" % (en ,proc))
+        p = subprocess.Popen(mergeargs)
+# need a sleep here otherwise merged files not ready
+time.sleep(5)
+
+if(opts.ue) :
+    yodafiles += ["-Run-II-UE.yoda", "-Run-I-UE.yoda", "-630-UE.yoda",
+                  "-300-UE.yoda", "-900-UE.yoda"]
+
+## Get histos
+outhistos={}
+histos_UE={}
+histos_Jets={}
+for f in yodafiles : 
+    fname='Rivet-'+args[0]+f
+    if not os.access(fname, os.R_OK):
+        logging.error("%s can not be read" % fname)
+        continue
+    try:
+        aos = yoda.read(fname)
+    except:
+        logging.error("%s can not be parsed as YODA" % fname)
+        continue
+    ## Get histos from this YODA fname
+    for aopath, ao in aos.items() :
+        if ("RAW" in aopath or "_XSEC" in aopath or "_EVTCOUNT" in aopath or
+            "sumWTrig" in aopath or "totalNum" in aopath or "sumWeights" in aopath) : continue
+        path=aopath
+        if "ENERGY" in path :
+            path=path.split(":")
+            path=path[0]+"/"+path[1].split("/")[1]
+            ao.setPath(path)
+        if "CDF_2001_S4751469" in path :
+            if "d01" in path or "d02" in path or "d07" in path :
+                if "y03" in path :
+                    if "Jets" in fname : outhistos[path]=ao
+                elif opts.ue and "UE" in fname :
+                    outhistos[path]=ao
+            elif "d04" in path or "d06" in path:
+                if "Jets" in fname : outhistos[path]=ao
+            elif opts.ue and "UE" in fname :
+                    outhistos[path]=ao
+        elif "CDF_2004_S5839831" in path :
+            if "d03" in path :
+                if "Jets" in fname : outhistos[path]=ao
+            elif "d05" in path or "d06" in path or "d10" in path or "d11" in path:
+                if opts.ue and "UE" in fname : outhistos[path]=ao
+            else :
+                if opts.ue and "UE" in fname :
+                    histos_UE[path]=ao
+                elif "Jets" in fname :
+                    histos_Jets[path]=ao
+        elif "CDF_2010_S8591881_QCD" in path or "CDF_2012_NOTE10874" in path :
+            if opts.ue and "UE" in fname :
+                histos_UE[path]=ao
+            elif "Jets" in fname :
+                histos_Jets[path]=ao
+        else :
+            if path in outhistos : print("DUP",path)
+            outhistos[path]=ao
+
+# UE plots where we need to merge
+if opts.ue :
+    for key in histos_UE.keys() :
+        outhistos[key]=mergeHistos(histos_UE[key],histos_Jets[key])
+    for i in range(1,4) :
+        names = ["/CDF_2012_NOTE10874/d0%s-x01-y01" % i,
+                 "/CDF_2012_NOTE10874/d0%s-x01-y02" % i,
+                 "/CDF_2012_NOTE10874/d0%s-x01-y03" % i]
+        # ratio 1960/300
+        if names[0] in outhistos and names[2] in outhistos :
+            outhistos["/CDF_2012_NOTE10874/d0%s-x01-y04" % i] = \
+                divide("/CDF_2012_NOTE10874/d0%s-x01-y04" % i,outhistos[names[2]],outhistos[names[0]])
+        # ratio 900/300
+        if names[0] in outhistos and names[1] in outhistos :
+            outhistos["/CDF_2012_NOTE10874/d0%s-x01-y05" % i]= \
+                divide("/CDF_2012_NOTE10874/d0%s-x01-y05" % i,outhistos[names[1]],outhistos[names[0]])
+        # ratio 1960/900
+        if names[1] in outhistos and names[2] in outhistos :
+            outhistos["/CDF_2012_NOTE10874/d0%s-x01-y06" % i]= \
+                divide("/CDF_2012_NOTE10874/d0%s-x01-y06" %i,outhistos[names[2]],outhistos[names[1]])
+
+# Choose output file
+name = args[0]+"-Jets.yoda"
+yoda.writeYODA(outhistos,name)
+sys.exit(0)

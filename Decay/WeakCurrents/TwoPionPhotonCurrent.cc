@@ -24,6 +24,7 @@
 #include "ThePEG/Persistency/PersistentIStream.h"
 #include "ThePEG/Helicity/WaveFunction/VectorWaveFunction.h"
 #include "ThePEG/Helicity/WaveFunction/ScalarWaveFunction.h"
+#include "ThePEG/Helicity/HelicityFunctions.h"
 
 using namespace Herwig;
 using namespace ThePEG::Helicity;
@@ -31,69 +32,41 @@ using namespace ThePEG::Helicity;
 TwoPionPhotonCurrent::TwoPionPhotonCurrent() {
   // modes handled
   addDecayMode(2,-1);
-  setInitialModes(1);
+  addDecayMode(1,-1);
+  addDecayMode(2,-2);
+  setInitialModes(3);
   // weight of the resonances in the current
-  _resweights.push_back(1.0);_resweights.push_back(-0.1);_resweights.push_back(0.0);
+  _resweights = {1.0,-0.1};
   // parameters of the rho resonaces
-  _rhoparameters=true;
-  _rhomasses.push_back(0.773*GeV);_rhomasses.push_back(1.70*GeV);
-  _rhowidths.push_back(0.145*GeV);_rhowidths.push_back(0.26*GeV);
+  _rhomasses = {0.773*GeV,1.70*GeV};
+  _rhowidths = {0.145*GeV,0.26*GeV};
   // parameters fo the omega resonance
-  _omegaparameters=true;
   _omegamass=782*MeV;_omegawidth=8.5*MeV;
   // couplings
   _grho   = 0.11238947*GeV2;
   _grhoomegapi = 12.924/GeV;
   // parameters for the resonance used in the integration
-  _intmass = 1.2*GeV;
+  _intmass  = 1.2*GeV;
   _intwidth = 0.35*GeV;
-}
-
-void TwoPionPhotonCurrent::doinit() {
-  WeakDecayCurrent::doinit();
-  // set up the rho masses and widths
-  tPDPtr temp;
-  for(unsigned int ix=0;ix<3;++ix) {
-    if(ix==0)      temp = getParticleData(-213);
-    else if(ix==1) temp = getParticleData(-100213);
-    else if(ix==2) temp = getParticleData(-30213);
-    // if using local values
-    if(!_rhoparameters&&ix<_rhomasses.size()) {
-      _rhomasses[ix]=temp->mass();
-      _rhowidths[ix]=temp->width();
-    }
-    else if(ix>=_rhomasses.size()) {
-      _rhomasses.push_back(temp->mass());
-      _rhowidths.push_back(temp->width());
-    }
-  }
-  // set up the omega masses and widths
-  if(!_omegaparameters) {
-    temp = getParticleData(ParticleID::omega);
-    _omegamass  = temp->mass();
-    _omegawidth = temp->width();
-  }
 }
 
 void TwoPionPhotonCurrent::persistentOutput(PersistentOStream & os) const {
   os << ounit(_grho,GeV2) << ounit(_grhoomegapi,1/GeV) << _resweights 
-     << _rhoparameters << ounit(_rhomasses,GeV) 
-     << ounit(_rhowidths,GeV) << _omegaparameters << ounit(_omegamass,GeV) 
+     << ounit(_rhomasses,GeV) << ounit(_rhowidths,GeV) << ounit(_omegamass,GeV) 
      << ounit(_omegawidth,GeV) << ounit(_intmass,GeV) 
      << ounit(_intwidth,GeV) ;
 }
 
 void TwoPionPhotonCurrent::persistentInput(PersistentIStream & is, int) { 
   is >> iunit(_grho,GeV2) >> iunit(_grhoomegapi,1/GeV) >> _resweights 
-     >> _rhoparameters >> iunit(_rhomasses,GeV) 
-     >> iunit(_rhowidths,GeV) >> _omegaparameters >> iunit(_omegamass,GeV) 
+     >> iunit(_rhomasses,GeV) >> iunit(_rhowidths,GeV) >> iunit(_omegamass,GeV) 
      >> iunit(_omegawidth,GeV) >> iunit(_intmass,GeV)
      >> iunit(_intwidth,GeV);
 }
 
 // The following static variable is needed for the type
 // description system in ThePEG.
-DescribeClass<TwoPionPhotonCurrent,WeakDecayCurrent>
+DescribeClass<TwoPionPhotonCurrent,WeakCurrent>
 describeHerwigTwoPionPhotonCurrent("Herwig::TwoPionPhotonCurrent", "HwWeakCurrents.so");
 
 void TwoPionPhotonCurrent::Init() {
@@ -103,37 +76,6 @@ void TwoPionPhotonCurrent::Init() {
      "The weights of the different resonances for the decay tau -> nu pi pi gamma",
      &TwoPionPhotonCurrent::_resweights,
      0, 0, 0, -1000, 1000, false, false, true);
-    
-  static Switch<TwoPionPhotonCurrent,bool> interfaceRhoParameters
-    ("RhoParameters",
-     "Use local values for the rho meson masses and widths",
-     &TwoPionPhotonCurrent::_rhoparameters, true, false, false);
-
-  static SwitchOption interfaceRhoParameterstrue
-    (interfaceRhoParameters,
-     "Local",
-     "Use local values",
-     true);
-  static SwitchOption interfaceRhoParametersParticleData
-    (interfaceRhoParameters,
-     "ParticleData",
-     "Use the value from the particle data objects",
-     false);
-  
-  static Switch<TwoPionPhotonCurrent,bool> interfaceomegaParameters
-    ("omegaParameters",
-     "Use local values for the omega meson masses and widths",
-     &TwoPionPhotonCurrent::_omegaparameters, true, false, false);
-  static SwitchOption interfaceomegaParameterstrue
-    (interfaceomegaParameters,
-     "Local",
-     "Use local values",
-     true);
-  static SwitchOption interfaceomegaParametersParticleData
-    (interfaceomegaParameters,
-     "ParticleData",
-     "Use the value from the particle data objects",
-     false);
 
   static ParVector<TwoPionPhotonCurrent,Energy> interfaceRhoMasses
     ("RhoMasses",
@@ -199,95 +141,172 @@ void TwoPionPhotonCurrent::Init() {
 }
 
 // complete the construction of the decay mode for integration
-bool TwoPionPhotonCurrent::createMode(int icharge, unsigned int,
-				      DecayPhaseSpaceModePtr mode,
-				      unsigned int iloc,unsigned int ires,
-				      DecayPhaseSpaceChannelPtr phase,Energy upp) {
-  if(icharge!=3&&icharge!=-3){return false;}
+bool TwoPionPhotonCurrent::createMode(int icharge, tcPDPtr resonance,
+				      FlavourInfo flavour,
+				      unsigned int imode,PhaseSpaceModePtr mode,
+				      unsigned int iloc,int ires,
+				      PhaseSpaceChannel phase, Energy upp ) {
+  assert(!resonance);
+  // check the charge
+  if((abs(icharge)!=3 && imode == 0) ||
+     (   icharge!=0   && imode >= 1))
+    return false;
+  // check the total isospin
+  if(flavour.I!=IsoSpin::IUnknown) {
+    if(flavour.I!=IsoSpin::IOne) return false;
+  }
+  // check I_3
+  if(flavour.I3!=IsoSpin::I3Unknown) {
+    switch(flavour.I3) {
+    case IsoSpin::I3Zero:
+      if(imode!=1) return false;
+      break;
+    case IsoSpin::I3One:
+      if(imode>1 || icharge ==-3) return false;
+      break;
+    case IsoSpin::I3MinusOne:
+      if(imode>1 || icharge ==3) return false;
+      break;
+    default:
+      return false;
+    }
+  }
+  if(flavour.strange != Strangeness::Unknown and flavour.strange != Strangeness::Zero)
+    return false;
+  if(flavour.charm   != Charm::Unknown       and flavour.charm   != Charm::Zero       )
+    return false;
+  if(flavour.bottom  != Beauty::Unknown      and flavour.bottom  !=Beauty::Zero       )
+    return false;
   // check that the mode is are kinematical allowed
   Energy min(getParticleData(ParticleID::piplus)->mass()+
-	     getParticleData(ParticleID::pi0)->mass());
+  	     getParticleData(ParticleID::pi0   )->mass());
   if(min>upp) return false;
   // set up the integration channels;
   tPDPtr omega(getParticleData(ParticleID::omega));
-  tPDPtr W(getParticleData(ParticleID::Wplus));
-  if(icharge<0) W=W->CC();
-  DecayPhaseSpaceChannelPtr newchannel; 
-  newchannel=new_ptr(DecayPhaseSpaceChannel(*phase));
-  newchannel->addIntermediate(W,0,0.0,-ires-1,iloc);
-  newchannel->addIntermediate(omega,0,0.0,iloc+1,iloc+2);
-  mode->addChannel(newchannel);
+  tPDPtr rho;
+  if(icharge==-3)     rho = getParticleData(-213);
+  else if(icharge==0) rho = getParticleData( 113);
+  else if(icharge==3) rho = getParticleData( 213);
+  mode->addChannel((PhaseSpaceChannel(phase),ires,rho,
+		    ires+1,omega,ires+1,iloc+1,
+		    ires+2,iloc+2,ires+2,iloc+3));
   // reset the masses and widths of the resonances if needed
-  mode->resetIntermediate(W,_intmass,_intwidth);
+  mode->resetIntermediate(rho,_intmass,_intwidth);
   // set up the omega masses and widths
-  if(_omegaparameters) mode->resetIntermediate(omega,_omegamass,_omegawidth);
+  mode->resetIntermediate(omega,_omegamass,_omegawidth);
   return true;
 }
 
 // the particles produced by the current
-tPDVector TwoPionPhotonCurrent::particles(int icharge, unsigned int,int,int) {
-  tPDVector extpart;
-  if(abs(icharge)!=3) return extpart;
-  if(icharge==3)       extpart.push_back(getParticleData(ParticleID::piplus));
-  else if(icharge==-3) extpart.push_back(getParticleData(ParticleID::piminus));
-  extpart.push_back(getParticleData(ParticleID::pi0));
-  extpart.push_back(getParticleData(ParticleID::gamma));
+tPDVector TwoPionPhotonCurrent::particles(int icharge, unsigned int imode,int,int) {
+  tPDVector extpart = {tPDPtr(),
+		       getParticleData(ParticleID::pi0),
+		       getParticleData(ParticleID::gamma)};
+  if(imode==0) {
+    if(icharge==3)       extpart[0] = getParticleData(ParticleID::piplus );
+    else if(icharge==-3) extpart[0] = getParticleData(ParticleID::piminus);
+  }
+  else {
+    extpart[0] = getParticleData(ParticleID::pi0);
+  }
   return extpart;
 }
 
+void TwoPionPhotonCurrent::constructSpinInfo(ParticleVector decay) const {
+  vector<LorentzPolarizationVector> temp(3);
+  for(unsigned int ix=0;ix<3;++ix) {
+    if(ix==1) ++ix;
+    temp[ix] = HelicityFunctions::polarizationVector(-decay[2]->momentum()
+						     ,ix,Helicity::outgoing);
+  }
+  for(unsigned int ix=0;ix<2;++ix)
+    ScalarWaveFunction::constructSpinInfo(decay[ix],outgoing,true);
+  VectorWaveFunction::constructSpinInfo(temp,decay[2],
+					outgoing,true,true);
+}
 
 // the hadronic currents    
 vector<LorentzPolarizationVectorE> 
-TwoPionPhotonCurrent::current(const int, const int,Energy & scale,
-			      const ParticleVector & decay,
-			      DecayIntegrator::MEOption meopt) const {
+TwoPionPhotonCurrent::current(tcPDPtr resonance,
+			      FlavourInfo flavour,
+			      const int imode, const int ,Energy & scale, 
+			      const tPDVector & outgoing,
+			      const vector<Lorentz5Momentum> & momenta,
+			      DecayIntegrator::MEOption) const {
+  assert(!resonance);
+  int icharge = outgoing[0]->iCharge()+outgoing[1]->iCharge()+outgoing[2]->iCharge();
+  // check the charge
+  if((abs(icharge)!=3 && imode == 0) ||
+     (   icharge!=0   && imode == 1))
+    return vector<LorentzPolarizationVectorE>();
+  // check the total isospin
+  if(flavour.I!=IsoSpin::IUnknown) {
+    if(flavour.I!=IsoSpin::IOne) return vector<LorentzPolarizationVectorE>();
+  }
+  // check I_3
+  if(flavour.I3!=IsoSpin::I3Unknown) {
+    switch(flavour.I3) {
+    case IsoSpin::I3Zero:
+      if(imode!=1) return vector<LorentzPolarizationVectorE>();
+      break;
+    case IsoSpin::I3One:
+      if(imode>1 || icharge ==-3) return vector<LorentzPolarizationVectorE>();
+      break;
+    case IsoSpin::I3MinusOne:
+      if(imode>1 || icharge ==3) return vector<LorentzPolarizationVectorE>();
+      break;
+    default:
+      return vector<LorentzPolarizationVectorE>();
+    }
+  }
+  if(flavour.strange != Strangeness::Unknown and flavour.strange != Strangeness::Zero)
+    return vector<LorentzPolarizationVectorE>();
+  if(flavour.charm   != Charm::Unknown       and flavour.charm   != Charm::Zero       )
+    return vector<LorentzPolarizationVectorE>();
+  if(flavour.bottom  != Beauty::Unknown      and flavour.bottom  !=Beauty::Zero       )
+    return vector<LorentzPolarizationVectorE>();
   useMe();
-  vector<LorentzPolarizationVector> temp;
-  VectorWaveFunction::
-    calculateWaveFunctions(temp,decay[2],outgoing,true);
-  if(meopt==DecayIntegrator::Terminate) {
-    for(unsigned int ix=0;ix<2;++ix)
-      ScalarWaveFunction::constructSpinInfo(decay[ix],outgoing,true);
-    VectorWaveFunction::constructSpinInfo(temp,decay[2],
-					  outgoing,true,true);
-    return vector<LorentzPolarizationVectorE>(1,LorentzPolarizationVectorE());
+  vector<LorentzPolarizationVector> temp(3);
+  for(unsigned int ix=0;ix<3;++ix) {
+    if(ix==1) ++ix;
+    temp[ix] = HelicityFunctions::polarizationVector(-momenta[2],ix,Helicity::outgoing);
   }
   // locate the particles
-  Lorentz5Momentum pout(decay[1]->momentum()+decay[2]->momentum()+
-			decay[0]->momentum());
+  Lorentz5Momentum pout(momenta[1]+momenta[2]+momenta[0]);
   // overall hadronic mass
   pout.rescaleMass();
   scale=pout.mass();
   Energy2 q2(pout.m2());
   // mass of the omega
-  pout = decay[1]->momentum()+decay[2]->momentum();
+  pout = momenta[1]+momenta[2];
   pout.rescaleMass();
   Energy2 s2(pout.m2());
   // compute the prefactor
   complex<InvEnergy3> prefactor(-FFunction(ZERO)*FFunction(q2)*scale*
-			    sqrt(Constants::twopi*generator()->standardModel()->alphaEM())*
-			    BreitWigner(s2,10));
+				sqrt(Constants::twopi*generator()->standardModel()->alphaEM())*
+				BreitWigner(s2,10));
   // dot products which don't depend on the polarization vector
-  Energy2 dot12(decay[2]->momentum()*decay[1]->momentum());
-  Energy2 dot13(decay[2]->momentum()*decay[0]->momentum());
-  Energy2 dot23(decay[1]->momentum()*decay[0]->momentum());
-  Energy2 mpi2 = sqr(decay[0]->mass());
+  Energy2 dot12(momenta[2]*momenta[1]);
+  Energy2 dot13(momenta[2]*momenta[0]);
+  Energy2 dot23(momenta[1]*momenta[0]);
+  Energy2 mpi2 = sqr(momenta[0].mass());
   vector<LorentzPolarizationVectorE> ret(3);
   for(unsigned int ix=0;ix<3;++ix) {
     if(ix!=1) {
       // obtain the dot products we need
-      complex<Energy> dote2 = temp[ix]*decay[1]->momentum();
-      complex<Energy> dote3 = temp[ix]*decay[0]->momentum();
+      complex<Energy> dote2 = temp[ix]*momenta[1];
+      complex<Energy> dote3 = temp[ix]*momenta[0];
       // now compute the coefficients
       complex<Energy4> coeffa = mpi2*dot13-dot12*(dot23-dot13);
       complex<Energy3> coeffb = dote2*dot13-dote3*dot12;
       complex<Energy3> coeffc = dote2*dot23-dote3*(mpi2+dot12);
       // finally compute the current
       ret[ix]= prefactor*(coeffa*temp[ix]
-			   -coeffb*decay[1]->momentum()
-			   +coeffc*decay[2]->momentum());
+			  -coeffb*momenta[1]
+			  +coeffc*momenta[2]);
     }
-    else{ret[ix]=LorentzPolarizationVectorE();}
+    else
+      ret[ix]=LorentzPolarizationVectorE();
   }
   return ret;
 }
@@ -300,11 +319,22 @@ bool TwoPionPhotonCurrent::accept(vector<int> id) {
     else if(id[ix]==ParticleID::gamma)  ++ngamma;
     else if(id[ix]==ParticleID::pi0)    ++npi0;
   }
-  return npiplus==1&&ngamma==1&&npi0==1;
+  return (npiplus==1&&ngamma==1&&npi0==1) ||
+    (npi0==2&&ngamma==1);
 }
 
-unsigned int TwoPionPhotonCurrent::decayMode(vector<int>) {
-  return 0;
+unsigned int TwoPionPhotonCurrent::decayMode(vector<int> id) {
+  int npip(0),npim(0),npi0(0),ngamma(0);
+  for(unsigned int ix=0;ix<id.size();++ix) {
+    if(id[ix]==ParticleID::piplus)         ++npip;
+    else if(id[ix]==ParticleID::piminus)   ++npim;
+    else if(id[ix]==ParticleID::pi0)       ++npi0;
+    else if(id[ix]==ParticleID::gamma)   ++ngamma;
+  }
+  if((npip==1 || npim == 1) && npi0==1 && ngamma==1)
+    return 0;
+  else
+    return 1;
 }
 
 // output the information for the database
@@ -313,8 +343,6 @@ void TwoPionPhotonCurrent::dataBaseOutput(ofstream & output,bool header,
   if(header) output << "update decayers set parameters=\"";
   if(create) output << "create Herwig::TwoPionPhotonCurrent " << name() 
 		    << " HwWeakCurrents.so\n";
-  output << "newdef " << name() << ":RhoParameters "    << _rhoparameters << "\n";
-  output << "newdef " << name() << ":omegaParameters "    << _omegaparameters << "\n";
   output << "newdef " << name() << ":omegamass "    << _omegamass/GeV << "\n";
   output << "newdef " << name() << ":omegawidth "    << _omegawidth/GeV << "\n";
   output << "newdef " << name() << ":grho "    << _grho/GeV2 << "\n";
@@ -323,7 +351,7 @@ void TwoPionPhotonCurrent::dataBaseOutput(ofstream & output,bool header,
   output << "newdef " << name() << ":IntegrationWidth " << _intwidth/GeV  << "\n";
   unsigned int ix;
   for(ix=0;ix<_resweights.size();++ix) {
-    if(ix<3) output << "newdef " << name() << ":Weights " << ix 
+    if(ix<2) output << "newdef " << name() << ":Weights " << ix 
 		    << " " << _resweights[ix] << "\n";
     else     output << "insert " << name() << ":Weights " << ix 
 		    << " " << _resweights[ix] << "\n";
@@ -340,7 +368,7 @@ void TwoPionPhotonCurrent::dataBaseOutput(ofstream & output,bool header,
     else     output << "insert " << name() << ":RhoWidths " << ix 
 		    << " " << _rhowidths[ix]/MeV << "\n";
   }
-  WeakDecayCurrent::dataBaseOutput(output,false,false);
+  WeakCurrent::dataBaseOutput(output,false,false);
   if(header) output << "\n\" where BINARY ThePEGName=\"" 
 		    << fullName() << "\";" << endl;
 }

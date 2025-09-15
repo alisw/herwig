@@ -13,6 +13,7 @@
 #include "CluHadConfig.h"
 #include "HadronSelector.h"
 #include "ClusterFissioner.fh"
+#include "CheckId.h"
 
 namespace Herwig {
 using namespace ThePEG;
@@ -214,6 +215,73 @@ public:
    */
   PPair produceHadron(tcPDPtr hadron, tPPtr newPtr, const Lorentz5Momentum &a,
 		      const LorentzPoint &b) const;
+
+protected:
+
+  /**
+  *  Function that returns either the cluster mass or the lambda measure
+  */
+  Energy2 clustermass(const ClusterPtr & cluster) const;
+
+  /**
+   * Draw a new flavour for the given cluster; currently defaults to
+   * the default model
+   */
+  virtual void drawNewFlavour(PPtr& newPtr1, PPtr& newPtr2, const ClusterPtr & cluster) const {
+    if (_enhanceSProb == 0){
+      drawNewFlavour(newPtr1,newPtr2);
+    }
+    else {
+      drawNewFlavourEnhanced(newPtr1,newPtr2,clustermass(cluster));
+    }
+  }
+
+  /**
+   * Calculate the masses and possibly kinematics of the cluster
+   * fission at hand; if claculateKineamtics is perfomring non-trivial
+   * steps kinematics claulcated here will be overriden. Currentl;y resorts to the default
+   */
+  virtual pair<Energy,Energy> drawNewMasses(Energy Mc, bool soft1, bool soft2,
+					    Lorentz5Momentum& pClu1, Lorentz5Momentum& pClu2,
+					    tPPtr ptrQ1, Lorentz5Momentum& pQ1,
+					    tPPtr, Lorentz5Momentum& pQone,
+					    tPPtr, Lorentz5Momentum& pQtwo,
+					    tPPtr ptrQ2,  Lorentz5Momentum& pQ2) const {
+
+    pair<Energy,Energy> result;
+
+    double exp1=_pSplitLight;
+    double exp2=_pSplitLight;
+
+    if     (CheckId::isExotic(ptrQ1->dataPtr())) exp1 = _pSplitExotic;
+    else if(CheckId::hasBottom(ptrQ1->dataPtr()))exp1 = _pSplitBottom;
+    else if(CheckId::hasCharm(ptrQ1->dataPtr())) exp1 = _pSplitCharm;
+
+    if     (CheckId::isExotic(ptrQ2->dataPtr()))  exp2 = _pSplitExotic;
+    else if(CheckId::hasBottom(ptrQ2->dataPtr())) exp2 = _pSplitBottom;
+    else if(CheckId::hasCharm(ptrQ2->dataPtr()))  exp2 = _pSplitCharm;
+
+    result.first = drawChildMass(Mc,pQ1.mass(),pQ2.mass(),pQone.mass(),exp1,soft1);
+    result.second = drawChildMass(Mc,pQ2.mass(),pQ1.mass(),pQtwo.mass(),exp2,soft2);
+
+    pClu1.setMass(result.first);
+    pClu2.setMass(result.second);
+
+    return result;
+
+  }
+
+  /**
+   * Calculate the final kinematics of a heavy cluster decay C->C1 +
+   * C2, if not already performed by drawNewMasses
+   */
+  virtual void calculateKinematics(const Lorentz5Momentum &pClu,
+				   const Lorentz5Momentum &p0Q1,
+				   const bool toHadron1, const bool toHadron2,
+				   Lorentz5Momentum &pClu1, Lorentz5Momentum &pClu2,
+				   Lorentz5Momentum &pQ1, Lorentz5Momentum &pQb,
+				   Lorentz5Momentum &pQ2, Lorentz5Momentum &pQ2b) const;
+
 protected:
 
   /**
@@ -234,7 +302,7 @@ protected:
    * needed for fission of a heavy cluster. Equal probabilities
    * are assumed for producing  u, d, or s pairs.
    */
-  void drawNewFlavour(PPtr& newPtrPos,PPtr& newPtrNeg) const;
+  void drawNewFlavour(PPtr& newPtrPos, PPtr& newPtrNeg) const;
 
   /**
    * Returns the new quark-antiquark pair
@@ -275,16 +343,6 @@ protected:
 		       const Energy m, const double exp, const bool soft) const;
 
   /**
-   * Determines the kinematics of a heavy cluster decay C->C1 + C2
-   */
-  void calculateKinematics(const Lorentz5Momentum &pClu,
-			   const Lorentz5Momentum &p0Q1,
-			   const bool toHadron1, const bool toHadron2,
-			   Lorentz5Momentum &pClu1, Lorentz5Momentum &pClu2,
-			   Lorentz5Momentum &pQ1, Lorentz5Momentum &pQb,
-			   Lorentz5Momentum &pQ2, Lorentz5Momentum &pQ2b) const;
-
-  /**
    * Determine the positions of the two children clusters.
    *
    * This routine generates the momentum of the decay products. It also
@@ -298,13 +356,6 @@ protected:
 			  LorentzPoint & positionClu1,
 			  LorentzPoint & positionClu2 ) const;
 
-
-
-  /**
-  *  Function that returns either the cluster mass or the lambda measure
-  */
-  Energy2 clustermass(const ClusterPtr & cluster);
-
 protected:
 
   /** @name Access members for child classes. */
@@ -312,7 +363,7 @@ protected:
   /**
    *  Access to the hadron selector
    */
-  HadronSelectorPtr hadronsSelector() const {return _hadronsSelector;}
+  HadronSelectorPtr hadronSelector() const {return _hadronSelector;}
 
   /**
    *  Access to soft-cluster parameter
@@ -343,6 +394,13 @@ protected:
 private:
 
   /**
+  * Smooth probability for dynamic threshold cuts:
+  * @scale the current scale, e.g. the mass of the cluster,
+  * @threshold the physical threshold,
+   */
+  bool ProbablityFunction(double scale, double threshold);
+
+  /**
    * Check if a cluster is heavy enough to split again
    */
   bool isHeavy(tcClusterPtr );
@@ -350,7 +408,7 @@ private:
   /**
    * A pointer to a Herwig::HadronSelector object for generating hadrons.
    */
-  HadronSelectorPtr _hadronsSelector;
+  HadronSelectorPtr _hadronSelector;
 
   /**
    * @name The Cluster max mass,dependant on which quarks are involved, used to determine when
@@ -390,6 +448,11 @@ private:
   * Flag used to determine between normal cluster fission and alternative cluster fission
   */
   int _fissionCluster;
+
+  /**
+  * Flag to choose static or dynamic kinematic thresholds in cluster splittings
+  */
+  int _kinematicThresholdChoice;
 
   //@}
    /**
@@ -431,6 +494,20 @@ private:
   */
   const double _maxScale = 20.;
 
+  /**
+  * Power factor in ClausterFissioner bell probablity function
+  */
+  double _probPowFactor;
+
+  /**
+  * Shifts from the center in ClausterFissioner bell probablity function
+  */
+  double _probShift;
+
+  /**
+  * Shifts from the kinetic threshold in ClausterFissioner
+  */
+  Energy2 _kinThresholdShift;
 
 };
 

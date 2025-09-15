@@ -18,12 +18,9 @@
 #include "ThePEG/Persistency/PersistentIStream.h"
 #include "Herwig/Models/StandardModel/StandardModel.h"
 #include "Herwig/Decay/General/GeneralFourBodyDecayer.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
 #include "DecayConstructor.h"
 
 using namespace Herwig;
-
-FourBodyDecayConstructor::~FourBodyDecayConstructor() {}
 
 IBPtr FourBodyDecayConstructor::clone() const {
   return new_ptr(*this);
@@ -113,10 +110,10 @@ void FourBodyDecayConstructor::Init() {
 
 }
 
-void FourBodyDecayConstructor::DecayList(const set<PDPtr> & particles) {
+void FourBodyDecayConstructor::DecayList(const set<PDPtr,MassOrdering> & particles) {
   if( particles.empty() ) return;
-  set<PDPtr> new_particles;
-  for(set<PDPtr>::const_iterator it=particles.begin();it!=particles.end();++it) {
+  set<PDPtr,MassOrdering> new_particles;
+  for(set<PDPtr,MassOrdering>::const_iterator it=particles.begin();it!=particles.end();++it) {
     if(!particles_.empty() && find(particles_.begin(),particles_.end(),*it)==particles_.end()) continue;
     if(!(**it).stable()&&!particleType_) continue;
     new_particles.insert(*it);

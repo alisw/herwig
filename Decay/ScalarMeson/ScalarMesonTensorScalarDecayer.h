@@ -12,7 +12,7 @@
 // This is the declaration of the ScalarMesonTensorScalarDecayer class.
 //
 #include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 #include "ThePEG/Helicity/LorentzTensor.h"
 
 namespace Herwig {
@@ -26,6 +26,8 @@ using namespace Herwig;
  *
  *  \f[\mathcal{M} = \epsilon^{\alpha\beta} p_{0\alpha} p_{2\beta} \f]
  *
+ * This Lorentz structure would also apply for scalar to pseudotensor scalar, pseudoscalar to tensor scalar or
+ * pseudoscalar to pseudotensor pseudoscalar decays.
  * The incoming and outgoing mesons and the coupling can be specified using the
  * interfaces.
  *
@@ -35,11 +37,6 @@ using namespace Herwig;
 class ScalarMesonTensorScalarDecayer: public DecayIntegrator {
 
 public:
-
-  /**
-   * Default constructor.
-   */
-  ScalarMesonTensorScalarDecayer();
   
   /**
    * Which of the possible decays is required
@@ -54,12 +51,21 @@ public:
    * Return the matrix element squared for a given mode and phase-space channel.
    * @param ichan The channel we are calculating the matrix element for. 
    * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
    * @param meopt Option for the calculation of the matrix element
    * @return The matrix element squared for the phase-space configuration.
    */
-  double me2( const int ichan,const Particle & part,
-	     const ParticleVector & decay, MEOption meopt) const;
+  double me2(const int ichan,const Particle & part,
+	     const tPDVector & outgoing,
+	     const vector<Lorentz5Momentum> & momenta,
+	     MEOption meopt) const;
+
+  /**
+   *   Construct the SpinInfos for the particles produced in the decay
+   */
+  virtual void constructSpinInfo(const Particle & part,
+				 ParticleVector outgoing) const;
 
   /**
    * Specify the \f$1\to2\f$ matrix element to be used in the running width calculation.
@@ -135,6 +141,13 @@ protected:
   virtual void doinitrun();
   //@}
 
+public:
+
+  /**
+   *   Set the parameters for a decay mode
+   */
+  string setUpDecayMode(string arg);
+
 private:
 
   /**
@@ -147,42 +160,32 @@ private:
   /**
    * the PDG code for the incoming particle
    */
-  vector<int> _incoming;
+  vector<int> incoming_;
 
   /**
-   * the PDG code for the tensor meson
+   * the PDG code for the outgoing mesons (tensor then scalar)
    */
-  vector<int> _outgoingT;
-
-  /**
-   * the PDG code for the scalar meson
-   */
-  vector<int> _outgoingS;
+  vector<pair<int,int> > outgoing_;
 
   /**
    * the coupling for the decay
    */
-  vector<InvEnergy> _coupling;
+  vector<InvEnergy> coupling_;
 
   /**
    * the maximum weight for the decay
    */
-  vector<double> _maxweight;
-
-  /**
-   *  initial number of modes
-   */
-  unsigned int _initsize;
+  vector<double> maxWeight_;
 
   /**
    *  Spin density matrix
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 
   /**
    *  Polarization tensors for the decay product
    */
-  mutable vector<Helicity::LorentzTensor<double> > _tensors;
+  mutable vector<Helicity::LorentzTensor<double> > tensors_;
 };
 
 }

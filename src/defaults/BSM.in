@@ -11,14 +11,14 @@ create Herwig::ModelGenerator NewModel
 create Herwig::ResonantProcessConstructor ResConstructor
 create Herwig::TwoToTwoProcessConstructor HPConstructor
 create Herwig::HiggsVectorBosonProcessConstructor HVConstructor
-set HVConstructor:AlphaQCD /Herwig/Shower/AlphaQCD
+set HVConstructor:AlphaQCD /Herwig/Shower/AlphaQCDFSR
 create Herwig::HiggsVBFProcessConstructor HiggsVBFConstructor
 create Herwig::QQHiggsProcessConstructor QQHiggsConstructor
 create Herwig::DecayConstructor DecayConstructor
 newdef DecayConstructor:QEDGenerator /Herwig/QEDRadiation/SOPHTY
 create Herwig::TwoBodyDecayConstructor TwoBodyDC
 set TwoBodyDC:ExcludeEffectiveVertices No
-set TwoBodyDC:AlphaQCD /Herwig/Shower/AlphaQCD
+set TwoBodyDC:AlphaQCD /Herwig/Shower/AlphaQCDFSR
 set TwoBodyDC:AlphaQED /Herwig/Shower/AlphaQED
 set TwoBodyDC:Interactions QCDandQED
 create Herwig::ThreeBodyDecayConstructor ThreeBodyDC
@@ -34,7 +34,7 @@ insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau1MesonCurrent
 insert WeakDecayConstructor:DecayModes 0 pi-;
 insert WeakDecayConstructor:Normalisation 0 1.01386262897
 # pi-,pi0
-insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau2MesonCurrent
+insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau2PionCurrent
 insert WeakDecayConstructor:DecayModes 0 pi-,pi0;
 insert WeakDecayConstructor:Normalisation 0 1.17616809738
 # e-,nu_ebar
@@ -90,23 +90,23 @@ insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau5PionCurrent
 insert WeakDecayConstructor:DecayModes 0 pi+,pi0,pi0,pi0,pi0;
 insert WeakDecayConstructor:Normalisation 0 0.603378959531
 # K0,pi+,pi0
-insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau3KaonCurrent
+insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau1K2PiCurrent
 insert WeakDecayConstructor:DecayModes 0 K0,pi+,pi0;
 insert WeakDecayConstructor:Normalisation 0 0.380268556539
 # K+,pi+,pi-
-insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau3KaonCurrent
+insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau1K2PiCurrent
 insert WeakDecayConstructor:DecayModes 0 K+,pi+,pi-;
 insert WeakDecayConstructor:Normalisation 0 0.407904176498
 # K+,K-,pi+
-insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau3KaonCurrent
+insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau2K1PiCurrent
 insert WeakDecayConstructor:DecayModes 0 K+,K-,pi+;
 insert WeakDecayConstructor:Normalisation 0 0.727416124384
 # K+,Kbar0,pi0 
-insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau3KaonCurrent
+insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau2K1PiCurrent
 insert WeakDecayConstructor:DecayModes 0 K+,Kbar0,pi0;
 insert WeakDecayConstructor:Normalisation 0 0.945076580717
 # K_L0,K_S0,pi+
-insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau3KaonCurrent
+insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau2K1PiCurrent
 insert WeakDecayConstructor:DecayModes 0 K_L0,K_S0,pi+;
 insert WeakDecayConstructor:Normalisation 0 1.10729951668
 # pi+,pi0,gamma
@@ -114,13 +114,33 @@ insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau2MesonPhotonCurrent
 insert WeakDecayConstructor:DecayModes 0 pi+,pi0,gamma;
 insert WeakDecayConstructor:Normalisation 0 3.13799210805
 # eta,pi+,pi0
-insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau3MesonCurrent
+insert WeakDecayConstructor:Current 0 /Herwig/Decays/TauEtaPiPiCurrent
 insert WeakDecayConstructor:DecayModes 0 eta,pi+,pi0;
 insert WeakDecayConstructor:Normalisation 0 0.880539616307
 # K+,Kbar0
-insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau2MesonCurrent
+insert WeakDecayConstructor:Current 0 /Herwig/Decays/Tau2PionCurrent
 insert WeakDecayConstructor:DecayModes 0 K+,Kbar0;
 insert WeakDecayConstructor:Normalisation 0 1.62501804004
+
+create Herwig::VectorCurrentDecayConstructor VectorDecayConstructor
+set VectorDecayConstructor:InitPoints 10000
+set VectorDecayConstructor:MassCut 2.
+
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/TwoPionCzyzCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/TwoKaonCzyzCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/ThreePionCzyzCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/FourPionCzyzCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/EtaPiPiCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/EtaPrimePiPiCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/OmegaPiPiCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/OmegaPiCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/PiGammaCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/EtaGammaCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/EtaPhiCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/EtaOmegaCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/CzyzCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/KKPiCurrent
+insert VectorDecayConstructor:Current 0 /Herwig/Decays/PhiPiCurrent
 
 insert NewModel:HardProcessConstructors[0] HPConstructor
 insert NewModel:HardProcessConstructors[1] ResConstructor

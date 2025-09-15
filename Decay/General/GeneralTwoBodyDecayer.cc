@@ -20,6 +20,7 @@
 #include "ThePEG/PDT/DecayMode.h"
 #include "ThePEG/Utilities/Exception.h"
 #include "Herwig/Shower/RealEmissionProcess.h"
+#include "Herwig/Utilities/Kinematics.h"
 
 using namespace Herwig;
 
@@ -46,11 +47,8 @@ void GeneralTwoBodyDecayer::doinit() {
   PerturbativeDecayer::doinit();
   assert( incoming_ && outgoing_.size()==2);
   //create phase space mode
-  tPDVector extpart(3);
-  extpart[0] = incoming_;
-  extpart[1] = outgoing_[0];
-  extpart[2] = outgoing_[1];
-  addMode(new_ptr(DecayPhaseSpaceMode(extpart, this)), maxWeight_, vector<double>());
+  addMode(new_ptr(PhaseSpaceMode(incoming_,{outgoing_[0],outgoing_[1]},
+				 maxWeight_)));
 }
 
 int GeneralTwoBodyDecayer::modeNumber(bool & cc, tcPDPtr parent, 
@@ -307,8 +305,8 @@ double GeneralTwoBodyDecayer::brat(const DecayMode &, const Particle & p,
 void GeneralTwoBodyDecayer::doinitrun() {
   PerturbativeDecayer::doinitrun();
   for(unsigned int ix=0;ix<numberModes();++ix) {
-    double fact = pow(1.5,int(mode(ix)->externalParticles(0)->iSpin())-1);
-    mode(ix)->setMaxWeight(fact*mode(ix)->maxWeight());
+    double fact = pow(1.5,int(mode(ix)->incoming().first->iSpin())-1);
+    mode(ix)->maxWeight(fact*mode(ix)->maxWeight());
   }
 }
 
@@ -444,19 +442,19 @@ double GeneralTwoBodyDecayer::colourFactor(tcPDPtr in, tcPDPtr out1,
 }
 
 Energy GeneralTwoBodyDecayer::partialWidth(PMPair inpart, PMPair outa, 
-					   PMPair outb) const {
+					    PMPair outb) const {
   // select the number of the mode
   tPDVector children;
   children.push_back(const_ptr_cast<PDPtr>(outa.first));
   children.push_back(const_ptr_cast<PDPtr>(outb.first));
   bool cc;
   int nmode=modeNumber(cc,inpart.first,children);
-  tcPDPtr newchild[2] = {mode(nmode)->externalParticles(1),
-			 mode(nmode)->externalParticles(2)};
+  tcPDPtr newchild[2] = {mode(nmode)->outgoing()[0],
+			 mode(nmode)->outgoing()[1]};
   // make the particles
   Lorentz5Momentum pparent = Lorentz5Momentum(inpart.second);
   PPtr parent = inpart.first->produceParticle(pparent);
-  Lorentz5Momentum pout[2];
+  vector<Lorentz5Momentum> pout(2);
   double ctheta,phi;
   Kinematics::generateAngles(ctheta,phi);
   Kinematics::twoBodyDecay(pparent, outa.second, outb.second,
@@ -465,10 +463,9 @@ Energy GeneralTwoBodyDecayer::partialWidth(PMPair inpart, PMPair outa,
       (  cc && !((  outa.first->CC() && outa.first->CC() == newchild[0])||
 		 ( !outa.first->CC() && outa.first       == newchild[0]) )))
     swap(pout[0],pout[1]);
-  ParticleVector decay;
-  decay.push_back(newchild[0]->produceParticle(pout[0]));
-  decay.push_back(newchild[1]->produceParticle(pout[1]));
-  double me =  me2(-1,*parent,decay,Initialize);
+  tPDVector out = {const_ptr_cast<tPDPtr>(outa.first),
+		   const_ptr_cast<tPDPtr>(outb.first)};
+  double me =  me2(-1,*parent,out,pout,Initialize);
   Energy pcm = Kinematics::pstarTwoBodyDecay(inpart.second,
 					     outa.second, outb.second);
   return me/(8.*Constants::pi)*pcm;
@@ -482,12 +479,17 @@ void GeneralTwoBodyDecayer::decayInfo(PDPtr incoming, PDPair outgoing) {
 }
 
 double GeneralTwoBodyDecayer::matrixElementRatio(const Particle & inpart, 
-						 const ParticleVector & decay2,
-						 const ParticleVector & decay3, 
-						 MEOption meopt,
-						 ShowerInteraction inter) {
+						  const ParticleVector & decay2,
+						  const ParticleVector & decay3, 
+						  MEOption meopt,
+						  ShowerInteraction inter) {
   // calculate R/B
-  double B = me2        (0, inpart, decay2, meopt);    
+  tPDVector outgoing = {const_ptr_cast<tPDPtr>(decay2[0]->dataPtr()),
+			const_ptr_cast<tPDPtr>(decay2[1]->dataPtr())};
+  const vector<Lorentz5Momentum> mom = {decay2[0]->momentum(),
+					decay2[1]->momentum()};
+  
+  double B = me2        (0, inpart, outgoing,mom, meopt);    
   double R = threeBodyME(0, inpart, decay3, inter, meopt);
   return R/B;
   
@@ -815,7 +817,7 @@ GeneralTwoBodyDecayer::colourFlows(const Particle & inpart,
 double GeneralTwoBodyDecayer::threeBodyME(const int , const Particle &,
 					  const ParticleVector &,
 					  ShowerInteraction, MEOption) {
-  throw Exception() << "Base class PerturbativeDecayer::threeBodyME() "
+  throw Exception() << "Base class GeneralTwoBodyDecayer::threeBodyME() "
 		    << "called, should have an implementation in the inheriting class"
 		    << Exception::runerror;
   return 0.;

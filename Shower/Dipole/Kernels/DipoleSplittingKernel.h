@@ -42,18 +42,10 @@ class DipoleSplittingKernel: public HandlerBase {
 
 public:
 
-  /** @name Standard constructors and destructors. */
-  //@{
   /**
    * The default constructor.
    */
   DipoleSplittingKernel();
-
-  /**
-   * The destructor.
-   */
-  virtual ~DipoleSplittingKernel();
-  //@}
 
 public:
 
@@ -316,6 +308,11 @@ public:
    */
   void renormalizationScaleFactor(double f) { theRenormalizationScaleFactor = f; }
 
+  /**
+   * Return the CMW sheme used by the kernel
+   */
+  unsigned int cmwScheme() const {return theCMWScheme;}
+  
 protected:
 
   /**

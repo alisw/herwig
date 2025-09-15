@@ -13,7 +13,7 @@
 //
 
 #include "Herwig/Decay/PerturbativeDecayer.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 #include "ThePEG/Helicity/Vertex/VertexBase.h"
 #include "GeneralTwoBodyDecayer.fh"
 
@@ -51,7 +51,7 @@ public:
   {}
 
 
-  /** @name Virtual functions required by the Decayer class. */
+  /** @name Virtual functions required by the Decayer2 class. */
   //@{
   /**
    * For a given decay mode and a given particle instance, perform the
@@ -69,17 +69,6 @@ public:
    * @param children The decay products
    */
   virtual int modeNumber(bool & cc, tcPDPtr parent,const tPDVector & children) const;
-
-  /**
-   * Return the matrix element squared for a given mode and phase-space channel
-   * @param ichan The channel we are calculating the matrix element for.
-   * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
-   * @param meopt Option for the calculation of the matrix element
-   * @return The matrix element squared for the phase-space configuration.
-   */
-  virtual double me2(const int , const Particle & part,
-		     const ParticleVector & decay, MEOption meopt) const = 0;
   
   /**
    * Function to return partial Width

@@ -16,7 +16,7 @@
 #include "ThePEG/PDT/DecayMode.h"
 #include "GenericWidthGenerator.fh"
 #include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 #include "Herwig/Utilities/Interpolator.h"
 #include "GenericMassGenerator.h"
 #include <iostream>

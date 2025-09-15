@@ -12,7 +12,7 @@
 // This is the declaration of the TensorMeson2PScalarDecayer class.
 //
 #include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 
 namespace Herwig {
 using namespace ThePEG;
@@ -48,11 +48,6 @@ class TensorMeson2PScalarDecayer: public DecayIntegrator {
 public:
 
   /**
-   * Default constructor.
-   */
-  TensorMeson2PScalarDecayer();
-
-  /**
    * Which of the possible decays is required
    * @param cc Is this mode the charge conjugate
    * @param parent The decaying particle
@@ -60,17 +55,26 @@ public:
    */
   virtual int modeNumber(bool & cc, tcPDPtr parent, 
 			 const tPDVector & children) const;
-  
+
   /**
    * Return the matrix element squared for a given mode and phase-space channel.
    * @param ichan The channel we are calculating the matrix element for. 
    * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
    * @param meopt Option for the calculation of the matrix element
    * @return The matrix element squared for the phase-space configuration.
    */
   double me2(const int ichan,const Particle & part,
-	     const ParticleVector & decay, MEOption meopt) const;
+	     const tPDVector & outgoing,
+	     const vector<Lorentz5Momentum> & momenta,
+	     MEOption meopt) const;
+
+  /**
+   *   Construct the SpinInfos for the particles produced in the decay
+   */
+  virtual void constructSpinInfo(const Particle & part,
+				 ParticleVector outgoing) const;
 
   /**
    * Specify the \f$1\to2\f$ matrix element to be used in the running width calculation.
@@ -153,48 +157,45 @@ private:
    */
   TensorMeson2PScalarDecayer & operator=(const TensorMeson2PScalarDecayer &) = delete;
 
+public:
+
+  /**
+   *   Set the parameters for a decay mode
+   */
+  string setUpDecayMode(string arg);
+
 private:
 
   /**
    * the PDG codes for the incoming particles
    */
-  vector<int> _incoming;
+  vector<int> incoming_;
 
   /**
-   * the PDG codes for first outgoing particle
+   * the PDG codes for the outgoing particles
    */
-  vector<int> _outgoing1;
-
-  /**
-   * the PDG codes for second outgoing particle
-   */
-  vector<int> _outgoing2;
+  vector<pair<int,int> > outgoing_;
 
   /**
    * the coupling for the decay
    */
-  vector<InvEnergy> _coupling;
+  vector<InvEnergy> coupling_;
 
   /**
    * the maximum weight for the decay
    */
-  vector<double> _maxweight;
-
-  /**
-   *  Initial size of the vectors
-   */
-  unsigned int _initsize;
+  vector<double> maxWeight_;
 
   /**
    *  Storage of polarization tensors to try and increase
    *  speed
    */
-  mutable vector<Helicity::LorentzTensor<double> > _tensors;
+  mutable vector<Helicity::LorentzTensor<double> > tensors_;
 
   /**
    *   Storage of the \f$\rho\f$ matrix
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 
 };
 

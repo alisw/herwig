@@ -11,7 +11,7 @@
 //
 // This is the declaration of the TwoPionPhotonCurrent class.
 //
-#include "WeakDecayCurrent.h"
+#include "WeakCurrent.h"
 
 namespace Herwig {
 using namespace ThePEG;
@@ -19,7 +19,7 @@ using namespace ThePEG;
 /** \ingroup Decay
  *
  *  This class implements the decay current for \f$\pi^\pm\pi^0 \gamma\f$ via
- *  an intermediate \f$\omega\f$. It inherits from the <code>WeakDecayCurrent</code>
+ *  an intermediate \f$\omega\f$. It inherits from the <code>WeakCurrent</code>
  *  class and implements the hadronic current.
  *
  *  The model is based on the one used in TAUOLA, Comput.Phys.Commun.76:361-380,1993.
@@ -52,12 +52,12 @@ using namespace ThePEG;
  * - \f$m_{\rho_k}\f$ is the mass of the \f${\rho_k}\f$.
  * - \f$\Gamma_{\rho_k} \f$ is the width of the \f${\rho_k}\f$.
  *
- * @see WeakDecayCurrent
+ * @see WeakCurrent
  * 
  *  \author Peter Richardson
  *
  */
-class TwoPionPhotonCurrent: public WeakDecayCurrent {
+class TwoPionPhotonCurrent: public WeakCurrent {
 
 public:
 
@@ -89,27 +89,31 @@ public:
 
 public:
 
-
   /** @name Methods for the construction of the phase space integrator. */
   //@{ 
   /**
-   * Complete the construction of the decay mode for integration.
-   * This version just adds the meson as the daughter of the last
-   * resonance in the phase space channel.
-   * @param icharge The total charge of the outgoing particles in the current.
-   * @param imode   The mode in the current being asked for.
-   * @param mode    The phase space mode for the integration
-   * @param iloc    The location of the of the first particle from the current in
-   *                the list of outgoing particles.
-   * @param ires    The location of the first intermediate for the current.
-   * @param phase   The prototype phase space channel for the integration.
-   * @param upp     The maximum possible mass the particles in the current are
-   *                allowed to have.
+   * Complete the construction of the decay mode for integration.classes inheriting
+   * from this one.
+   * This method is purely virtual and must be implemented in the classes inheriting
+   * from WeakCurrent.
+   * @param icharge   The total charge of the outgoing particles in the current.
+   * @param resonance If specified only include terms with this particle
+   * @param flavour Information on the required flavours of the quarks
+   * @param imode     The mode in the current being asked for.
+   * @param mode      The phase space mode for the integration
+   * @param iloc      The location of the of the first particle from the current in
+   *                  the list of outgoing particles.
+   * @param ires      The location of the first intermediate for the current.
+   * @param phase     The prototype phase space channel for the integration.
+   * @param upp       The maximum possible mass the particles in the current are
+   *                  allowed to have.
    * @return Whether the current was sucessfully constructed.
    */
-  virtual bool createMode(int icharge,unsigned int imode,DecayPhaseSpaceModePtr mode,
-			  unsigned int iloc,unsigned int ires,
-			  DecayPhaseSpaceChannelPtr phase,Energy upp);
+  virtual bool createMode(int icharge, tcPDPtr resonance,
+			  FlavourInfo flavour,
+			  unsigned int imode,PhaseSpaceModePtr mode,
+			  unsigned int iloc,int ires,
+			  PhaseSpaceChannel phase, Energy upp );
 
   /**
    * The particles produced by the current. This just returns the pseudoscalar
@@ -124,17 +128,30 @@ public:
   //@}
 
   /**
-   * Hadronic current. This version returns the hadronic current described above.
+   * Hadronic current. This method is purely virtual and must be implemented in
+   * all classes inheriting from this one.
+   * @param resonance If specified only include terms with this particle
+   * @param flavour Information on the required flavours of the quarks
    * @param imode The mode
    * @param ichan The phase-space channel the current is needed for.
    * @param scale The invariant mass of the particles in the current.
-   * @param decay The decay products
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
    * @param meopt Option for the calculation of the matrix element
    * @return The current. 
    */
   virtual vector<LorentzPolarizationVectorE> 
-  current(const int imode,const int ichan,Energy & scale, 
-	  const ParticleVector & decay,DecayIntegrator::MEOption meopt) const;
+  current(tcPDPtr resonance,
+	  FlavourInfo flavour,
+	  const int imode, const int ichan,Energy & scale,
+	  const tPDVector & outgoing,
+	  const vector<Lorentz5Momentum> & momenta,
+	  DecayIntegrator::MEOption meopt) const;
+
+  /**
+   *   Construct the SpinInfo for the decay products
+   */
+  virtual void constructSpinInfo(ParticleVector decay) const;
 
   /**
    * Accept the decay. Checks the meson against the list
@@ -175,18 +192,6 @@ protected:
    */
   virtual IBPtr fullclone() const {return new_ptr(*this);}
   //@}
-  
-protected:
-
-  /** @name Standard Interfaced functions. */
-  //@{
-  /**
-   * Initialize this object after the setup phase before saving and
-   * EventGenerator to disk.
-   * @throws InitException if object could not be initialized properly.
-   */
-  virtual void doinit();
-  //@}
 
 private:
 
@@ -204,7 +209,7 @@ private:
    */
   complex<InvEnergy> FFunction(Energy2 q2) const {
     complex<InvEnergy2> output(ZERO);
-    for(unsigned int ix=0, N=_resweights.size(); ix<N && ix <3;++ix) {
+    for(unsigned int ix=0; ix<_resweights.size();++ix) {
       output -= _resweights[ix]*BreitWigner(q2,ix);
     }
     return output*_grho*_grhoomegapi*sqrt(2.);
@@ -246,12 +251,6 @@ private:
    * Weights of the different rho resonances in the current
    */
   vector<double> _resweights;
-  
-  /**
-   * Use local parameters for the rho resonances rather than from the particle data
-   * objects
-   */
-  bool _rhoparameters;
 
   /**
    * Masses of the \f$\rho\f$ resonances
@@ -261,12 +260,7 @@ private:
   /**
    * Widths of the \f$\rho\f$ resonances
    */
-  vector<Energy> _rhowidths; 
-
-  /**
-   * use local parameters for the omega rather than from the particle data objects
-   */
-  bool _omegaparameters;
+  vector<Energy> _rhowidths;
 
   /**
    * The \f$\omega\f$ mass.

@@ -11,7 +11,7 @@
 // This is the declaration of the EtaPiPiPiDecayer class.
 
 #include "Herwig/Decay/DecayIntegrator.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 
 namespace Herwig {
 using namespace ThePEG;
@@ -48,7 +48,11 @@ public:
   /**
    * Default constructor.
    */
-  EtaPiPiPiDecayer();
+  EtaPiPiPiDecayer() {
+    // no intermediates
+    generateIntermediates(false);
+  }
+ 
   
   /**
    * Which of the possible decays is required
@@ -58,17 +62,26 @@ public:
    */
   virtual int modeNumber(bool & cc, tcPDPtr parent, 
 			 const tPDVector & children) const;
-
+  
   /**
    * Return the matrix element squared for a given mode and phase-space channel.
    * @param ichan The channel we are calculating the matrix element for. 
    * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
    * @param meopt Option for the calculation of the matrix element
    * @return The matrix element squared for the phase-space configuration.
    */
   double me2(const int ichan,const Particle & part,
-	     const ParticleVector & decay, MEOption meopt) const;
+	     const tPDVector & outgoing,
+	     const vector<Lorentz5Momentum> & momenta,
+	     MEOption meopt) const;
+
+  /**
+   *   Construct the SpinInfos for the particles produced in the decay
+   */
+  virtual void constructSpinInfo(const Particle & part,
+				 ParticleVector outgoing) const;
 
   /**
    * Method to return an object to calculate the 3 body partial width.
@@ -162,27 +175,34 @@ private:
    */
   EtaPiPiPiDecayer & operator=(const EtaPiPiPiDecayer &) = delete;
 
+public:
+
+  /**
+   *   Set the parameters for a decay mode
+   */
+  string setUpDecayMode(string arg);
+
 private:
 
   /**
    * the id of the incoming particle
    */
-  vector<int> _incoming;
+  vector<int> incoming_;
 
   /**
    * the id of the last neutral meson
    */
-  vector<int> _outgoing;
+  vector<int> outgoing_;
 
   /**
    * whether the pions are charged or neutral
    */
-  vector<bool> _charged;
+  vector<bool> charged_;
 
   /**
    * the prefactor for the decay
    */
-  vector<double> _prefactor;
+  vector<double> prefactor_;
 
   /**
    * The constants for the matrix elements
@@ -191,33 +211,28 @@ private:
   /**
    * The \f$a\f$ constant
    */
-  vector<double> _a;
+  vector<double> a_;
 
   /**
    * The \f$a\f$ constant
    */
-  vector<double> _b;
+  vector<double> b_;
 
   /**
    * The \f$a\f$ constant
    */
-  vector<double> _c;
+  vector<double> c_;
   //@}
 
   /**
    * maximum weights
    */
-  vector<double> _maxweight;
-
-  /**
-   *  Initial size of the vectors
-   */
-  unsigned int _initsize;
+  vector<double> maxWeight_;
 
   /**
    *  Spin density matrix
    */
-  mutable RhoDMatrix _rho;
+  mutable RhoDMatrix rho_;
 };
 
 }

@@ -32,17 +32,12 @@ public:
     interOpt_(0), widthOpt_(1), particleType_(false) {}
 
   /**
-   *  Destructor
-   */
-  ~FourBodyDecayConstructor();
-
-  /**
    * Function used to determine allowed decaymodes, to be implemented
    * in derived class.
    * @param particles vector of ParticleData pointers containing 
    * particles in model
    */
-  virtual void DecayList(const set<PDPtr> & particles);
+  virtual void DecayList(const set<PDPtr,MassOrdering> & particles);
 
   /**
    * Number of outgoing lines. Required for correct ordering.

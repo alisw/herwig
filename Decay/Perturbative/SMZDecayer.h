@@ -13,7 +13,7 @@
 //
 #include "Herwig/Decay/PerturbativeDecayer.h"
 #include "ThePEG/Helicity/Vertex/Vector/FFVVertex.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
+#include "Herwig/Decay/PhaseSpaceMode.h"
 
 namespace Herwig {
 using namespace ThePEG;
@@ -69,7 +69,7 @@ public:
 				     PPtr progenitor,
 				     const bool & fs,
 				     const Energy & highestpT,
-				     const vector<tcPDPtr> & ids,
+				     const tcPDVector & ids,
 				     const double & z,
 				     const Energy & scale,
 				     const Energy & pT);
@@ -92,15 +92,32 @@ public:
 			 const tPDVector & children) const;
 
   /**
+   * For a given decay mode and a given particle instance, perform the
+   * decay and return the decay products. As this is the base class this
+   * is not implemented.
+   * @return The vector of particles produced in the decay.
+   */
+  virtual ParticleVector decay(const Particle & parent,const tPDVector & children) const;
+
+  /**
    * Return the matrix element squared for a given mode and phase-space channel.
    * @param ichan The channel we are calculating the matrix element for. 
    * @param part The decaying Particle.
-   * @param decay The particles produced in the decay.
+   * @param outgoing The particles produced in the decay
+   * @param momenta  The momenta of the particles produced in the decay
    * @param meopt Option for the calculation of the matrix element
    * @return The matrix element squared for the phase-space configuration.
    */
-  virtual double me2(const int ichan, const Particle & part,
-		     const ParticleVector & decay,MEOption meopt) const;
+  double me2(const int ichan,const Particle & part,
+	     const tPDVector & outgoing,
+	     const vector<Lorentz5Momentum> & momenta,
+	     MEOption meopt) const;
+
+  /**
+   *   Construct the SpinInfos for the particles produced in the decay
+   */
+  virtual void constructSpinInfo(const Particle & part,
+				 ParticleVector outgoing) const;
 
   /**
    * Output the setup information for the particle database
@@ -310,7 +327,8 @@ protected:
    *  Real emission term, for use in generating the hardest emission
    */
   double calculateRealEmission(double x1, double x2, 
-			       vector<PPtr> hardProcess,
+			       tcPDVector outgoing,
+			       vector<Lorentz5Momentum> momenta,
 			       double phi,
 			       bool subtract,
 			       int emitter) const;
@@ -336,7 +354,7 @@ protected:
   /**
    *  Calculate the ratio between NLO & LO ME
    */
-  double meRatio(vector<cPDPtr> partons, 
+  double meRatio(tcPDVector partons, 
 		 vector<Lorentz5Momentum> momenta,
 		 unsigned int iemitter,bool subtract) const;
 
@@ -350,13 +368,13 @@ protected:
   /**
    *  Calculate the LO ME
    */
-  double loME(const vector<cPDPtr> & partons, 
+  double loME(const tcPDVector & partons, 
 	      const vector<Lorentz5Momentum> & momenta) const;
 
   /**
    *  Calculate the NLO real emission piece of ME
    */
-  InvEnergy2 realME(const vector<cPDPtr> & partons, 
+  InvEnergy2 realME(const tcPDVector & partons, 
 		    const vector<Lorentz5Momentum> & momenta,
 		    ShowerInteraction inter) const;
 
@@ -507,7 +525,7 @@ private:
   /**
    *  The ParticleData objects for the fermions
    */
-  vector<tcPDPtr> partons_;
+  tcPDVector partons_;
 
   /**
    * The fermion momenta

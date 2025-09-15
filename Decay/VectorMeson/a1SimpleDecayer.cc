@@ -28,21 +28,17 @@ using namespace Herwig;
 using namespace ThePEG::Helicity;
 
 a1SimpleDecayer::a1SimpleDecayer() 
-  : _rhomass(3), _rhowidth(3), _rhowgts(3),_localparameters(true), 
-    _coupling(47.95/GeV), _onemax(5.4474), _twomax(5.47784), 
-    _threemax(5.40185), _onewgts(6), 
-    _twowgts(6), _threewgts(6), _mpi(ZERO) {
   // rho masses, widths and weights
-  _rhomass[0] = 0.773*GeV; _rhowidth[0] = 0.145*GeV; _rhowgts[0] =  1.0;  
-  _rhomass[1] = 1.370*GeV; _rhowidth[1] = 0.510*GeV; _rhowgts[1] = -0.145;
-  _rhomass[2] = 1.750*GeV; _rhowidth[2] = 0.120*GeV; _rhowgts[2] =  0.;
-  // integration weights
-  _onewgts[0] = 0.235562; _twowgts[0] = 0.236208; _threewgts[0] = 0.234259;
-  _onewgts[1] = 0.231098; _twowgts[1] = 0.229481; _threewgts[1] = 0.233634;
-  _onewgts[2] = 0.131071; _twowgts[2] = 0.131169; _threewgts[2] = 0.135922;
-  _onewgts[3] = 0.131135; _twowgts[3] = 0.133604; _threewgts[3] = 0.129231;
-  _onewgts[4] = 0.135841; _twowgts[4] = 0.132685; _threewgts[4] = 0.133949;
-  _onewgts[5] = 0.135294; _twowgts[5] = 0.136854; _threewgts[5] = 0.133005;
+  : _rhomass ({0.773*GeV,1.370*GeV,1.750*GeV}),
+    _rhowidth({0.145*GeV,0.510*GeV,0.120*GeV}),
+    _rhowgts({1.0,-0.145,0.}),_localparameters(true), 
+    _coupling(47.95/GeV),
+    // integration weights
+    _onemax(5.4474), _twomax(5.47784), _threemax(5.40185),
+    _onewgts  ({0.235562,0.231098,0.131071,0.131135,0.135841,0.135294}), 
+    _twowgts  ({0.236208,0.229481,0.131169,0.133604,0.132685,0.136854}),
+    _threewgts({0.234259,0.233634,0.135922,0.129231,0.133949,0.133005}),
+    _mpi(ZERO) {
   generateIntermediates(true);
 }
 
@@ -61,76 +57,61 @@ void a1SimpleDecayer::doinit() {
 		    getParticleData(30113)};
   tPDPtr rhom[3] = {getParticleData(-213),getParticleData(-100213),
 		    getParticleData(-30213)};
-  tPDVector extpart(4);
-  DecayPhaseSpaceChannelPtr newchannel;
-  DecayPhaseSpaceModePtr mode;
   // decay mode a_1+ -> pi+ pi0 pi0
-  extpart[0]=a1p;
-  extpart[1]=pi0;
-  extpart[2]=pi0;
-  extpart[3]=pip;
-  mode = new_ptr(DecayPhaseSpaceMode(extpart,this));
+  tPDPtr in = a1p;
+  tPDVector out = {pi0,pi0,pip};
+  PhaseSpaceModePtr mode = new_ptr(PhaseSpaceMode(in,out,_onemax));
+  unsigned int nrho(0);
+  for(unsigned int ix=0;ix<3;++ix) if(rhop[ix]) ++nrho;
+  if(_onewgts.size()!=2*nrho) _onewgts=vector<double>(2*nrho,0.5/nrho);
   for(unsigned int ix=0;ix<3;++ix) {
     if(!rhop[ix]) continue;
     // first rho+ channel
-    newchannel = new_ptr(DecayPhaseSpaceChannel(mode));
-    newchannel->addIntermediate(a1p,0,0.0,-1,2);
-    newchannel->addIntermediate(rhop[ix],0,0.0,1,3);
-    mode->addChannel(newchannel);
+    PhaseSpaceChannel c1((PhaseSpaceChannel(mode),0,rhop[ix],0,2,1,1,1,3));
+    c1.weight(_onewgts[2*ix]);
+    mode->addChannel(c1);
     // second rho+ channel
-    newchannel = new_ptr(DecayPhaseSpaceChannel(mode));
-    newchannel->addIntermediate(a1p,0,0.0,-1,1);
-    newchannel->addIntermediate(rhop[ix],0,0.0,2,3);
-    mode->addChannel(newchannel);
+    PhaseSpaceChannel c2((PhaseSpaceChannel(mode),0,rhop[ix],0,1,1,2,1,3));
+    c2.weight(_onewgts[2*ix+1]);
+    mode->addChannel(c2);
   }
-  if(_onewgts.size()!=mode->numberChannels()) 
-    _onewgts=vector<double>(mode->numberChannels(),1./mode->numberChannels());
-  addMode(mode,_onemax,_onewgts);
+  addMode(mode);
   // decay mode a_10 -> pi+ pi- pi0
-  extpart[0]=a10;
-  extpart[1]=pip;
-  extpart[2]=pim;
-  extpart[3]=pi0;
-  mode = new_ptr(DecayPhaseSpaceMode(extpart,this));
+  in = a10;
+  out = {pip,pim,pi0};
+  mode = new_ptr(PhaseSpaceMode(in,out,_twomax));
+  if(_twowgts.size()!=2*nrho) _twowgts=vector<double>(2*nrho,0.5/nrho);
   for(unsigned int ix=0;ix<3;++ix) {
     if(!rhop[ix]) continue;
     // first rho channel
-    newchannel = new_ptr(DecayPhaseSpaceChannel(mode));
-    newchannel->addIntermediate(a10,0,0.0,-1,2);
-    newchannel->addIntermediate(rhop[ix],0,0.0,1,3);
-    mode->addChannel(newchannel);
+    PhaseSpaceChannel c1((PhaseSpaceChannel(mode),0,rhop[ix],0,2,1,1,1,3));
+    c1.weight(_twowgts[2*ix]);
+    mode->addChannel(c1);
     // second channel
-    newchannel = new_ptr(DecayPhaseSpaceChannel(mode));
-    newchannel->addIntermediate(a10,0,0.0,-1,1);
-    newchannel->addIntermediate(rhom[ix],0,0.0,2,3);
-    mode->addChannel(newchannel);
+    PhaseSpaceChannel c2((PhaseSpaceChannel(mode),0,rhom[ix],0,1,1,2,1,3));
+    c2.weight(_twowgts[2*ix+1]);
+    mode->addChannel(c2);
   }
-  if(_twowgts.size()!=mode->numberChannels()) 
-    _twowgts=vector<double>(mode->numberChannels(),1./mode->numberChannels());
-  addMode(mode,_twomax,_twowgts);
+  addMode(mode);
   // decay mode a_1+ -> pi+ pi+ pi-
-  extpart[0]=a1p;
-  extpart[1]=pip;
-  extpart[2]=pip;
-  extpart[3]=pim;
-  mode = new_ptr(DecayPhaseSpaceMode(extpart,this));
+  in = a1p;
+  out = {pip,pip,pim};
+  mode = new_ptr(PhaseSpaceMode(in,out,_threemax));
+  nrho = 0;
+  for(unsigned int ix=0;ix<3;++ix) if(rho0[ix]) ++nrho;
+  if(_threewgts.size()!=2*nrho) _threewgts=vector<double>(2*nrho,0.5/nrho);
   for(unsigned int ix=0;ix<3;++ix) {
     if(!rho0[ix]) continue;
     // the neutral rho channels
-    // first channel
-    newchannel = new_ptr(DecayPhaseSpaceChannel(mode));
-    newchannel->addIntermediate(a1p,0,0.0,-1,2);
-    newchannel->addIntermediate(rho0[ix],0,0.0,1,3);
-    mode->addChannel(newchannel);
+    PhaseSpaceChannel c1((PhaseSpaceChannel(mode),0,rho0[ix],0,2,1,1,1,3));
+    c1.weight(_threewgts[2*ix]);
+    mode->addChannel(c1);
     // interchanged channel
-    newchannel = new_ptr(DecayPhaseSpaceChannel(mode));
-    newchannel->addIntermediate(a1p,0,0.0,-1,1);
-    newchannel->addIntermediate(rho0[ix],0,0.0,2,3);
-    mode->addChannel(newchannel);      
+    PhaseSpaceChannel c2((PhaseSpaceChannel(mode),0,rho0[ix],0,1,1,2,1,3));
+    c2.weight(_threewgts[2*ix+1]);
+    mode->addChannel(c2);
   }
-  if(_threewgts.size()!=mode->numberChannels()) 
-    _threewgts=vector<double>(mode->numberChannels(),1./mode->numberChannels());
-  addMode(mode,_threemax,_threewgts);
+  addMode(mode);
   // if using local parameters set the values in the phase space channels
   if(_localparameters) {
     for(unsigned int iy=0;iy<_rhomass.size();++iy) {
@@ -164,11 +145,11 @@ void a1SimpleDecayer::doinitrun() {
   if(initialize()) {
     // get the weights for the different channels
     for(unsigned int ix=0;ix<_onewgts.size();++ix)
-      _onewgts[ix]=mode(0)->channelWeight(ix);
+      _onewgts[ix]=mode(0)->channels()[ix].weight();
     for(unsigned int ix=0;ix<_twowgts.size();++ix)
-      _twowgts[ix]=mode(1)->channelWeight(ix);
+      _twowgts[ix]=mode(1)->channels()[ix].weight();
     for(unsigned int ix=0;ix<_threewgts.size();++ix)
-      _threewgts[ix]=mode(2)->channelWeight(ix);
+      _threewgts[ix]=mode(2)->channels()[ix].weight();
     // get the maximum weight
     _onemax   = mode(0)->maxWeight();
     _twomax   = mode(1)->maxWeight();
@@ -230,20 +211,20 @@ void a1SimpleDecayer::Init() {
 
   static ParVector<a1SimpleDecayer,Energy> interfacerhomass
     ("RhoMasses",
-     "The masses of the different rho resonnaces",
-     &a1SimpleDecayer::_rhomass,
-     MeV, 0, ZERO, ZERO, 10000*MeV, false, false, true);
+     "The masses of the different rho resonaces",
+     &a1SimpleDecayer::_rhomass, MeV, 3, 775.*MeV, ZERO, 10000*MeV,
+     false, false, Interface::limited);
 
-  static ParVector<a1SimpleDecayer,Energy> interfacerhowidth
+  static ParVector<a1SimpleDecayer,Energy> interfaceRhoWidths
     ("RhoWidths",
-     "The widths of the different rho resonnaces",
-     &a1SimpleDecayer::_rhowidth,
-     MeV, 0, ZERO, ZERO, 10000*MeV, false, false, true);
-
+     "The widths of the different rho resonances",
+     &a1SimpleDecayer::_rhowidth, MeV, 3, 141*MeV, 0.0*MeV, 10000.0*MeV,
+     false, false, Interface::limited);
+  
   static ParVector<a1SimpleDecayer,double> interfaceRhoWeights
     ("RhoWeights",
      "Weight for the different rho resonances",
-     &a1SimpleDecayer::_rhowgts, -1, 0.0, -10.0, 10.0,
+     &a1SimpleDecayer::_rhowgts, 3, 0.0, -10.0, 10.0,
      false, false, Interface::limited);
 
   static Parameter<a1SimpleDecayer,double> interfaceOneMax
@@ -288,15 +269,13 @@ void a1SimpleDecayer::Init() {
 }
 
 int a1SimpleDecayer::modeNumber(bool & cc,tcPDPtr parent,
-				       const tPDVector & children) const {
+				const tPDVector & children) const {
   if(children.size()!=3) return -1;
   int id(parent->id());
   // check the pions
-  tPDVector::const_iterator pit  = children.begin();
-  tPDVector::const_iterator pend = children.end();
-  int idtemp,npi0(0),npiplus(0),npiminus(0);
-  for( ; pit!=pend;++pit) {
-    idtemp=(**pit).id();
+  int npi0(0),npiplus(0),npiminus(0);
+  for(auto child : children) {
+    int idtemp= child->id();
     if(idtemp==ParticleID::piplus)       ++npiplus;
     else if(idtemp==ParticleID::piminus) ++npiminus;
     else if(idtemp==ParticleID::pi0)     ++npi0;
@@ -322,38 +301,41 @@ int a1SimpleDecayer::modeNumber(bool & cc,tcPDPtr parent,
   return imode;
 }
 
-double a1SimpleDecayer::me2(const int ichan,const Particle & inpart,
-			    const ParticleVector & decay,MEOption meopt) const {
+void a1SimpleDecayer::
+constructSpinInfo(const Particle & part, ParticleVector decay) const {
+  VectorWaveFunction::constructSpinInfo(_vectors,const_ptr_cast<tPPtr>(&part),
+					incoming,true,false);
+  // set up the spin information for the decay products
+  for(unsigned int ix=0;ix<3;++ix)
+    ScalarWaveFunction::constructSpinInfo(decay[ix],outgoing,true);
+}
+
+double a1SimpleDecayer::me2(const int ichan, const Particle & part,
+			    const tPDVector & ,
+			    const vector<Lorentz5Momentum> & momenta,
+			    MEOption meopt) const {
   if(!ME())
     ME(new_ptr(GeneralDecayMatrixElement(PDT::Spin1,PDT::Spin0,PDT::Spin0,PDT::Spin0)));
   useMe();
   if(meopt==Initialize) {
     VectorWaveFunction::calculateWaveFunctions(_vectors,_rho,
-						const_ptr_cast<tPPtr>(&inpart),
+						const_ptr_cast<tPPtr>(&part),
 						incoming,false);
   }
-  if(meopt==Terminate) {
-    VectorWaveFunction::constructSpinInfo(_vectors,const_ptr_cast<tPPtr>(&inpart),
-					  incoming,true,false);
-    // set up the spin information for the decay products
-    for(unsigned int ix=0;ix<3;++ix)
-      ScalarWaveFunction::constructSpinInfo(decay[ix],outgoing,true);
-    return 0.;
-  }
   Lorentz5Vector<complex<Energy> > current;
-  Energy2 s1 = (decay[1]->momentum()+decay[2]->momentum()).m2();
-  Energy2 s2 = (decay[0]->momentum()+decay[2]->momentum()).m2();
+  Energy2 s1 = (momenta[1]+momenta[2]).m2();
+  Energy2 s2 = (momenta[0]+momenta[2]).m2();
   if(ichan<0) {
-    current = rhoFormFactor(s2,-1)*(decay[0]->momentum()-decay[2]->momentum())
-    +rhoFormFactor(s1,-1)*(decay[1]->momentum()-decay[2]->momentum());
+    current = rhoFormFactor(s2,-1)*(momenta[0]-momenta[2])
+    +rhoFormFactor(s1,-1)*(momenta[1]-momenta[2]);
   }
   else if(ichan<3) {
     current = 
-      rhoFormFactor(s2,ichan)*(decay[0]->momentum()-decay[2]->momentum());
+      rhoFormFactor(s2,ichan)*(momenta[0]-momenta[2]);
   }
   else if(ichan<6) {
     current = 
-      rhoFormFactor(s1,-1)*(decay[1]->momentum()-decay[2]->momentum());
+      rhoFormFactor(s1,-1)*(momenta[1]-momenta[2]);
   }
   // compute the matrix element
   for(unsigned int ix=0;ix<3;++ix)
@@ -362,13 +344,15 @@ double a1SimpleDecayer::me2(const int ichan,const Particle & inpart,
   double output=ME()->contract(_rho).real();
   if(imode()!=1) output*=0.5;
   // test the output
-//   double test = threeBodyMatrixElement(imode(),sqr(inpart.mass()),
-// 				       s3,s2,s1,decay[0]->mass(),decay[1]->mass(), 
-// 				       decay[2]->mass());
-//   if(ichan<0) cerr << "testing matrix element " << inpart.PDGName() << " -> "
-//        << decay[0]->PDGName() << " " << decay[1]->PDGName() << " "
-//        << decay[2]->PDGName() << output << " " << test << " " 
-//        << (output-test)/(output+test) << "\n";  
+  // Energy2 s3 = (momenta[0]+momenta[1]).m2();
+  // double test = threeBodyMatrixElement(imode(),sqr(part.mass()),
+  // 				       s3,s2,s1,momenta[0].mass(),
+  // 				       momenta[1].mass(), 
+  // 				       momenta[2].mass());
+  // if(ichan<0) cerr << "testing matrix element " << part.PDGName() << " -> "
+  // 		   << outgoing[0]->PDGName() << " " << outgoing[1]->PDGName() << " "
+  // 		   << outgoing[2]->PDGName() << output << " " << test << " " 
+  // 		   << (output-test)/(output+test) << "\n";  
   // return the answer
   return output;
 }
@@ -425,22 +409,16 @@ void a1SimpleDecayer::dataBaseOutput(ofstream & output,
   output << "newdef " << name() << ":TwoMax   " <<   _twomax << "\n";
   output << "newdef " << name() << ":ThreeMax " << _threemax << "\n";
   for(unsigned int ix=0;ix<_rhomass.size();++ix) {
-    if(ix<3) output << "newdef    " << name() << ":RhoMasses " << ix << " " 
-		    << _rhomass[ix]/MeV << "\n";
-    else     output << "insert " << name() << ":RhoMasses " << ix << " " 
-		    << _rhomass[ix]/MeV << "\n";
+    output << "newdef    " << name() << ":RhoMasses " << ix << " "
+	   << _rhomass[ix]/MeV << "\n";
   }
   for(unsigned int ix=0;ix<_rhowidth.size();++ix) {
-    if(ix<3) output << "newdef    " << name() << ":RhoWidths " << ix << " " 
-		    << _rhowidth[ix]/MeV << "\n";
-    else     output << "insert " << name() << ":RhoWidths " << ix << " " 
-		    << _rhowidth[ix]/MeV << "\n";
+    output << "newdef    " << name() << ":RhoWidths " << ix << " "
+	   << _rhowidth[ix]/MeV << "\n";
   }
   for(unsigned int ix=0;ix<_rhowgts.size();++ix) {
-    if(ix<3) output << "newdef    " << name() << ":RhoWeights " << ix << " " 
-		    << _rhowgts[ix] << "\n";
-    else     output << "insert " << name() << ":RhoWeights " << ix << " " 
-		    << _rhowgts[ix] << "\n";
+    output << "newdef    " << name() << ":RhoWeights " << ix << " "
+	   << _rhowgts[ix] << "\n";
   }
   for(unsigned int ix=0;ix<_onewgts.size();++ix) {
     output << "newdef " << name() << ":OneChargedWeights " 
@@ -456,24 +434,4 @@ void a1SimpleDecayer::dataBaseOutput(ofstream & output,
   }
   if(header) output << "\n\" where BINARY ThePEGName=\"" 
 		    << fullName() << "\";" << endl;
-}
-
-// functions to return the Breit-Wigners
-Complex a1SimpleDecayer::rhoFormFactor(Energy2 q2,int ires) const {
-  Complex output(0.),norm(0.);
-  for(unsigned int ix=0,N=min(3,int(_rhowgts.size()));ix<N;++ix)
-    norm+=_rhowgts[ix];
-  if(ires<0) {
-    for(unsigned int ix=0,N=min(3,int(_rhowgts.size()));ix<N;++ix) {
-      output+=_rhowgts[ix]*rhoBreitWigner(q2,ix);
-    }
-  }
-  else {
-    unsigned int temp(ires);
-    if(temp<_rhowgts.size()&&temp<3)
-      output=_rhowgts[temp]*rhoBreitWigner(q2,temp);
-    else
-      output=0.;
-  }
-  return output/norm;
 }

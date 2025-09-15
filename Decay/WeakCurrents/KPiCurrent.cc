@@ -19,12 +19,10 @@
 #include "ThePEG/Interface/ClassDocumentation.h"
 #include "ThePEG/Persistency/PersistentOStream.h"
 #include "ThePEG/Persistency/PersistentIStream.h"
-#include "ThePEG/Helicity/WaveFunction/ScalarWaveFunction.h"
 
 using namespace Herwig;
 using namespace ThePEG::Helicity;
 using ThePEG::Helicity::outgoing;
-using ThePEG::Helicity::ScalarWaveFunction;
 
 KPiCurrent::KPiCurrent() :
   _localparameters(true),_transverse(false), _cV(1.),_cS(0.2),
@@ -68,7 +66,7 @@ void KPiCurrent::persistentInput(PersistentIStream & is, int) {
 }
 
 void KPiCurrent::doinit() {
-  WeakDecayCurrent::doinit();
+  WeakCurrent::doinit();
   // check consistency of parametrers
   if(_vecmass.size()!=_vecwidth.size()||
      _scamass.size()!=_scawidth.size()) {
@@ -163,7 +161,7 @@ void KPiCurrent::doinit() {
 }
 // The following static variable is needed for the type
 // description system in ThePEG.
-DescribeClass<KPiCurrent,WeakDecayCurrent>
+DescribeClass<KPiCurrent,WeakCurrent>
 describeHerwigKPiCurrent("Herwig::KPiCurrent", "HwWeakCurrents.so");
 
 void KPiCurrent::Init() {
@@ -315,11 +313,35 @@ unsigned int KPiCurrent::decayMode(vector<int> id) {
   return imode;
 }
 
-bool KPiCurrent::createMode(int icharge,unsigned int imode,
-			    DecayPhaseSpaceModePtr mode,
-			    unsigned int iloc,unsigned int,
-			    DecayPhaseSpaceChannelPtr phase,Energy upp) {
-  if(abs(icharge)!=3) return false; 
+bool KPiCurrent::createMode(int icharge, tcPDPtr resonance,
+			    FlavourInfo flavour,
+			    unsigned int imode,PhaseSpaceModePtr mode,
+			    unsigned int iloc,int ires,
+			    PhaseSpaceChannel phase, Energy upp ) {
+  if(abs(icharge)!=3) return false;
+  // check the total isospin
+  if(flavour.I!=IsoSpin::IUnknown) {
+    if(flavour.I!=IsoSpin::IHalf) return false;
+  } 
+  // check I_3
+  if(flavour.I3!=IsoSpin::I3Unknown) {
+    switch(flavour.I3) {
+    case IsoSpin::I3Half:
+      if(icharge ==-3) return false;
+      break;
+    case IsoSpin::I3MinusHalf:
+      if(icharge ==3) return false;
+      break;
+    default:
+      return false;
+    }
+  }
+  if(flavour.strange != Strangeness::Unknown) {
+    if(icharge== 3 and flavour.strange != Strangeness::PlusOne ) return false;
+    if(icharge==-3 and flavour.strange != Strangeness::MinusOne) return false;
+  }
+  if(flavour.charm   != Charm::Unknown       and flavour.charm   != Charm::Zero      ) return false;
+  if(flavour.bottom  != Beauty::Unknown      and flavour.bottom  !=Beauty::Zero      ) return false;
   // make sure that the decays are kinematically allowed
   tPDPtr part[2];
   if(imode==0) {
@@ -335,18 +357,16 @@ bool KPiCurrent::createMode(int icharge,unsigned int imode,
   }
   Energy min(part[0]->massMin()+part[1]->massMin());
   if(min>upp) return false;
-  DecayPhaseSpaceChannelPtr newchannel;
   // possible resonances
   tPDPtr res[5]={getParticleData(-323   ),getParticleData(-100323),
 		 getParticleData(-30323 ),getParticleData(-9000321),
 		 getParticleData(-10321)};
   // create the channels
   for(unsigned int ix=0;ix<5;++ix) {
-    if(res[ix]) {
-      newchannel=new_ptr(DecayPhaseSpaceChannel(*phase));
-      newchannel->addIntermediate(res[ix],0,0.0,iloc,iloc+1);
-      mode->addChannel(newchannel);
-    }
+    if(!res[ix]) continue;
+    if(resonance && resonance != res[ix]) continue;
+    mode->addChannel((PhaseSpaceChannel(phase),ires,res[ix],
+		      ires+1,iloc+1,ires+1,iloc+2));
   }
   // reset the masses in the intergrators if needed
   if(_localparameters) {
@@ -407,24 +427,45 @@ void KPiCurrent::dataBaseOutput(ofstream & output,bool header,
     else     output << "insert ";
     output << name() << ":ScalarWidth " << ix << " " << _scawidth[ix]/MeV << "\n";
   }
-  WeakDecayCurrent::dataBaseOutput(output,false,false);
+  WeakCurrent::dataBaseOutput(output,false,false);
   if(header) output << "\n\" where BINARY ThePEGName=\"" 
 		    << fullName() << "\";" << endl;
 }
 
 vector<LorentzPolarizationVectorE> 
-KPiCurrent::current(const int imode, const int ichan, Energy & scale,
-		    const ParticleVector & decay,
-		    DecayIntegrator::MEOption meopt) const {
+KPiCurrent::current(tcPDPtr resonance,
+		    FlavourInfo flavour,
+		    const int imode, const int ichan,Energy & scale, 
+		    const tPDVector & outgoing,
+		    const vector<Lorentz5Momentum> & momenta,
+		    DecayIntegrator::MEOption) const {
   useMe();
-  if(meopt==DecayIntegrator::Terminate) {
-    for(unsigned int ix=0;ix<2;++ix)
-      ScalarWaveFunction::constructSpinInfo(decay[ix],outgoing,true);
-    return vector<LorentzPolarizationVectorE>(1,LorentzPolarizationVectorE());
+  // check the isospin
+  if(flavour.I!=IsoSpin::IUnknown && flavour.I!=IsoSpin::IHalf)
+    return vector<LorentzPolarizationVectorE>();
+  int icharge = outgoing[0]->iCharge()+outgoing[1]->iCharge();
+  // check I_3
+  if(flavour.I3!=IsoSpin::I3Unknown) {
+    switch(flavour.I3) {
+    case IsoSpin::I3Half:
+      if(icharge ==-3) return vector<LorentzPolarizationVectorE>();
+      break;
+    case IsoSpin::I3MinusHalf:
+      if(icharge ==3) return vector<LorentzPolarizationVectorE>();
+      break;
+    default:
+      return vector<LorentzPolarizationVectorE>();
+    }
   }
+  if(flavour.strange != Strangeness::Unknown) {
+    if(icharge== 3 and flavour.strange != Strangeness::PlusOne ) return vector<LorentzPolarizationVectorE>();
+    if(icharge==-3 and flavour.strange != Strangeness::MinusOne) return vector<LorentzPolarizationVectorE>();
+  }
+  if(flavour.charm   != Charm::Unknown       and flavour.charm   != Charm::Zero      ) return vector<LorentzPolarizationVectorE>();
+  if(flavour.bottom  != Beauty::Unknown      and flavour.bottom  !=Beauty::Zero      ) return vector<LorentzPolarizationVectorE>();
   // momentum difference and sum of the mesons
-  Lorentz5Momentum pdiff(decay[0]->momentum()-decay[1]->momentum());
-  Lorentz5Momentum psum (decay[0]->momentum()+decay[1]->momentum());
+  Lorentz5Momentum pdiff(momenta[0]-momenta[1]);
+  Lorentz5Momentum psum (momenta[0]+momenta[1]);
   psum.rescaleMass();
   scale=psum.mass();
   // mass2 of intermediate state
@@ -433,7 +474,26 @@ KPiCurrent::current(const int imode, const int ichan, Energy & scale,
   // contribution of the vector resonances
   Complex vnorm(0.),gterm(0.),sterm(0.),snorm(0.);
   complex<InvEnergy2> qterm(ZERO);
-  for(unsigned int ix=0;ix<_vecwgt.size();++ix) {
+  unsigned int imin=0, imax=_vecwgt.size();
+  if(resonance) {
+    if(abs(resonance->id())%1000==323) {
+      switch(abs(resonance->id())/1000) {
+      case 0:
+	imin=0; break;
+      case 100:
+	imin=1; break;
+      case  30:
+	imin=2; break;
+      default:
+	assert(false);
+      }
+      imax = imin+1;
+    }
+    else {
+      imax=0;
+    }
+  }
+  for(unsigned int ix=imin;ix<imax;++ix) {
     vnorm += _vecwgt[ix];
     if(ichan<0||_resmap[ix]==ichan) {
       Complex bw=_vecwgt[ix]*pWaveBreitWigner(q2,ix);
@@ -442,7 +502,24 @@ KPiCurrent::current(const int imode, const int ichan, Energy & scale,
     }
   }
   // contribution of the scalar resonances
-  for(unsigned int ix=0;ix<_scawgt.size();++ix) {
+  imin=0, imax=_scawgt.size();
+  if(resonance) {
+    if(abs(resonance->id())%1000==321) {
+      switch(abs(resonance->id())/1000) {
+      case 9000:
+	imin=0; break;
+      case 10:
+	imin=1; break;
+      default:
+	assert(false);
+      }
+      imax = imin+1;
+    }
+    else {
+      imax=0;
+    }
+  }
+  for(unsigned int ix=imin;ix<imax;++ix) {
     snorm += _scawgt[ix];
     if(ichan<0||_resmap[ix+_vecwgt.size()]==ichan) {
       sterm+=_scawgt[ix]*sWaveBreitWigner(q2,ix);

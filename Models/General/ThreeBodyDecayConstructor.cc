@@ -14,7 +14,6 @@
 #include "ThePEG/Persistency/PersistentIStream.h"
 #include "Herwig/Models/StandardModel/StandardModel.h"
 #include "Herwig/Decay/General/GeneralThreeBodyDecayer.h"
-#include "Herwig/Decay/DecayPhaseSpaceMode.h"
 #include "Herwig/PDT/ThreeBodyAllOnCalculator.h"
 #include "ThePEG/PDT/StandardMatchers.h"
 #include "ThePEG/Interface/Switch.h"
@@ -131,7 +130,7 @@ void ThreeBodyDecayConstructor::Init() {
 
 }
 
-void ThreeBodyDecayConstructor::DecayList(const set<PDPtr> & particles) {
+void ThreeBodyDecayConstructor::DecayList(const set<PDPtr,MassOrdering> & particles) {
   if( particles.empty() ) return;
   // special for weak decays
   for(unsigned int ix=0;ix<decayConstructor()->decayConstructors().size();++ix) {
